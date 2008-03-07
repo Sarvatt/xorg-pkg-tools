@@ -1,0 +1,462 @@
+#!/bin/bash
+
+# A script to automate http://wiki.debian.org/XTips
+# 2007 Tormod Volden, Bryce Harrington
+
+# Defaults
+DISTRIBUTION=${DISTRIBUTION:-$(lsb_release -c -s)}
+if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
+    ADDVERSION=${ADDVERSION:-0ubuntu0$USER}
+else
+    ADDVERSION=${ADDVERSION:-0.1}
+fi
+DEBIANREPO="origin/debian-experimental"
+BRANCH="master"
+WORKING_DIR="."
+INTERACTIVE="yes"
+MANUAL_MERGE="no"
+MERGE_STRATEGY=""
+DROP_DEBIAN_PATCHES="no"
+PACKAGE_VERSION=
+QUIET=0
+declare -a CHANGES
+
+msg() {
+    if [ ${QUIET:-0} -lt 1 ]; then
+        echo $1
+    fi
+}
+
+warn() {
+    echo "Warning:  $1" 1>&2
+}
+
+die() {
+    echo "ERROR:  $1" 1>&2
+    exit 1
+}
+
+# Prints the branch id with leading 'v' removed
+git_branch_id() {
+    branch=$1
+    branch_id=$((git describe $branch))
+    echo ${branch_id#v}
+}
+
+# Given a debian-style X.org package, turn it into the corresponding
+# fdo package
+debpkg_to_fdopkg() {
+    pkg=$1
+
+    if [ "$pkg" = "libdmx" -o \
+         "$pkg" = "libdrm" -o \
+         "$pkg" = "libfontenc" -o \
+         "$pkg" = "liblbxutil" -o \
+         "$pkg" = "libpciaccess" -o \
+         "$pkg" = "libxkbui" -o \
+         "$pkg" = "libxkbfile" -o \
+         "$pkg" = "libxtrans" ]; then
+        echo $pkg
+        return
+    fi
+
+    echo ${pkg} \
+        | sed -e "s/^xorg-server$/xserver/" \
+        | sed -e "s/^xserver-xorg-/xf86-/" \
+        | sed -e "s/^x11proto-core$/x11proto/" \
+        | sed -e "s/^x11proto-\(.*\)$/\1proto/" \
+        | sed -e "s/^xfonts-encodings$/encodings/"\
+        | sed -e "s/^libfs$/libFS/" \
+        | sed -e "s/^libice$/libICE/" \
+        | sed -e "s/^libsm$/libSM/" \
+        | sed -e "s/^libxcalibrate$/libXCalibrate/" \
+        | sed -e "s/^libxres$/libXRes/" \
+        | sed -e "s/^libxscrnsaver$/libXScrnSaver/" \
+        | sed -e "s/^libxtrap$/libXTrap/" \
+        | sed -e "s/^libxprintapputil$/libXprintAppUtil/" \
+        | sed -e "s/^libxvmc$/libXvMC/" \
+        | sed -e "s/^libxprintutil$/libXprintUtil/" \
+        | sed -e "s/^lib\([a-z]\)/lib\U\1/" \
+        | sed -e "s/^lib\(.*\)wm$/lib\1WM/"
+}
+
+# Converts an fdo package name into its debian variant
+# Note:  This does not handle the grouped packages (like xapps and fonts)
+fdopkg_to_debpkg() {
+    echo ${1} \
+        | sed -e "s/^xserver$/xorg-server/" \
+        | sed -e "s/^xf86-/xserver-xorg-/" \
+        | sed -e "s/^x11proto$/x11proto-core/" \
+        | sed -e "s/^\(.*\)proto$/x11proto-\1/" \
+        | sed -e "s/^encodings$/xfonts-encodings/" \
+        | tr A-Z a-z
+}
+
+# Determines the corresponding git dir for a given fdo package
+fdogitdir_for_fdopkg() {
+    fdopkg=$1
+
+    if [ -z "${fdopkg}" ]; then
+        echo ""
+    elif [ ${fdopkg} = "xorg-server" ]; then
+        echo "xorg/server"
+    elif [ ${fdopkg} = "libdrm" ]; then
+        echo "mesa/drm"
+    elif [ ${fdopkg#xf86-} != ${fdopkg} ]; then
+        echo "xorg/driver"
+    elif [ ${fdopkg#lib} != ${fdopkg} ]; then
+        echo "xorg/lib"
+    elif [ ${fdopkg%proto} != ${fdopkg} ]; then
+        echo "xorg/proto"
+    elif [ ${fdopkg} = "bitmaps" -o ${fdopkg} = "cursors" ]; then
+        echo "xorg/data"
+    elif [ ${fdopkg} = "xorg-docs" -o ${fdopkg} = "xorg-sgml-doctools" ]; then
+        echo "xorg/doc"
+    else
+        # Hard to say, could be xorg/app, xorg/font, or xorg/util
+        echo "unknown"
+    fi
+}
+
+# Calculates the appropriate subdir at debian git for the debian package
+debgitdir_for_debpkg() {
+    debpkg=$1
+
+    if [ -z "${debpkg}" ]; then
+        echo ""
+    elif [ ${debpkg} = "xorg-server" ]; then
+        echo "pkg-xorg/xserver"
+    elif [ ${debpkg#xf86-} != ${debpkg} ]; then
+        echo "pkg-xorg/driver"
+    elif [ ${debpkg#lib} != ${debpkg} -o ${debpkg} = "mesa" -o ${debpkg} = "pixman" -o ${debpkg} = "xft" -o ${debpkg} = "xtrans" ]; then
+        echo "pkg-xorg/lib"
+    elif [ ${debpkg#x11proto-} != ${debpkg} ]; then
+        echo "pkg-xorg/proto"
+    elif [ ${debpkg} = "xbitmaps" -o ${debpkg} = "xcursors-themes" -o ${debpkg} = "xkb-data" ]; then
+        echo "pkg-xorg/data"
+    elif [ ${debpkg} = "xorg-docs" -o ${debpkg} = "xorg-sgml-doctools" ]; then
+        echo "pkg-xorg/doc"
+    elif [ ${debpkg/compiz/} != ${debpkg} ]; then
+        echo "pkg-xorg/bling"
+    elif [ ${debpkg#x11-} != ${debpkg} ]; then
+        # Not a complete listing - but this should get the grouped app pkgs
+        # which are the main things we care about.
+        echo "pkg-xorg/app"
+    elif [ ${debpkg} = "xsfb" -o ${debpkg} = "doc-hackers" ]; then
+        echo "pkg-xorg"
+    elif [ ${debpkg} = "xorg" ]; then
+        echo "pkg-xorg/debian"
+    else
+        # Hard to say, could be xorg/app, xorg/font, or xorg/util
+        echo "unknown"
+    fi
+}
+
+discard() {
+    file=$1
+    head=$2
+    dest=$(dirname $file)
+
+    msg "+ Discarding Debian differences in ${file}"
+    mv ./${file} ./${file}.merge
+    cp "${head}/${file}" $dest
+    git add "./${file}"
+    git commit -m "Dropping Debian's ${file} in favor of X.org's"
+    CHANGES+=("Dropped Debian's ${file}")
+}
+
+usage() {
+    echo "Usage: $0 [opts] < driver | xorg-server >"
+    echo
+    echo "opts:"
+    echo " -a <add-version>   Extra version tag to add ('0ubuntu0me')"
+    echo " -b <branch>        Upstream git branch"
+    echo " -d <git repo>      Debian git repository [origin/debian-experimental]"
+    echo " -D                 Drop existing debian patches before merging"
+    echo " -e <epoch>         Add epoch to autodetected package version"
+    echo " -f                 Force overwrite of existing directories"
+    echo " -h                 This help text"
+    echo " -m                 Pause for manual merging"
+    echo " -n                 Non-interactive"
+    echo " -p <pkg-name>      Explicit package name (no automunge)"
+    echo " -q                 Operate quietly"
+    echo " -r <release>       Distro release (feisty, gutsy, hardy, etc.)"
+    echo " -s <version>       Force Build-depends to xserver-xorg-dev <version>"
+    echo " -S <strategy>      Override merge strategy"
+    echo " -v <pkg-version>   Override package version (don't autodetect)"
+    echo " -w <working-dir>   Tmp location for checkouts (defaults to cwd)"
+    exit $1
+}
+
+# Command line options
+while getopts "a:b:d:De:fmnp:qr:s:S:v:w:h\?" opt $*; do
+    case "$opt" in
+        a ) ADDVERSION="$OPTARG"                   ;;
+        b ) BRANCH="$OPTARG";
+            ADDBRANCH="+${BRANCH}"                 ;;
+        D ) DROP_DEBIAN_PATCHES="yes"              ;;
+        d ) DEBIANREPO="$OPTARG"                   ;;
+        e ) EPOCH="${OPTARG}:"                     ;;
+        f ) FORCE_OVERWRITE=1                      ;;
+        m ) MANUAL_MERGE="yes"                     ;;
+        n ) INTERACTIVE="no"                       ;;
+        p ) PACKAGE="$OPTARG"                      ;;
+        q ) QUIET=${QUIET}+1                       ;;
+        r ) DISTRIBUTION="$OPTARG"                 ;;
+        S ) MERGE_STRATEGY="-s $OPTARG"            ;;
+        s ) XSERVER_VERSION="$OPTARG"              ;;
+        v ) PACKAGE_VERSION="$OPTARG"              ;;
+        w ) WORKING_DIR="$OPTARG"                  ;;
+        h ) usage 0;                               ;;
+        \?) usage 1;                               ;;
+        * ) warn "Unknown option '$opt'"; usage 1; ;;
+    esac
+done
+shift $(($OPTIND -1))
+
+msg "Package=$PACKAGE"
+msg "Merge_Strategy=$MERGE_STRATEGY"
+msg "Interactive=$INTERACTIVE"
+msg "QUIET=$QUIET"
+msg "Package_version=$PACKAGE_VERSION"
+msg "MANUAL_MERGE=$MANUAL_MERGE"
+
+if [ -z "$PACKAGE" ]; then
+    DRIVER=$1
+    if [ -z "$DRIVER" ]; then
+        usage 1
+    fi
+
+    # Fix up driver name
+    if [ "$DRIVER" = "xorg-server" -o "$DRIVER" = "xserver" ]; then
+        DEBDIR="pkg-xorg/xserver"
+        DEBPKG="xorg-server"
+        FDODIR="xorg"
+        FDOPKG="xserver"
+    elif [ "$DRIVER" = "avivo" ]; then
+        # TODO:  Can we just drop avivo?
+        DEBDIR="pkg-xorg/driver"
+        DEBPKG="xserver-xorg-video-$DRIVER"
+        FDODIR=$DRIVER
+        FDOPKG="xf86-video-$DRIVER"
+    else
+        DEBDIR="pkg-xorg/driver"
+        DEBPKG="xserver-xorg-video-$DRIVER"
+        FDODIR="xorg/driver"
+        FDOPKG="xf86-video-$DRIVER"
+    fi
+
+    PACKAGE=$DRIVER
+else
+    msg "Using package $PACKAGE"
+    DEBPKG=$PACKAGE
+    DEBDIR=$(debgitdir_for_debpkg $DEBPKG)
+
+    FDOPKG=$(debpkg_to_fdopkg $PACKAGE)
+    FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
+fi
+
+DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
+FDOGIT=git://git.freedesktop.org/git/$FDODIR/$FDOPKG
+
+cd $WORKING_DIR || die "Could not cd to $WORKING_DIR"
+
+# Check for existing checkout directory
+# TODO:  Maybe just update existing repo?
+if [ -e $DEBPKG ]; then
+    if [ ! $FORCE_OVERWRITE ]; then
+        die "can't overwrite existing $DEBPKG without -f option"
+    fi
+    warn "overwriting existing dir $DEBPKG"
+    rm -rf $DEBPKG
+fi
+
+msg "Cloning from Debian repository..."
+git clone $DEBIANGIT || die "git clone: code $?"
+cd $DEBPKG
+git checkout $DEBIANREPO
+
+msg "Fetching from freedesktop repository..."
+git remote add freedesktop $FDOGIT
+git fetch freedesktop refs/heads/$BRANCH:refs/heads/upstream-head || die "git fetch freedesktop: $?"
+git checkout -b mybranch upstream-head || die "git checkout -b mybranch upstream-head: $?"
+LASTCOMMIT=$(git log|head -1)
+
+msg "Merging Debian changes..."
+git merge ${MERGE_STRATEGY} $DEBIANREPO
+if [ $? -ne 0 ]; then
+    msg "Merges needed"
+    git status
+    if [ $MANUAL_MERGE = "yes" ]; then
+        msg "Perform merges manually in ${DEBPKG} using git diff and git commit -a, then press enter to continue"
+        read nothing
+    elif [ $INTERACTIVE = "yes" ]; then
+        msg "Interactively merging..."
+        git-mergetool
+        msg "Press enter to continue with packaging"
+        read nothing
+    else
+        msg "Attempting to address merge issues automatically..."
+        ISSUES=0
+
+        # 0.  Retrieve a copy of upstream's git HEAD
+        HEAD="../${DEBPKG}-FDO-HEAD"
+        rm -rf ${HEAD}
+        git clone ${FDOGIT} ${HEAD}
+
+        # 1.  Upstream has dropped ChangeLog, but Debian hasn't
+        if git status | grep "unmerged: *ChangeLog" ; then
+            msg "+ unmerged ChangeLog from Debian - attempting to delete"
+            git rm ChangeLog
+            git commit -m "Dropping Debian-provided ChangeLog in favor of generated one"
+            CHANGES+=("Dropped Debian-provided ChangeLog")
+            ISSUES=$(( ISSUES + 1 ))
+        fi
+
+        # 2.  Debian Makefile.am changes can be discarded
+        if git status | grep "unmerged: *Makefile.am" ; then
+            discard "Makefile.am" ${HEAD}
+            ISSUES=$(( ISSUES + 1 ))
+        fi
+
+        # 3.  Debian man/Makefile.am changes can be discarded
+        if git status | grep "unmerged: *man/Makefile.am" ; then
+            discard "man/Makefile.am" ${HEAD}
+            ISSUES=$(( ISSUES + 1 ))
+        fi
+
+        # 4.  Debian man page differences can be discarded
+        if git status | grep "unmerged: *man/.*\.man" ; then
+            msg "+ Discarding Debian differences in man pages"
+            cp "$HEAD/man/*.man" ./man/
+            git add man/*.man
+            git commit -m "Dropping Debian customized man pages"
+            CHANGES+=("Dropped Debian customized man pages")
+            ISSUES=$(( ISSUES + 1 ))
+        fi
+
+        # 5.  If Debian's xsfbs dir missing, copy it into place
+        if [ ! -d "debian/xsfbs" ]; then
+            msg "+ Copying missing xsfbs into place"
+            if [ ! -d "../xsfbs" ]; then
+                msg " - No available dir ../xsfbs from " $((pwd))
+            else
+                # TODO:  Why didn't xsfbs come in with the merge anyway??
+                msg " - Copying ../xsfbs to debian/"
+                cp -r ../xsfbs debian/
+                git add debian/xsfbs
+                git commit -m "Copying in missing xsfbs"
+                CHANGES+=(dch "Added missing xsfbs")
+                ISSUES=$(( ISSUES + 1 ))
+            fi
+        fi
+
+        # 6.  Debian configure.ac changes can be discarded
+        if git status | grep "unmerged: *configure.ac" ; then
+            discard "configure.ac" $HEAD
+            ISSUES=$(( ISSUES + 1 ))
+        fi
+
+        # 7.  Debian COPYING changes can be discarded
+        if git status | grep "unmerged: *COPYING" ; then
+            discard "COPYING" $HEAD
+            ISSUES=$(( ISSUES + 1 ))
+        fi
+
+        if [ $ISSUES -gt 0 ]; then
+            if [ $ISSUES -gt 1 ]; then S=s; fi
+            git merge ${MERGE_STRATEGY} $DEBIANREPO
+            if [ $? -ne 0 ]; then
+                die "$ISSUES merge issue$S addressed, but more remain"
+            else
+                msg "Success resolving $ISSUES merge issue$S in $DEBPKG"
+            fi
+        else
+            die "Cannot address any of the merge issues"
+        fi
+    fi
+fi
+
+if [ $INTERACTIVE = "yes" ]; then
+    msg "Press enter to apply patches and reconfigure"
+    read nothing
+fi
+
+if [ -d ./debian/patches ]; then
+    if [ $DROP_DEBIAN_PATCHES = "yes" ]; then
+        msg "Dropping debian/patches/*"
+        rm ./debian/patches/*
+        CHANGES+=('Dropped debian/patches/*')
+    else
+        msg "Applying debian patches..."
+        fakeroot ./debian/rules prepare || die "fakeroot: $?"
+        quilt push -a || die "quilt: $?"
+    fi
+fi
+
+msg "Running autoreconf"
+autoreconf -i -f || die "autoreconf: $?"
+
+# At this point, this will include the merge commit
+git log > ChangeLog
+
+msg "Updating changelog..."
+TODAY=`date +%Y%m%d`
+if [ -z "$PACKAGE_VERSION" ]; then
+    eval `grep PACKAGE_VERSION= configure`
+fi
+[ -z "$PACKAGE_VERSION" ] && die "No PACKAGE_VERSION in configure"
+GITVER="${PACKAGE_VERSION}+git${TODAY}${ADDBRANCH}.${LASTCOMMIT:7:8}"
+NO_EPOCH_VER=`echo $GITVER | sed 's/^.://'`
+
+# -b forces version even if missing epoch
+dch -b --distribution $DISTRIBUTION --newversion ${EPOCH}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
+
+# Change Maintainer if on Ubuntu
+if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
+    sed -i -e "s/^Maintainer:/Maintainer: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>\nXSBC-Original-Maintainer:/" debian/control
+    dch "Changed to Ubuntu maintainers"
+fi
+
+# Relax Build-depends (for backporting)
+if [ -n "$XSERVER_VERSION" ]; then
+    msg "Forcing Build-depends to xserver-xorg-dev $XSERVER_VERSION"
+    dch "Forcing Build-depends to xserver-xorg-dev $XSERVER_VERSION"
+    sed -i -e "/^Build-Depends:/s/xserver-xorg-dev (>= [0-9:.]*)/xserver-xorg-dev (>= $XSERVER_VERSION)/" debian/control
+fi
+
+# Add previously generated changelog entries
+for text in "${CHANGES[@]}"; do
+    dch "$text"
+done
+
+fakeroot ./debian/rules clean || die "rules clean: $?"
+
+# Bug: the make-orig-tar-gz in xsfbs doesn't filter away .git, so rather use our own
+#fakeroot ./debian/rules make-orig-tar-gz
+false
+if [ $? -ne 0 ]; then
+    warn "make-orig-tar-gz failed, so attempting to do manually..."
+    CURDIR=`pwd`
+    PKG=`basename ${CURDIR}`
+    cd ..
+    if [ "$PKG" != "${DEBPKG}-${NO_EPOCH_VER}" ]; then
+        msg "Our current working directory has the wrong name. Renaming..."
+        mv ${CURDIR} ${DEBPKG}-${NO_EPOCH_VER}
+    fi
+    tar --exclude=debian --exclude=debian/* \
+        --exclude=.git --exclude=.git/* \
+        -cf - ${DEBPKG}-${NO_EPOCH_VER} \
+        | gzip -9 >${DEBPKG}_${NO_EPOCH_VER}.orig.tar.gz
+    cd ${DEBPKG}-${NO_EPOCH_VER}
+fi
+
+if [ $INTERACTIVE = "yes" ]; then
+    msg "Press enter to build packages"
+    read nothing
+fi
+msg "Building source and binary packages"
+# -d forces building even if missing (version) dependency
+dpkg-buildpackage -d -us -uc -i -rfakeroot
+
+exit 0

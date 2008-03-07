@@ -1,0 +1,22 @@
+Scripts for helping with updating and building X.org packages,
+particularly for automation purposes.
+
+Examples
+--------
+The following checks out current git head of the -ati driver and
+generates a package, prompting for manually fixing up merge issues and
+such as you go.
+
+  ./auto-xorg-git.sh xserver-xorg-video-ati
+
+The following retrieves the current git head of libxrender from xorg
+overwriting any existing checkout, and generates a package of it with
+version <VERSION>-0ubuntu0bwh non-interactively, dropping all Debian
+patches to sidestep merge conflicts.  This could be appropriate if
+you're processing a large number of packages for testing purposes and
+wish to do things completedly automatically:
+
+  ./auto-xorg-git.sh -Dfn -p libxrender -a 0ubuntu0bwh -r gutsy
+
+
+
