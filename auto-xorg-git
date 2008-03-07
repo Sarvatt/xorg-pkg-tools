@@ -11,10 +11,12 @@ else
     ADDVERSION=${ADDVERSION:-0.1}
 fi
 DEBIANREPO="origin/debian-experimental"
+DATE_PREFIX="+"
 BRANCH="master"
 WORKING_DIR="."
 INTERACTIVE="yes"
 MANUAL_MERGE="no"
+NO_MERGE="no"
 MERGE_STRATEGY=""
 DROP_DEBIAN_PATCHES="no"
 PACKAGE_VERSION=
@@ -36,6 +38,13 @@ die() {
     exit 1
 }
 
+interact() {
+    if [ "$INTERACTIVE" = "yes" ]; then
+        echo -n "Press enter to $1 ..."
+        read nothing
+    fi
+}
+
 # Prints the branch id with leading 'v' removed
 git_branch_id() {
     branch=$1
@@ -49,7 +58,6 @@ debpkg_to_fdopkg() {
     pkg=$1
 
     if [ "$pkg" = "libdmx" -o \
-         "$pkg" = "libdrm" -o \
          "$pkg" = "libfontenc" -o \
          "$pkg" = "liblbxutil" -o \
          "$pkg" = "libpciaccess" -o \
@@ -58,6 +66,11 @@ debpkg_to_fdopkg() {
          "$pkg" = "libxtrans" ]; then
         echo $pkg
         return
+    fi
+
+    if [ "$pkg" = "libdrm" ]; then
+	echo "drm"
+	return
     fi
 
     echo ${pkg} \
@@ -95,13 +108,12 @@ fdopkg_to_debpkg() {
 # Determines the corresponding git dir for a given fdo package
 fdogitdir_for_fdopkg() {
     fdopkg=$1
-
     if [ -z "${fdopkg}" ]; then
         echo ""
     elif [ ${fdopkg} = "xorg-server" ]; then
         echo "xorg/server"
-    elif [ ${fdopkg} = "libdrm" ]; then
-        echo "mesa/drm"
+    elif [ ${fdopkg} = "drm" -o  ${fdopkg} = "mesa" ]; then
+        echo "mesa"
     elif [ ${fdopkg#xf86-} != ${fdopkg} ]; then
         echo "xorg/driver"
     elif [ ${fdopkg#lib} != ${fdopkg} ]; then
@@ -165,126 +177,39 @@ discard() {
     CHANGES+=("Dropped Debian's ${file}")
 }
 
-usage() {
-    echo "Usage: $0 [opts] < driver | xorg-server >"
-    echo
-    echo "opts:"
-    echo " -a <add-version>   Extra version tag to add ('0ubuntu0me')"
-    echo " -b <branch>        Upstream git branch"
-    echo " -d <git repo>      Debian git repository [origin/debian-experimental]"
-    echo " -D                 Drop existing debian patches before merging"
-    echo " -e <epoch>         Add epoch to autodetected package version"
-    echo " -f                 Force overwrite of existing directories"
-    echo " -h                 This help text"
-    echo " -m                 Pause for manual merging"
-    echo " -n                 Non-interactive"
-    echo " -p <pkg-name>      Explicit package name (no automunge)"
-    echo " -q                 Operate quietly"
-    echo " -r <release>       Distro release (feisty, gutsy, hardy, etc.)"
-    echo " -s <version>       Force Build-depends to xserver-xorg-dev <version>"
-    echo " -S <strategy>      Override merge strategy"
-    echo " -v <pkg-version>   Override package version (don't autodetect)"
-    echo " -w <working-dir>   Tmp location for checkouts (defaults to cwd)"
-    exit $1
+check_directory() {
+    # Check for existing checkout directory
+    # TODO:  Maybe just update existing repo?
+    if [ -e $DEBPKG ]; then
+        if [ ! $FORCE_OVERWRITE ]; then
+            die "can't overwrite existing $DEBPKG without -f option"
+        fi
+        warn "overwriting existing dir $DEBPKG"
+        rm -rf $DEBPKG
+    fi
+}
+    
+get_debian() {
+    msg "Cloning from Debian repository..."
+    git clone $DEBIANGIT || die "git clone: code $?"
+    cd $DEBPKG
+    git checkout $DEBIANREPO
+    cd ..
 }
 
-# Command line options
-while getopts "a:b:d:De:fmnp:qr:s:S:v:w:h\?" opt $*; do
-    case "$opt" in
-        a ) ADDVERSION="$OPTARG"                   ;;
-        b ) BRANCH="$OPTARG";
-            ADDBRANCH="+${BRANCH}"                 ;;
-        D ) DROP_DEBIAN_PATCHES="yes"              ;;
-        d ) DEBIANREPO="$OPTARG"                   ;;
-        e ) EPOCH="${OPTARG}:"                     ;;
-        f ) FORCE_OVERWRITE=1                      ;;
-        m ) MANUAL_MERGE="yes"                     ;;
-        n ) INTERACTIVE="no"                       ;;
-        p ) PACKAGE="$OPTARG"                      ;;
-        q ) QUIET=${QUIET}+1                       ;;
-        r ) DISTRIBUTION="$OPTARG"                 ;;
-        S ) MERGE_STRATEGY="-s $OPTARG"            ;;
-        s ) XSERVER_VERSION="$OPTARG"              ;;
-        v ) PACKAGE_VERSION="$OPTARG"              ;;
-        w ) WORKING_DIR="$OPTARG"                  ;;
-        h ) usage 0;                               ;;
-        \?) usage 1;                               ;;
-        * ) warn "Unknown option '$opt'"; usage 1; ;;
-    esac
-done
-shift $(($OPTIND -1))
+get_upstream() {
+    msg "Fetching from freedesktop repository..."
+    git remote add freedesktop $FDOGIT
+    git fetch freedesktop refs/heads/$BRANCH:refs/heads/upstream-head || die "git fetch freedesktop: $?"
+    git checkout -b mybranch upstream-head || die "git checkout -b mybranch upstream-head: $?"
+    LASTCOMMIT=$(git log|head -1)
+    echo $LASTCOMMIT > .lastcommit 
+}
 
-msg "Package=$PACKAGE"
-msg "Merge_Strategy=$MERGE_STRATEGY"
-msg "Interactive=$INTERACTIVE"
-msg "QUIET=$QUIET"
-msg "Package_version=$PACKAGE_VERSION"
-msg "MANUAL_MERGE=$MANUAL_MERGE"
-
-if [ -z "$PACKAGE" ]; then
-    DRIVER=$1
-    if [ -z "$DRIVER" ]; then
-        usage 1
-    fi
-
-    # Fix up driver name
-    if [ "$DRIVER" = "xorg-server" -o "$DRIVER" = "xserver" ]; then
-        DEBDIR="pkg-xorg/xserver"
-        DEBPKG="xorg-server"
-        FDODIR="xorg"
-        FDOPKG="xserver"
-    elif [ "$DRIVER" = "avivo" ]; then
-        # TODO:  Can we just drop avivo?
-        DEBDIR="pkg-xorg/driver"
-        DEBPKG="xserver-xorg-video-$DRIVER"
-        FDODIR=$DRIVER
-        FDOPKG="xf86-video-$DRIVER"
-    else
-        DEBDIR="pkg-xorg/driver"
-        DEBPKG="xserver-xorg-video-$DRIVER"
-        FDODIR="xorg/driver"
-        FDOPKG="xf86-video-$DRIVER"
-    fi
-
-    PACKAGE=$DRIVER
-else
-    msg "Using package $PACKAGE"
-    DEBPKG=$PACKAGE
-    DEBDIR=$(debgitdir_for_debpkg $DEBPKG)
-
-    FDOPKG=$(debpkg_to_fdopkg $PACKAGE)
-    FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
-fi
-
-DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
-FDOGIT=git://git.freedesktop.org/git/$FDODIR/$FDOPKG
-
-cd $WORKING_DIR || die "Could not cd to $WORKING_DIR"
-
-# Check for existing checkout directory
-# TODO:  Maybe just update existing repo?
-if [ -e $DEBPKG ]; then
-    if [ ! $FORCE_OVERWRITE ]; then
-        die "can't overwrite existing $DEBPKG without -f option"
-    fi
-    warn "overwriting existing dir $DEBPKG"
-    rm -rf $DEBPKG
-fi
-
-msg "Cloning from Debian repository..."
-git clone $DEBIANGIT || die "git clone: code $?"
-cd $DEBPKG
-git checkout $DEBIANREPO
-
-msg "Fetching from freedesktop repository..."
-git remote add freedesktop $FDOGIT
-git fetch freedesktop refs/heads/$BRANCH:refs/heads/upstream-head || die "git fetch freedesktop: $?"
-git checkout -b mybranch upstream-head || die "git checkout -b mybranch upstream-head: $?"
-LASTCOMMIT=$(git log|head -1)
-
-msg "Merging Debian changes..."
-git merge ${MERGE_STRATEGY} $DEBIANREPO
-if [ $? -ne 0 ]; then
+merge_debian() {
+  msg "Merging Debian changes..."
+  git merge ${MERGE_STRATEGY} $DEBIANREPO
+  if [ $? -ne 0 ]; then
     msg "Merges needed"
     git status
     if [ $MANUAL_MERGE = "yes" ]; then
@@ -375,68 +300,63 @@ if [ $? -ne 0 ]; then
             die "Cannot address any of the merge issues"
         fi
     fi
-fi
+  fi
+}
 
-if [ $INTERACTIVE = "yes" ]; then
-    msg "Press enter to apply patches and reconfigure"
-    read nothing
-fi
+add_debian() {
+	TMPDEB=`mktemp -d`
+	git checkout $DEBIANREPO
+	cp -a debian $TMPDEB/
+	git checkout mybranch
+	cp -a $TMPDEB/debian debian
+	rm -r $TMPDEB
+        CHANGES+=('Only added debian/ tree')
+}
 
-if [ -d ./debian/patches ]; then
+debian_patches() {
+  if [ -d ./debian/patches ]; then
     if [ $DROP_DEBIAN_PATCHES = "yes" ]; then
         msg "Dropping debian/patches/*"
         rm ./debian/patches/*
         CHANGES+=('Dropped debian/patches/*')
     else
-        msg "Applying debian patches..."
-        fakeroot ./debian/rules prepare || die "fakeroot: $?"
-        quilt push -a || die "quilt: $?"
+        msg "Applying Debian patches..."
+        fakeroot ./debian/rules prepare || warn "fakeroot: $?"
+        QUILT_PATCHES=debian/patches quilt push -a || ./debian/rules patch || die "patching failed: $?"
     fi
-fi
+  fi
+}
 
-msg "Running autoreconf"
-autoreconf -i -f || die "autoreconf: $?"
+update_changelogs() {
+    # After merging, this will include the merge commit
+    git log > ChangeLog
+    
+    msg "Updating changelog..."
+    TODAY=`date +%Y%m%d`
+    if [ -z "$PACKAGE_VERSION" ]; then
+        eval `grep PACKAGE_VERSION= configure`
+    fi
+    [ -z "$PACKAGE_VERSION" ] && die "No PACKAGE_VERSION in configure"
+    LASTCOMMIT=$(< .lastcommit)
+    GITVER="${PACKAGE_VERSION}${DATE_PREFIX}git${TODAY}${ADDBRANCH}.${LASTCOMMIT:7:8}"
+    NO_EPOCH_VER=`echo $GITVER | sed 's/^.://'`
+    
+    # -b forces version even if missing epoch
+    dch -b --distribution $DISTRIBUTION --newversion ${EPOCH}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
+    
+    # Change Maintainer if on Ubuntu
+    if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
+        sed -i -e "s/^Maintainer:/Maintainer: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>\nXSBC-Original-Maintainer:/" debian/control
+        dch "Changed to Ubuntu maintainers"
+    fi
+    
+    # Add previously generated changelog entries
+    for text in "${CHANGES[@]}"; do
+        dch "$text"
+    done
+}
 
-# At this point, this will include the merge commit
-git log > ChangeLog
-
-msg "Updating changelog..."
-TODAY=`date +%Y%m%d`
-if [ -z "$PACKAGE_VERSION" ]; then
-    eval `grep PACKAGE_VERSION= configure`
-fi
-[ -z "$PACKAGE_VERSION" ] && die "No PACKAGE_VERSION in configure"
-GITVER="${PACKAGE_VERSION}+git${TODAY}${ADDBRANCH}.${LASTCOMMIT:7:8}"
-NO_EPOCH_VER=`echo $GITVER | sed 's/^.://'`
-
-# -b forces version even if missing epoch
-dch -b --distribution $DISTRIBUTION --newversion ${EPOCH}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
-
-# Change Maintainer if on Ubuntu
-if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
-    sed -i -e "s/^Maintainer:/Maintainer: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>\nXSBC-Original-Maintainer:/" debian/control
-    dch "Changed to Ubuntu maintainers"
-fi
-
-# Relax Build-depends (for backporting)
-if [ -n "$XSERVER_VERSION" ]; then
-    msg "Forcing Build-depends to xserver-xorg-dev $XSERVER_VERSION"
-    dch "Forcing Build-depends to xserver-xorg-dev $XSERVER_VERSION"
-    sed -i -e "/^Build-Depends:/s/xserver-xorg-dev (>= [0-9:.]*)/xserver-xorg-dev (>= $XSERVER_VERSION)/" debian/control
-fi
-
-# Add previously generated changelog entries
-for text in "${CHANGES[@]}"; do
-    dch "$text"
-done
-
-fakeroot ./debian/rules clean || die "rules clean: $?"
-
-# Bug: the make-orig-tar-gz in xsfbs doesn't filter away .git, so rather use our own
-#fakeroot ./debian/rules make-orig-tar-gz
-false
-if [ $? -ne 0 ]; then
-    warn "make-orig-tar-gz failed, so attempting to do manually..."
+make_orig_tarball() {
     CURDIR=`pwd`
     PKG=`basename ${CURDIR}`
     cd ..
@@ -449,12 +369,144 @@ if [ $? -ne 0 ]; then
         -cf - ${DEBPKG}-${NO_EPOCH_VER} \
         | gzip -9 >${DEBPKG}_${NO_EPOCH_VER}.orig.tar.gz
     cd ${DEBPKG}-${NO_EPOCH_VER}
+}
+
+usage() {
+    echo "Usage: $0 [opts] < driver | xorg-server >"
+    echo
+    echo "opts:"
+    echo " -a <add-version>   Extra version tag to add ('0ubuntu0me')"
+    echo " -b <branch>        Upstream git branch"
+    echo " -d <git repo>      Debian git repository [origin/debian-experimental]"
+    echo " -D                 Drop existing debian patches before merging"
+    echo " -e <epoch>         Add epoch to autodetected package version"
+    echo " -f                 Force overwrite of existing directories"
+    echo " -g                 No merge, just add debian/ tree"
+    echo " -h                 This help text"
+    echo " -m                 Pause for manual merging"
+    echo " -n                 Non-interactive"
+    echo " -p <pkg-name>      Explicit package name (no automunge)"
+    echo " -q                 Operate quietly"
+    echo " -r <release>       Distro release (feisty, gutsy, hardy, etc.)"
+    echo " -s <version>       Force Build-depends to xserver-xorg-dev <version>"
+    echo " -t separator       Separator between version and date [+]"
+    echo " -S <strategy>      Override merge strategy"
+    echo " -v <pkg-version>   Override package version (don't autodetect)"
+    echo " -w <working-dir>   Tmp location for checkouts (defaults to cwd)"
+    exit $1
+}
+
+# main starts here
+
+# Command line options
+while getopts "a:b:d:De:fgmnp:qr:s:t:S:v:w:h\?" opt $*; do
+    case "$opt" in
+        a ) ADDVERSION="$OPTARG"                   ;;
+        b ) BRANCH="$OPTARG";
+            ADDBRANCH="+${BRANCH}"                 ;;
+        D ) DROP_DEBIAN_PATCHES="yes"              ;;
+        d ) DEBIANREPO="$OPTARG"                   ;;
+        e ) EPOCH="${OPTARG}:"                     ;;
+        f ) FORCE_OVERWRITE=1                      ;;
+        g ) NO_MERGE="yes"                         ;;
+        m ) MANUAL_MERGE="yes"                     ;;
+        n ) INTERACTIVE="no"                       ;;
+        p ) PACKAGE="$OPTARG"                      ;;
+        q ) QUIET=${QUIET}+1                       ;;
+        r ) DISTRIBUTION="$OPTARG"                 ;;
+        S ) MERGE_STRATEGY="-s $OPTARG"            ;;
+        s ) XSERVER_VERSION="$OPTARG"              ;;
+        t ) DATE_PREFIX="$OPTARG"                  ;;
+        v ) PACKAGE_VERSION="$OPTARG"              ;;
+        w ) WORKING_DIR="$OPTARG"                  ;;
+        h ) usage 0;                               ;;
+        \?) usage 1;                               ;;
+        * ) warn "Unknown option '$opt'"; usage 1; ;;
+    esac
+done
+shift $(($OPTIND -1))
+
+msg "Package=$PACKAGE"
+msg "Merge_Strategy=$MERGE_STRATEGY"
+msg "Interactive=$INTERACTIVE"
+msg "QUIET=$QUIET"
+msg "Package_version=$PACKAGE_VERSION"
+msg "MANUAL_MERGE=$MANUAL_MERGE"
+msg "NO_MERGE=$NO_MERGE"
+
+if [ -z "$PACKAGE" ]; then
+    DRIVER=$1
+    if [ -z "$DRIVER" ]; then
+        usage 1
+    fi
+
+    # Fix up driver name
+    if [ "$DRIVER" = "xorg-server" -o "$DRIVER" = "xserver" ]; then
+        DEBDIR="pkg-xorg/xserver"
+        DEBPKG="xorg-server"
+        FDODIR="xorg"
+        FDOPKG="xserver"
+    elif [ "$DRIVER" = "avivo" ]; then
+        # TODO:  Can we just drop avivo?
+        DEBDIR="pkg-xorg/driver"
+        DEBPKG="xserver-xorg-video-$DRIVER"
+        FDODIR=$DRIVER
+        FDOPKG="xf86-video-$DRIVER"
+    else
+        DEBDIR="pkg-xorg/driver"
+        DEBPKG="xserver-xorg-video-$DRIVER"
+        FDODIR="xorg/driver"
+        FDOPKG="xf86-video-$DRIVER"
+    fi
+
+    PACKAGE=$DRIVER
+else
+    msg "Using package $PACKAGE"
+    DEBPKG=$PACKAGE
+    DEBDIR=$(debgitdir_for_debpkg $DEBPKG)
+
+    FDOPKG=$(debpkg_to_fdopkg $PACKAGE)
+    FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
 fi
 
-if [ $INTERACTIVE = "yes" ]; then
-    msg "Press enter to build packages"
-    read nothing
+DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
+FDOGIT=git://anongit.freedesktop.org/git/$FDODIR/$FDOPKG
+msg "Debian: $DEBIANGIT"
+msg "Freedesktop: $FDOGIT"
+
+cd $WORKING_DIR || die "Could not cd to $WORKING_DIR"
+if [ "$DONE_MERGING" != 1 ]; then
+	check_directory
+	get_debian
+	cd $DEBPKG
+	get_upstream
+
+	if [ "$NO_MERGE" != "yes" ]; then
+	    interact "merge"
+	    merge_debian
+	else
+	    add_debian
+	fi
 fi
+
+interact "apply patches and reconfigure"
+debian_patches
+msg "Running autoreconf"
+autoreconf -i -f || die "autoreconf: $?"
+
+# Relax Build-depends (for backporting) in debian/control
+if [ -n "$XSERVER_VERSION" ]; then
+    sed -i -e "/^Build-Depends:/s/xserver-xorg-dev (>= [0-9:.]*)/xserver-xorg-dev (>= $XSERVER_VERSION)/" debian/control
+    CHANGES+=("Forcing Build-depends to xserver-xorg-dev $XSERVER_VERSION")
+fi
+
+update_changelogs
+
+fakeroot ./debian/rules clean || die "rules clean: $?"
+
+make_orig_tarball
+
+interact "build packages"
 msg "Building source and binary packages"
 # -d forces building even if missing (version) dependency
 dpkg-buildpackage -d -us -uc -i -rfakeroot
