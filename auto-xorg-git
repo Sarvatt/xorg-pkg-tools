@@ -206,6 +206,16 @@ get_upstream() {
     echo $LASTCOMMIT > .lastcommit 
 }
 
+hooks () {
+    if [ -n "$HOOKS" ]; then
+        hook=$HOOKS/${DEBPKG}.$1
+        if [ -r $hook ]; then
+            msg "Sourcing hook for $1"
+            . $hook
+        fi
+    fi
+}
+
 merge_debian() {
   msg "Merging Debian changes..."
   git merge ${MERGE_STRATEGY} $DEBIANREPO
@@ -347,7 +357,7 @@ update_changelogs() {
     # Change Maintainer if on Ubuntu
     if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
         sed -i -e "s/^Maintainer:/Maintainer: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>\nXSBC-Original-Maintainer:/" debian/control
-        dch "Changed to Ubuntu maintainers"
+        dch "Change to Ubuntu maintainers"
     fi
     
     # Add previously generated changelog entries
@@ -383,6 +393,7 @@ usage() {
     echo " -f                 Force overwrite of existing directories"
     echo " -g                 No merge, just add debian/ tree"
     echo " -h                 This help text"
+    echo " -H <hooks-dir>     Adds hooks from directory"
     echo " -m                 Pause for manual merging"
     echo " -n                 Non-interactive"
     echo " -p <pkg-name>      Explicit package name (no automunge)"
@@ -399,7 +410,7 @@ usage() {
 # main starts here
 
 # Command line options
-while getopts "a:b:d:De:fgmnp:qr:s:t:S:v:w:h\?" opt $*; do
+while getopts "a:b:d:De:fgH:mnp:qr:s:t:S:v:w:h\?" opt $*; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"                   ;;
         b ) BRANCH="$OPTARG";
@@ -409,6 +420,7 @@ while getopts "a:b:d:De:fgmnp:qr:s:t:S:v:w:h\?" opt $*; do
         e ) EPOCH="${OPTARG}:"                     ;;
         f ) FORCE_OVERWRITE=1                      ;;
         g ) NO_MERGE="yes"                         ;;
+        H ) HOOKS="$OPTARG"                        ;;
         m ) MANUAL_MERGE="yes"                     ;;
         n ) INTERACTIVE="no"                       ;;
         p ) PACKAGE="$OPTARG"                      ;;
@@ -469,6 +481,16 @@ else
     FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
 fi
 
+# make absolute path
+if [ -n "$HOOKS" ]; then
+    if cd $HOOKS; then
+        HOOKS=$PWD
+        cd $OLDPWD
+    else
+        die "Can not find hooks directory: $HOOKS"
+    fi
+fi
+
 DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
 FDOGIT=git://anongit.freedesktop.org/git/$FDODIR/$FDOPKG
 msg "Debian: $DEBIANGIT"
@@ -481,6 +503,7 @@ if [ "$DONE_MERGING" != 1 ]; then
 	cd $DEBPKG
 	get_upstream
 
+	hooks premerge
 	if [ "$NO_MERGE" != "yes" ]; then
 	    interact "merge"
 	    merge_debian
@@ -489,6 +512,7 @@ if [ "$DONE_MERGING" != 1 ]; then
 	fi
 fi
 
+hooks prepatch
 interact "apply patches and reconfigure"
 debian_patches
 msg "Running autoreconf"
@@ -500,6 +524,7 @@ if [ -n "$XSERVER_VERSION" ]; then
     CHANGES+=("Forcing Build-depends to xserver-xorg-dev $XSERVER_VERSION")
 fi
 
+hooks prebuild
 update_changelogs
 
 fakeroot ./debian/rules clean || die "rules clean: $?"

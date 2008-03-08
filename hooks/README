@@ -1,0 +1,15 @@
+
+Examples of hooks files for auto-xorg-git
+
+File names are: <debian package name>.<state>
+where <state> is: premerge, prepatch, prebuild
+
+Usage example:
+../auto-xorg-git -e 1 -r hardy -H ../hooks ati
+
+Current directory:
+The hooks will be executed in the build directory of the package, usually 
+a generated subdirectory of the current directory where you run the 
+auto-xorg-git command. The hook script can therefore reference for instance
+debian/control or src/Makefile, independently of the location of the hooks
+directory itself.

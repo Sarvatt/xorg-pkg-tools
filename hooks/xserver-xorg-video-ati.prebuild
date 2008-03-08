@@ -1,0 +1,10 @@
+# This will be sourced as a bash script
+
+# Tormod Volden 2007-03-07
+# Came after the package split
+# Needed as long as Ubuntu doesn't ship the new packages
+
+sed -i '/^Depends:/s/, xserver-xorg-video-r128, xserver-xorg-video-mach64//' debian/control
+
+CHANGES+=("Drop depends on xserver-xorg-video-r128 and xserver-xorg-video-mach64 since they don't exist in Ubuntu yet")
+
