@@ -1,0 +1,9 @@
+# This file will be sourced as bash
+
+# Tormod Volden 2007-03-09
+
+# this is a ugly hack
+# store away configs files from debian repo
+# to be copied in later (after merging with upstream)
+HOOKS_MESA_TMPDEB=`mktemp -d`
+cp -a configs $HOOKS_MESA_TMPDEB

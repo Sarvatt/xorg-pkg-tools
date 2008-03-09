@@ -1,0 +1,15 @@
+# This file will be sourced as bash
+
+# Tormod Volden 2007-03-09
+
+sed -i '/^01_fix-makefile.patch/s/^/#/' debian/patches/series
+CHANGES+=("Drop patch 01 (went upstream)")
+sed -i '/^04_cleanup-osmesa-configs.patch/s/^/#/' debian/patches/series
+CHANGES+=("Drop patch 04 (will not apply)")
+
+# refresh patch 03
+sed -i -e '/^+PROGS ?=/a \
+ 	corender \\
+' -e '/^ 	glxgears \\$/d' debian/patches/03_optional-progs-and-install.patch
+CHANGES+=("Refresh patch 03 so it applies")
+

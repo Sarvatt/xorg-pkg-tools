@@ -5,5 +5,5 @@
 
 sed -i '/^02_temporary_revert_pciaccess.diff/s/^/#/' debian/patches/series
 
-CHANGES+=("Manually disabled 02_temporary_revert_pciaccess.diff")
+CHANGES+=("Disable 02_temporary_revert_pciaccess.diff")
 

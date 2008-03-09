@@ -311,16 +311,17 @@ merge_debian() {
         fi
     fi
   fi
+  CHANGES+=("Merge with $DEBIANREPO")
 }
 
 add_debian() {
 	TMPDEB=`mktemp -d`
 	git checkout $DEBIANREPO
-	cp -a debian $TMPDEB/
+	cp -a debian $TMPDEB
 	git checkout mybranch
 	cp -a $TMPDEB/debian debian
 	rm -r $TMPDEB
-        CHANGES+=('Only added debian/ tree')
+        CHANGES+=("Only added debian/ tree from $DEBIANREPO")
 }
 
 debian_patches() {
@@ -501,6 +502,7 @@ if [ "$DONE_MERGING" != 1 ]; then
 	check_directory
 	get_debian
 	cd $DEBPKG
+	hooks preupstream
 	get_upstream
 
 	hooks premerge
@@ -510,6 +512,8 @@ if [ "$DONE_MERGING" != 1 ]; then
 	else
 	    add_debian
 	fi
+else
+	cd $DEBPKG || die "Could not find existing $DEBPKG"
 fi
 
 hooks prepatch
