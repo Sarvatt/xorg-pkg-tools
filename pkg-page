@@ -1,12 +1,59 @@
 #!/usr/bin/perl -w
+#========================================================================
+#
+# pkg-page
+#
+# DESCRIPTION
+#
+# Generates an HTML page listing of debian packages, useful for testing
+#
+# AUTHOR
+#   Bryce W Harrington <bryce@bryceharrington.org>
+#
+# COPYRIGHT
+#   Copyright (C) 2008 Bryce W. Harrington
+#   All Rights Reserved.
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+#========================================================================
 
 use strict;
+use Pod::Usage;
 use Template;
-use Getopt::Long;
+use Getopt::Long qw(:config no_ignore_case bundling);
 
-# TODO:  Insert option handling here
+#------------------------------------------------------------------------
+# Global variables
+#------------------------------------------------------------------------
+use vars qw($VERSION $NAME $YEAR);
+$VERSION                  = '1.00';
+$NAME                     = 'pkg-page';
+$YEAR                     = '2008';
 
-# TODO:  Accept Ubuntu/Debian package list as a command line argument
+our $opt_version          = 0;
+our $opt_help             = 0;
+our $opt_helplong         = 0;
+our $opt_man              = 0;
+our $opt_packages         = undef;  # Ubuntu/Debian package list file
+our $opt_debs             = undef;  # Listing of deb files
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           "version|V",
+           "help|h",
+           "helplong|H",
+           "man|M",
+           "packages|p",
+           "debs|d",
+           ) or pod2usage(-verbose => 0, -exitstatus => 0);
+
+version_and_exit() if $opt_version;
+pod2usage(-verbose => 0, -exitstatus => 0) if $opt_help;
+pod2usage(-verbose => 1, -exitstatus => 0) if $opt_helplong;
+pod2usage(-verbose => 0, -exitstatus => 1) if (! $opt_packages or ! $opt_debs);
+
 my %rels = (
             '2.1.1' =>            [{'version'=>'2.1.1-0ubuntu9', 'style'=>'ubuntu', 'name'=>'Gutsy (Release)'},
                                    {'version'=>'2.1.1-0ubuntu9.1', 'style'=>'ubuntu', 'name'=>'Gutsy (Current)'}
@@ -26,7 +73,6 @@ my %rels = (
 # TODO:  Load Ubuntu/Debian package releases into %rels
 # TODO:  Fill in this file, using mockup's data
 
-# TODO:  Accept a listing of .debs as a command line argument
 my %debs = ();
 # TODO:  Load debs from a file
 foreach my $row (
@@ -125,6 +171,8 @@ foreach my $row (@rows) {
     }
 }
 
+# TODO:  Extract debian sorting algorithms from versions_current script
+
 my $tt      = Template->new();
 my $vars = {
     'rows' => \@rows,
@@ -133,12 +181,23 @@ my $vars = {
 $tt->process(\*DATA, $vars)
     || die $tt->error();
 
-# TODO:  Extract debian sorting algorithms from versions_current script
+exit 0;
 
-# TODO:  TT2 calls (borrow from my status_current script)
-# f($var);
+=head2 version_and_exit()
 
-# TODO:  POD documentation
+Displays text describing the version of the script
+
+=cut
+
+sub version_and_exit
+{
+    print "$NAME version $VERSION\n";
+    print "Copyright (C) 2008 Bryce W. Harrington <bryce\@bryceharrington.org>\n";
+    print "This program is free software; you can redistribute it and/or\n";
+    print "modify it under the same terms as Perl itself.\n";
+    exit(0);
+}
+
 
 __DATA__
 <html>
@@ -210,3 +269,60 @@ number of patches that need to be checked to figure out the cause.
 [% END -%]
 </body>
 </html>
+
+__END__
+
+=head1 NAME
+
+B<pkg-page> - Generates a web page of past versions of packages
+
+=head1 SYNOPSIS
+
+pkg-page -p <package-list> -d <debs-list>
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>,  B<--version>
+
+Prints the version and exits
+
+=item B<-h>, B<--help>
+
+Prints a brief help message
+
+=item B<-H>, B<--helplong>
+
+Prints a long help message
+
+=item B<--man>
+
+Prints a manual page (detailed help)
+
+=back
+
+See B<pkg-page> -h for a summary of options.
+
+=head1 PREREQUISITES
+
+L<Pod::Usage>,
+L<Getopt::Long>=head1 BUGS
+
+=head1 AUTHOR
+
+Bryce W. Harrington E<lt>bryce@bryceharrington.orgE<gt>
+
+L<http://www.bryceharrington.org|http://www.bryceharrington.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008 Bryce W. Harrington.
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
