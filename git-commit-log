@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+use strict;
+
+
+sub usage {
+    print "$0 <package>\n";
+    print "Must be run from inside a git repository\n";
+    print "Examples:\n";
+    print "  $0 xf86-video-intel\n";
+    print "  $0 nv\n";
+    exit 0;
+}
+
+my $package = shift @ARGV || usage();
+my @commits = (split(/\n/, `git tag -l "$package-*" `), 'master');
+
+my $prev = pop @commits;
+my $display = $prev;
+my $select = '';
+my $count = 0;
+my $interval = 8;
+my $hide_non_intervals = 1;
+while (my $next = pop @commits) {
+    my ($commit, $date, $time);
+    foreach my $line (`git log $next..$prev | grep -A2 commit`) {
+        next if $line =~ /^Author/ or $line =~ /^--/;
+        if ($line =~ /commit\s*(\w+)/) {
+            $commit = $1;
+        } elsif ($line =~ /^Date:\s*\w{3} (\w{3} \d+) (\d\d:\d\d):\d\d (\d{4})/) {
+            my $short = sprintf("%.8s", $commit);
+            $date = $3 . ' ' . $1;
+            $time = $2;
+            $count++;
+            if (!$display && $count % $interval) {
+                next if $hide_non_intervals;
+                $select = '      ';
+            } elsif (!$display && $count % ($interval*2)) {
+                $select = '    ';
+            } elsif (!$display && $count % ($interval*4)) {
+                $select = '   ';
+            } elsif (!$display && $count % ($interval*8)) {
+                $select = '  ';
+            } elsif (!$display) {
+                $select = ' ';
+            } else {
+                $select = '';
+            }
+            printf("%-46s %-11s %s r%s %s\n", $select . $commit, $date, $time, $short, $display | '');
+            $display = undef;
+        }
+    }
+    $prev = $next;
+    $display = $prev;
+    $display =~ s/$package-//;
+    $count = 1;
+}
