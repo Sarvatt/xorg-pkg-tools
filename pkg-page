@@ -1,0 +1,212 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Template;
+use Getopt::Long;
+
+# TODO:  Insert option handling here
+
+# TODO:  Accept Ubuntu/Debian package list as a command line argument
+my %rels = (
+            '2.1.1' =>            [{'version'=>'2.1.1-0ubuntu9', 'style'=>'ubuntu', 'name'=>'Gutsy (Release)'},
+                                   {'version'=>'2.1.1-0ubuntu9.1', 'style'=>'ubuntu', 'name'=>'Gutsy (Current)'}
+                                   ],
+            '2.2.0+git2008107' => [{'version'=>'2.2.0+git20080107-1ubuntu3', 'style'=>'ubuntu-pre'}],
+            '2.2.0' =>            [{'version'=>'2.2.0-1ubuntu2', 'style'=>'ubuntu-pre'}],
+            '2.2.0.90' =>         [{'version'=>'2.2.0.90-2ubuntu3', 'style'=>'ubuntu-pre'},
+                                   {'version'=>'2.2.0.90-2ubuntu4', 'style'=>'ubuntu-pre'},
+                                   {'version'=>'2.2.0.90-2ubuntu5', 'style'=>'ubuntu-pre'},
+                                   {'version'=>'2.2.0.90-2ubuntu6', 'style'=>'ubuntu-pre'},
+                                   {'version'=>'2.2.0.90-2ubuntu8', 'style'=>'ubuntu-pre'},
+                                   ],
+            '2.2.1' =>            [{'version'=>'2.2.1-1ubuntu6', 'style'=>'ubuntu-pre'},
+                                   {'version'=>'2.2.1-1ubuntu5', 'style'=>'ubuntu', 'name'=>'Hardy (Current)'},
+                                   ],
+            );
+# TODO:  Load Ubuntu/Debian package releases into %rels
+# TODO:  Fill in this file, using mockup's data
+
+# TODO:  Accept a listing of .debs as a command line argument
+my %debs = ();
+# TODO:  Load debs from a file
+foreach my $row (
+                 'xserver-xorg-video-intel-dbg_2.2.0+git20080107-1ubuntu3_i386.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0-1ubuntu2_i386.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu3_i386.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu4_i386.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu5_i386.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu6_i386.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu8_i386.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.1-1ubuntu6_i386.deb',
+                 'xserver-xorg-video-intel_2.2.0+git20080107-1ubuntu3_i386.deb',
+                 'xserver-xorg-video-intel_2.2.0-1ubuntu2_i386.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu3_i386.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu4_i386.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu5_i386.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu6_i386.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu8_i386.deb',
+                 'xserver-xorg-video-intel_2.2.1-1ubuntu6_i386.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0+git20080107-1ubuntu3_amd64.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0-1ubuntu2_amd64.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu3_amd64.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu4_amd64.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu5_amd64.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu6_amd64.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu8_amd64.deb',
+                 'xserver-xorg-video-intel-dbg_2.2.1-1ubuntu6_amd64.deb',
+                 'xserver-xorg-video-intel_2.2.0+git20080107-1ubuntu3_amd64.deb',
+                 'xserver-xorg-video-intel_2.2.0-1ubuntu2_amd64.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu3_amd64.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu4_amd64.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu5_amd64.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu6_amd64.deb',
+                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu8_amd64.deb',
+                 'xserver-xorg-video-intel_2.2.1-1ubuntu6_amd64.deb'
+                 ) {
+    if ($row =~ /^.*?(-dbg)*_([^_\s]+?)_(\w+)\.deb/) {
+        my $version = $2;
+        my $dist = 'hardy';  # TODO:  Determine dist release
+        my $arch = $3 . ($1||'');
+        $arch =~ s/-/_/g;
+        $debs{$version}->{$dist}->{$arch} = $row;
+    }
+}
+# TODO:  Fill in this file from mockup's data
+
+# Generate sorted data structure
+my @rows = ();
+
+while (my $row = <>) {
+    if ($row =~ /^(\s*)(\w+)\s+(\d{4} \w+ \d+ +[\d:]+)\s+(\w+)\s*([^\s]+)*$/) {
+        my %pkg = (
+                   'indent' => $1,
+                   'commit' => $2,
+                   'commit_date', => $3,
+                   'commit_short', => $4,
+                   'release' => $5,
+                   'style' => 'git',
+                   );
+
+        if (defined $pkg{'release'}) {
+            if ($pkg{'release'} eq 'master') {
+                $pkg{'name'} = 'Xorg-git (master)';
+                $pkg{'version'} = $pkg{'commit_short'};
+            } else {
+                $pkg{'style'} = 'xorg';
+                $pkg{'version'} = $pkg{'release'};
+                if ($pkg{'version'} =~ /9/) {
+                    $pkg{'name'} = 'Xorg (Pre-release)';
+                } else {
+                    $pkg{'name'} = 'Xorg (Release)';
+                }
+                # Prepend Ubuntu/Debian packages
+                if (defined $rels{$pkg{'release'}}) {
+                    push(@rows, @{ $rels{$pkg{'release'}} });
+                }
+            }
+        } else {
+            # TODO:  Set up version string according to debian rules
+            $pkg{'version'} = $pkg{'commit_short'};
+        }
+
+        push @rows, \%pkg;
+    }
+}
+
+# Look for packages in %debs and attach
+foreach my $row (@rows) {
+    my $version = $row->{'version'};
+    if (defined $debs{$version}) {
+        foreach my $dist (keys %{$debs{$version}}) {
+            foreach my $arch (keys %{$debs{$version}->{$dist}}) {
+                $row->{'debs'}->{$dist}->{$arch} = $debs{$version}->{$dist}->{$arch};
+            }
+        }
+    }
+}
+
+my $tt      = Template->new();
+my $vars = {
+    'rows' => \@rows,
+    'dists' => ['gutsy', 'hardy', 'intrepid'],
+};
+$tt->process(\*DATA, $vars)
+    || die $tt->error();
+
+# TODO:  Extract debian sorting algorithms from versions_current script
+
+# TODO:  TT2 calls (borrow from my status_current script)
+# f($var);
+
+# TODO:  POD documentation
+
+__DATA__
+<html>
+<head>
+ <link rel="stylesheet" type="text/css" charset="utf-8" media="all"
+ href="http://www.ubuntu.com/htdocs/ubuntuweb/css/common.css">
+ <link rel="stylesheet" type="text/css" charset="utf-8" media="screen"
+ href="http://www.ubuntu.com/htdocs/ubuntuweb/css/screen.css">
+ <style>
+  <!
+    a {text-decoration:none; }
+table {margin:0em}
+
+tr.heading    { background-color: #dddddd}
+
+                tr.ubuntu     { background-color: #d9bb7a; }
+                tr.ubuntu-pre { background-color: #fff3dd; font-size:80% }
+                tr.debian     { background-color: #ffcabd; font-size:95% }
+                tr.xorg       { background-color: #aaccee; font-size:95% }
+                tr.git        { background-color: #f9f9ff; color: darkblue; font-size:80% }
+
+                td            { padding:        0.2em; }
+                td.ubuntu     { padding-left:   02px; }
+                td.ubuntu-pre { padding-left:   10px;}
+                td.debian     { padding-left:   10px; }
+                td.xorg       { padding-left:   20px; }
+                td.git        { padding-left:   30px; font-family: monospace}
+  //>
+ </style>
+</head>
+
+<body>
+<h3>Historical Ubuntu Xorg Intel Drivers</h3>
+
+<p>
+If you are experiencing a bug in a recent version of the Intel driver,
+that did not occur in older versions, the following driver listing can
+be used to help narrow in on where the issue first started happening.
+This can be extremely helpful to developers, as it greatly reduces the
+number of patches that need to be checked to figure out the cause.
+</p>
+
+<table border=1 cellpadding=2 cellspacing=0>
+<thead>
+<tr class="heading"><td colspan="5" align="center"><b>xserver-xorg-video-intel Driver</b></td></tr>
+<tr class="heading"><td rowspan="2" valign="bottom">Name</td><td rowspan="2" valign="bottom">Version</td><td colspan="3" align="center">Pre-built Packages</td></tr>
+<tr class="heading">
+[%- FOREACH dist IN dists -%]<td>[% dist %]</td>[%- END -%]
+</tr>
+</thead>
+<tbody>
+[% FOREACH row IN rows -%]
+<tr class="[% row.style %]">
+  <td>[% row.name %]</td><td class="[% row.style %]">[% row.version %]</td>
+  [%- FOREACH dist IN dists -%]
+  <td>
+    [%- FOREACH arch IN row.debs.$dist -%]
+     [% IF !loop.first AND loop.index % 2 == 0 %]<br>[% END %]
+     [%- IF arch.key.match('_dbg') -%]
+     &nbsp;[<a href="[% arch.value %]">dbg</a>]
+     [%- ELSE -%]
+     <b><a href="[% arch.value %]">[% arch.key %]</a></b>
+     [%- END -%]
+    [%- END -%]
+  </td>
+  [%- END -%]
+</tr>
+
+[% END -%]
+</body>
+</html>
