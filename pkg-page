@@ -74,41 +74,10 @@ my %rels = (
 # TODO:  Fill in this file, using mockup's data
 
 my %debs = ();
-# TODO:  Load debs from a file
-foreach my $row (
-                 'xserver-xorg-video-intel-dbg_2.2.0+git20080107-1ubuntu3_i386.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0-1ubuntu2_i386.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu3_i386.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu4_i386.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu5_i386.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu6_i386.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu8_i386.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.1-1ubuntu6_i386.deb',
-                 'xserver-xorg-video-intel_2.2.0+git20080107-1ubuntu3_i386.deb',
-                 'xserver-xorg-video-intel_2.2.0-1ubuntu2_i386.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu3_i386.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu4_i386.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu5_i386.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu6_i386.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu8_i386.deb',
-                 'xserver-xorg-video-intel_2.2.1-1ubuntu6_i386.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0+git20080107-1ubuntu3_amd64.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0-1ubuntu2_amd64.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu3_amd64.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu4_amd64.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu5_amd64.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu6_amd64.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.0.90-2ubuntu8_amd64.deb',
-                 'xserver-xorg-video-intel-dbg_2.2.1-1ubuntu6_amd64.deb',
-                 'xserver-xorg-video-intel_2.2.0+git20080107-1ubuntu3_amd64.deb',
-                 'xserver-xorg-video-intel_2.2.0-1ubuntu2_amd64.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu3_amd64.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu4_amd64.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu5_amd64.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu6_amd64.deb',
-                 'xserver-xorg-video-intel_2.2.0.90-2ubuntu8_amd64.deb',
-                 'xserver-xorg-video-intel_2.2.1-1ubuntu6_amd64.deb'
-                 ) {
+$opt_debs ||= 'data/sample_debs.txt';
+open(DEBSFILE, "< $opt_debs")
+    or die "Can't open $opt_debs: $!\n";
+foreach my $row (<DEBSFILE>) {
     if ($row =~ /^.*?(-dbg)*_([^_\s]+?)_(\w+)\.deb/) {
         my $version = $2;
         my $dist = 'hardy';  # TODO:  Determine dist release
@@ -117,7 +86,8 @@ foreach my $row (
         $debs{$version}->{$dist}->{$arch} = $row;
     }
 }
-# TODO:  Fill in this file from mockup's data
+close(DEBSFILE);
+
 
 # Generate sorted data structure
 my @rows = ();

@@ -30,3 +30,7 @@ xserver-xorg-video-intel_2.2.0.90-2ubuntu5_amd64.deb
 xserver-xorg-video-intel_2.2.0.90-2ubuntu6_amd64.deb
 xserver-xorg-video-intel_2.2.0.90-2ubuntu8_amd64.deb
 xserver-xorg-video-intel_2.2.1-1ubuntu6_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/main/x/xserver-xorg-video-intel/xserver-xorg-video-intel_2.1.1-0ubuntu9.1_i386.deb
+http://archive.ubuntu.com/ubuntu/pool/main/x/xserver-xorg-video-intel/xserver-xorg-video-intel_2.1.1-0ubuntu9_i386.deb
+http://archive.ubuntu.com/ubuntu/pool/main/x/xserver-xorg-video-intel/xserver-xorg-video-intel_2.2.1-1ubuntu5_i386.deb
+http://archive.ubuntu.com/ubuntu/pool/main/x/xserver-xorg-video-intel/xserver-xorg-video-intel-dbg_2.2.1-1ubuntu5_i386.deb
