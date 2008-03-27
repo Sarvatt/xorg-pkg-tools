@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# Given git commit id
+COMMIT=ac763634
+PACKAGE=xserver-xorg-video-intel
+REPO=${REPO:-~/src/xserver-xorg-video-intel/xf86-video-intel/}
+DEBIAN=${DEBIAN:-~/src/${PACKAGE}/debian}
+DISTRIBUTION=${DISTRIBUTION:-hardy}
+EPOCH='2:'
+ADDVERSION=bwh1
+DATE_PREFIX="+"
+AUTOSIGN=55955A6B
+
+cd $REPO
+
+BASEDIR=$(dirname $REPO)
+ORIGDIR=${REPO%/*}.orig
+
+# Update the git repository to the commit id
+git reset --hard $COMMIT
+date=$(git log | head | grep Date | sed -e "s/Date: *//" | sed -e "s/\+.*$//")
+DATE=`date +%Y%m%d -d "$date"`
+
+# Copy to new working directory
+if [ -e ${ORIGDIR} ]; then
+    echo "Removing existing ${ORIGDIR}"
+    rm -rf ${ORIGDIR}
+fi
+echo "cp -a ${REPO} ${ORIGDIR}"
+cp -a ${REPO} ${ORIGDIR}
+
+# Update autoconfage
+cd ${ORIGDIR}
+./autogen.sh
+
+# Get the released package version for this branch
+if [ -z "$PACKAGE_VERSION" ]; then
+    eval `grep PACKAGE_VERSION= configure`
+fi
+[ -z "$PACKAGE_VERSION" ] && die "No PACKAGE_VERSION in configure"
+
+# Set the version string
+GITVER="${PACKAGE_VERSION}${DATE_PREFIX}git${DATE}.${COMMIT}"
+echo $GITVER
+
+# Create the source dir
+SOURCE=${BASEDIR}/${PACKAGE}-${GITVER}.orig
+if [ -e $SOURCE ]; then
+    echo "Removing existing $SOURCE dir"
+    rm -rf ${SOURCE}
+fi
+echo "mv ${ORIGDIR} ${SOURCE}"
+mv ${ORIGDIR} ${SOURCE}
+
+# Create the target dir
+TARGET=${BASEDIR}/${PACKAGE}-${GITVER}
+if [ -e ${TARGET} ]; then
+    echo "Removing existing ${TARGET}"
+    rm -rf ${TARGET}
+fi
+echo "cp -a ${SOURCE} ${TARGET}"
+cp -a ${SOURCE} ${TARGET}
+cd ${TARGET}
+
+# Copy in the given debian/ directory
+if [ -e ${TARGET}/debian ]; then
+    echo "Error:  ${TARGET}/debian already exists!"
+    exit 1
+fi
+echo "cp -a ${DEBIAN} ${TARGET}"
+cp -a ${DEBIAN} ${TARGET}
+
+# Add changelog entry
+echo "Adding changelog entry via dch..."
+dch -b --distribution $DISTRIBUTION --newversion ${EPOCH}${GITVER}-${ADDVERSION} "Checkout from git up to $COMMIT ($date)" || die "dch: $?"
+
+# Create package
+pwd
+echo "debuild -sa -S"
+debuild -sa -S -k${AUTOSIGN}
