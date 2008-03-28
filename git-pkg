@@ -1,15 +1,23 @@
 #!/bin/bash
 
 # Given git commit id
-COMMIT=ac763634
+COMMIT=$1
+if [ -z "${COMMIT}" ]; then
+    echo "Usage: $0 <commit-id>"
+    exit 1
+fi
+
 PACKAGE=xserver-xorg-video-intel
 REPO=${REPO:-~/src/xserver-xorg-video-intel/xf86-video-intel/}
 DEBIAN=${DEBIAN:-~/src/${PACKAGE}/debian}
 DISTRIBUTION=${DISTRIBUTION:-hardy}
-EPOCH='2:'
-ADDVERSION=bwh1
+#EPOCH='2:'
+EPOCH=""
+#ADDVERSION="-bwh1"
+ADDVERSION=""
 DATE_PREFIX="+"
-AUTOSIGN=55955A6B
+AUTOSIGN=${AUTOSIGN:-55955A6B}
+VERPREFIX="2:2.2.1-bisect."
 
 cd $REPO
 
@@ -40,7 +48,7 @@ fi
 [ -z "$PACKAGE_VERSION" ] && die "No PACKAGE_VERSION in configure"
 
 # Set the version string
-GITVER="${PACKAGE_VERSION}${DATE_PREFIX}git${DATE}.${COMMIT}"
+GITVER="${VERPREFIX}${PACKAGE_VERSION}${DATE_PREFIX}git${DATE}~${COMMIT}"
 echo $GITVER
 
 # Create the source dir
@@ -72,9 +80,23 @@ cp -a ${DEBIAN} ${TARGET}
 
 # Add changelog entry
 echo "Adding changelog entry via dch..."
-dch -b --distribution $DISTRIBUTION --newversion ${EPOCH}${GITVER}-${ADDVERSION} "Checkout from git up to $COMMIT ($date)" || die "dch: $?"
+dch -b --distribution $DISTRIBUTION --newversion ${EPOCH}${GITVER}${ADDVERSION} "Checkout from git up to $COMMIT ($date)" || die "dch: $?"
 
 # Create package
 pwd
 echo "debuild -sa -S"
 debuild -sa -S -k${AUTOSIGN}
+
+# Rejected:  xserver-xorg-video-intel_2:2.2.1~is.really.2.2.0+git20080318.ac763634-bwh1.dsc
+#            3:2:2.2.1~is.really.2.2.0+git20080318.ac763634-bwh1
+# ACCEPTED:  xserver-xorg-video-intel_2.2.0+git20080318.ac763634.dsc
+#            3:2.2.0+git20080318.ac763634
+# Rejected:  xserver-xorg-video-intel_3:2.2.0+git20080318.ac763634.dsc
+#            3:3:2.2.0+git20080318.ac763634
+# Rejected:  xserver-xorg-video-intel_2.2.0+git20080318.ac763634.dsc
+#            3:2.2.0+git20080318.ac763634
+#            MD5 sum does not match
+# Rejected:  xserver-xorg-video-intel_2.2.1-bisect.2.2.0+git20080318.ac763634.dsc
+#            2:2.2.1-bisect.2.2.0+git20080318.ac763634
+#            Version older than that in the archive.
+#            2:2.2.1-bisect.2.2.0+git20080318.ac763634 <= 3:2.2.0+git20080318.ac763634

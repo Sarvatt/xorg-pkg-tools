@@ -1,13 +1,64 @@
-#!/usr/bin/perl
-use strict;
+#!/usr/bin/perl -w
+#========================================================================
+#
+# git-commit-log
+#
+# DESCRIPTION
+#
+# When run in a git repository, generates a listing of git commit ids
+# organized by release tags.
+#
+# AUTHOR
+#   Bryce W Harrington <bryce@bryceharrington.org>
+#
+# COPYRIGHT
+#   Copyright (C) 2008 Bryce W. Harrington
+#   All Rights Reserved.
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+#========================================================================
 
+use strict;
+use Pod::Usage;
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+#------------------------------------------------------------------------
+# Global variables
+#------------------------------------------------------------------------
+use vars qw($VERSION $NAME $YEAR);
+$VERSION                  = '1.00';
+$NAME                     = 'git-commit-log';
+$YEAR                     = '2008';
+
+our $opt_version          = 0;
+our $opt_help             = 0;
+our $opt_helplong         = 0;
+our $opt_man              = 0;
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           "version|V",
+           "help|h",
+           "helplong|H",
+           "man|M",
+           ) or pod2usage(-verbose => 0, -exitstatus => 0);
+
+version_and_exit() if $opt_version;
+pod2usage(-verbose => 0, -exitstatus => 0) if $opt_help;
+pod2usage(-verbose => 1, -exitstatus => 0) if $opt_helplong;
+pod2usage(-verbose => 0, -exitstatus => 1) if (! $ARGV[0]);
 
 sub usage {
-    print "$0 <package>\n";
+    print "$0 [-c] <package>\n";
     print "Must be run from inside a git repository\n";
     print "Examples:\n";
     print "  $0 xf86-video-intel\n";
     print "  $0 nv\n";
+    print "\n";
+    print "Options:\n";
+    print "  -c       Only display commit id's\n";
     exit 0;
 }
 
@@ -45,7 +96,7 @@ while (my $next = pop @commits) {
             } else {
                 $select = '';
             }
-            printf("%-46s %-11s %s r%s %s\n", $select . $commit, $date, $time, $short, $display | '');
+            printf("%-46s %-11s %s r%s %s\n", $select . $commit, $date, $time, $short, $display || '');
             $display = undef;
         }
     }
@@ -54,3 +105,63 @@ while (my $next = pop @commits) {
     $display =~ s/$package-//;
     $count = 1;
 }
+
+__END__
+
+=head1 SYNOPSIS
+
+git-commit-log [-c] <commit-id>
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>,  B<--version>
+
+Prints the version and exits
+
+=item B<-h>, B<--help>
+
+Prints a brief help message
+
+=item B<-H>, B<--helplong>
+
+Prints a long help message
+
+=item B<--man>
+
+Prints a manual page (detailed help)
+
+=item B<-c>
+
+Display a simple columnar list of commit id's.  This is intended to be
+suitable for feeding into other programs, like git-pkg.
+
+=back
+
+See B<pkg-page> -h for a summary of options.
+
+=head1 PREREQUISITES
+
+L<Pod::Usage>,
+L<Getopt::Long>
+
+=head1 BUGS
+
+=head1 AUTHOR
+
+Bryce W. Harrington E<lt>bryce@bryceharrington.orgE<gt>
+
+L<http://www.bryceharrington.org|http://www.bryceharrington.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008 Bryce W. Harrington.
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
