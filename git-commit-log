@@ -36,6 +36,7 @@ our $opt_version          = 0;
 our $opt_help             = 0;
 our $opt_helplong         = 0;
 our $opt_man              = 0;
+our $opt_commits          = 0;
 
 Getopt::Long::Configure ("bundling", "no_ignore_case");
 GetOptions(
@@ -43,6 +44,7 @@ GetOptions(
            "help|h",
            "helplong|H",
            "man|M",
+           "commits|c",
            ) or pod2usage(-verbose => 0, -exitstatus => 0);
 
 version_and_exit() if $opt_version;
@@ -96,7 +98,11 @@ while (my $next = pop @commits) {
             } else {
                 $select = '';
             }
-            printf("%-46s %-11s %s r%s %s\n", $select . $commit, $date, $time, $short, $display || '');
+            if ($opt_commits) {
+                print "$short\n";
+            } else {
+                printf("%-46s %-11s %s r%s %s\n", $select . $commit, $date, $time, $short, $display || '');
+            }
             $display = undef;
         }
     }
@@ -110,9 +116,20 @@ __END__
 
 =head1 SYNOPSIS
 
-git-commit-log [-c] <commit-id>
+git-commit-log [-c] <tag-pattern>
+
+Examples:
+
+  git-commit-log xf86-video-intel
+
+  git-commit-log -c nv
 
 =head1 DESCRIPTION
+
+This program displays a listing of commits and commit date from a git
+tree, sorted by releases.  The 'tag-pattern' allows distinguishing
+tags that correspond to releases; only tags containing this text will
+be used as valid tags.
 
 =head1 OPTIONS
 

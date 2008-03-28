@@ -11,18 +11,20 @@ PACKAGE=xserver-xorg-video-intel
 REPO=${REPO:-~/src/xserver-xorg-video-intel/xf86-video-intel/}
 DEBIAN=${DEBIAN:-~/src/${PACKAGE}/debian}
 DISTRIBUTION=${DISTRIBUTION:-hardy}
-#EPOCH='2:'
-EPOCH=""
-#ADDVERSION="-bwh1"
-ADDVERSION=""
+EPOCH='2:'
+ADDVERSION="-1"
 DATE_PREFIX="+"
 AUTOSIGN=${AUTOSIGN:-55955A6B}
-VERPREFIX="2:2.2.1-bisect."
 
 cd $REPO
 
-BASEDIR=$(dirname $REPO)
+BASEDIR=$(dirname $REPO)/bisect
 ORIGDIR=${REPO%/*}.orig
+
+if [ ! -d ${BASEDIR} ]; then
+    echo "mkdir -p ${BASEDIR}"
+    mkdir -p ${BASEDIR}
+fi
 
 # Update the git repository to the commit id
 git reset --hard $COMMIT
@@ -48,7 +50,7 @@ fi
 [ -z "$PACKAGE_VERSION" ] && die "No PACKAGE_VERSION in configure"
 
 # Set the version string
-GITVER="${VERPREFIX}${PACKAGE_VERSION}${DATE_PREFIX}git${DATE}~${COMMIT}"
+GITVER="${PACKAGE_VERSION}${DATE_PREFIX}git${DATE}.${COMMIT}"
 echo $GITVER
 
 # Create the source dir
