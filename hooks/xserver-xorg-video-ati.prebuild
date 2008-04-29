@@ -1,10 +1,17 @@
 # This will be sourced as a bash script
 
-# Tormod Volden 2007-03-07
+# Tormod Volden 2008-03-07
 # Came after the package split
 # Needed as long as Ubuntu doesn't ship the new packages
 
 sed -i '/^Depends:/s/, xserver-xorg-video-r128, xserver-xorg-video-mach64//' debian/control
 
 CHANGES+=("Drop depends on xserver-xorg-video-r128 and xserver-xorg-video-mach64 since they don't exist in Ubuntu yet")
+
+# Tormod Volden 2008-04-29
+# Debian dpkg-shlibdeps has a new option, not yet in Ubuntu
+
+sed -i '/dh_shlibdeps/s/ --warnings=6//' debian/rules
+
+CHANGES+=("Drop --warnings=6 from dh_shlibdeps in debian/rules")
 
