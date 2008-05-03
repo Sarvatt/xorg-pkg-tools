@@ -1,0 +1,143 @@
+#!/bin/bash
+
+# Fool-proof script for building and installing drm modules from git
+# Tormod Volden 2007 https://wiki.ubuntu.com/TormodVolden
+# Version 3
+
+# end-user usage: double-clicking on this script should be enough
+# hint for packager: ship this script together with a known-good drm version
+
+
+# leave empty to build and install all drivers
+#BUILD_MODULES="savage"
+BUILD_MODULES=
+
+# where modules should be installed
+KERNELDIR=/lib/modules/`uname -r`/kernel/drivers/char/drm
+
+# use "echo sudo" for debugging
+SUDO="sudo"
+
+# if not run in a terminal, relaunch in an xterm
+if ! tty -s; then
+	xterm -e $0
+	exit
+fi
+
+leave_script() {
+	echo "Press Enter to close this window"
+	read nothing
+	exit $1
+} 
+
+check_installed() {
+	if ! which $1 >/dev/null; then
+		echo "The package $2 will be installed"
+		echo "Enter your normal user password to continue"
+		$SUDO apt-get install $2
+	fi
+}
+
+echo
+DIR=`dirname $0`
+cd $DIR || leave_script 1
+
+# will pick the newest tree, if there are several
+SOURCE=`ls -rd drm-*/. libdrm-*/. 2>/dev/null | head -1 | sed 's#/.$##'`
+
+if [ -d "$SOURCE" ]; then
+	echo Found DRM source directory $SOURCE
+	echo "Would you like to download the newest 'git' version, instead"
+	echo -n "of using these sources [y/N]? "
+	read answer
+else
+	echo "Found no sources, will download newest git version"
+	answer=y
+fi
+
+if [ "$answer" = "y" ]; then
+	check_installed git git-core
+	[ -e drm ] && mv drm drm.old
+	echo "Downloading..."
+	git clone git://anongit.freedesktop.org/git/mesa/drm || leave_script 1
+	SOURCE=drm-`date +'%Y%m%d'`
+	mv drm $SOURCE 
+else
+	echo Will use existing source $SOURCE
+fi
+
+[ -f /lib/modules/`uname -r`/build/.config ] || check_installed "" linux-headers-`uname -r`
+check_installed gcc build-essential
+echo "Building from $SOURCE"
+echo
+TMPDIR=`mktemp -d`
+cp -a $SOURCE $TMPDIR/ || leave_script 1
+cd $TMPDIR/$SOURCE/linux-core || leave_script 1
+
+if [ -n "$BUILD_MODULES" ]; then
+	make DRM_MODULES="$BUILD_MODULES"
+else
+	make
+fi
+RET=$?
+echo
+if [ "$RET" != 0 ]; then
+	echo "Building modules failed!"
+	echo "Leaving build tree in $TMPDIR"
+	leave_script $RET
+fi
+
+TMPMODULES=$TMPDIR/$SOURCE/linux-core
+MODULES=`cd $TMPMODULES && ls *.ko`
+if [ -z "$MODULES" ]; then
+	echo "Can't find any built modules!"
+	leave_script 1
+fi
+
+echo "Built new modules:"
+echo $MODULES
+echo
+
+echo -n "Would you like to install them [Y/n] ? "
+read answer
+
+if [ "$answer" = "n" ]; then
+	echo "Leaving built modules in $TMPMODULES"
+	leave_script
+fi
+
+if [ ! -d $KERNELDIR ]; then
+	echo "Can not find existing kernel modules in $KERNELDIR!"
+	leave_script 1
+fi
+
+echo "Enter your normal user password to gain administrative rights"
+if ! $SUDO true; then
+	echo "Could not run sudo!"
+	leave_script 1
+fi
+
+for M in $MODULES
+do
+	strip --strip-debug $TMPMODULES/$M
+	if [ -f ${KERNELDIR}/${M}.orig ]; then
+		echo "Module $M is already backed up."
+	elif [ -f ${KERNELDIR}/${M} ]; then
+		echo "Making backup module ${M}.orig"
+		$SUDO mv ${KERNELDIR}/${M} ${KERNELDIR}/${M}.orig || leave_script 1
+	fi
+	echo "Installing new module $M"
+	$SUDO cp $TMPMODULES/$M ${KERNELDIR}/$M || leave_script 1
+done
+
+echo "Running depmod -a ..."
+$SUDO depmod -a
+
+echo 
+echo "Finished. Reboot your computer to use the new modules."
+
+# only remove if modules installed and all went well
+rm -rf $TMPDIR
+
+leave_script
+
