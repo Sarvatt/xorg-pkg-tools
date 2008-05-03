@@ -14,5 +14,5 @@ sed -i -e '/^+PROGS ?=/a \
 CHANGES+=("Refresh patch 03 so it applies")
 
 # refresh patch 02
-sed -i '/^     defined(__amd64__) || \\$/s/\\/defined(__x86_64__) || \\/' debian/patches/02_use-ieee-fp-on-s390-and-m68k.patch
+sed -i '/^     defined(__amd64__)/s:defined(__amd64__) || ::' debian/patches/02_use-ieee-fp-on-s390-and-m68k.patch
 CHANGES+=("Refresh patch 02 so it applies")
