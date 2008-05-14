@@ -281,7 +281,7 @@ merge_debian() {
                 cp -r ../xsfbs debian/
                 git add debian/xsfbs
                 git commit -m "Copying in missing xsfbs"
-                CHANGES+=(dch "Added missing xsfbs")
+                CHANGES+=("Added missing xsfbs")
                 ISSUES=$(( ISSUES + 1 ))
             fi
         fi
@@ -358,12 +358,12 @@ update_changelogs() {
     # Change Maintainer if on Ubuntu
     if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
         sed -i -e "s/^Maintainer:/Maintainer: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>\nXSBC-Original-Maintainer:/" debian/control
-        dch "Change to Ubuntu maintainers"
+        dch --append "Change to Ubuntu maintainers"
     fi
     
     # Add previously generated changelog entries
     for text in "${CHANGES[@]}"; do
-        dch "$text"
+        dch --append "$text"
     done
 }
 
