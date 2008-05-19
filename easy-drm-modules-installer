@@ -1,16 +1,15 @@
 #!/bin/bash
 
 # Fool-proof script for building and installing drm modules from git
-# Tormod Volden 2007 https://wiki.ubuntu.com/TormodVolden
-# Version 3
+# Tormod Volden 2008 https://wiki.ubuntu.com/TormodVolden
+# Version 4.20
 
 # end-user usage: double-clicking on this script should be enough
 # hint for packager: ship this script together with a known-good drm version
 
-
-# leave empty to build and install all drivers
-#BUILD_MODULES="savage"
-BUILD_MODULES=
+# Optional arguments:
+# -y        (auto mode) assumes default answer to all questions
+# <module>  kernel module to build (otherwise build all)
 
 # where modules should be installed
 KERNELDIR=/lib/modules/`uname -r`/kernel/drivers/char/drm
@@ -42,14 +41,31 @@ echo
 DIR=`dirname $0`
 cd $DIR || leave_script 1
 
+# auto-mode for scripts, ask no questions
+if [ "$1" = "-y" ]; then
+	AUTO=1
+	shift
+else
+	AUTO=0
+fi
+
+# optional argument: module to build
+if [ -n "$1" ]; then
+	BUILD_MODULES="$1"
+fi
+
 # will pick the newest tree, if there are several
 SOURCE=`ls -rd drm-*/. libdrm-*/. 2>/dev/null | head -1 | sed 's#/.$##'`
 
 if [ -d "$SOURCE" ]; then
 	echo Found DRM source directory $SOURCE
-	echo "Would you like to download the newest 'git' version, instead"
-	echo -n "of using these sources [y/N]? "
-	read answer
+	if [ "$AUTO" = 1 ]; then
+		answer=n
+	else
+		echo "Would you like to download the newest 'git' version, instead"
+		echo -n "of using these sources [y/N]? "
+		read answer
+	fi
 else
 	echo "Found no sources, will download newest git version"
 	answer=y
@@ -98,12 +114,16 @@ echo "Built new modules:"
 echo $MODULES
 echo
 
-echo -n "Would you like to install them [Y/n] ? "
-read answer
+if [ "$AUTO" = 1 ]; then
+	answer=y
+else
+	echo -n "Would you like to install them [Y/n] ? "
+	read answer
+fi
 
 if [ "$answer" = "n" ]; then
 	echo "Leaving built modules in $TMPMODULES"
-	leave_script
+	leave_script 0
 fi
 
 if [ ! -d $KERNELDIR ]; then
@@ -139,5 +159,9 @@ echo "Finished. Reboot your computer to use the new modules."
 # only remove if modules installed and all went well
 rm -rf $TMPDIR
 
-leave_script
+if [ "$AUTO" = 1 ]; then
+	exit 0
+else
+	leave_script 0
+fi
 
