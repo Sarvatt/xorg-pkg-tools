@@ -7,3 +7,13 @@ sed -i '/^Build-Depends: /s/$/, x11proto-xext-dev/' debian/control
 
 CHANGES+=("Add Build-depends on x11proto-xext-dev")
 
+
+# 2008-05-21 Tormod Volden
+# Debian dpkg-shlibdeps has a new option, not yet in Ubuntu dpkg-dev
+
+sed -i '/dh_shlibdeps/s/ --warnings=6//' debian/rules
+sed -i '/^Build-Depends:/s/, dpkg-dev (>= 1.14.17)//' debian/control
+
+CHANGES+=("Drop --warnings=6 from dh_shlibdeps in debian/rules")
+CHANGES+=("Drop build-dep on versioned dpkg-dev")
+

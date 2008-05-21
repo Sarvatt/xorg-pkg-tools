@@ -114,6 +114,8 @@ fdogitdir_for_fdopkg() {
         echo "xorg/server"
     elif [ ${fdopkg} = "drm" -o  ${fdopkg} = "mesa" ]; then
         echo "mesa"
+    elif [ ${fdopkg} = "nouveau" ]; then
+        echo "nouveau"
     elif [ ${fdopkg#xf86-} != ${fdopkg} ]; then
         echo "xorg/driver"
     elif [ ${fdopkg#lib} != ${fdopkg} ]; then
