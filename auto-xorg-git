@@ -111,12 +111,14 @@ fdogitdir_for_fdopkg() {
     fdopkg=$1
     if [ -z "${fdopkg}" ]; then
         echo ""
-    elif [ ${fdopkg} = "xorg-server" ]; then
-        echo "xorg/server"
+    elif [ ${fdopkg} = "xserver" ]; then
+        echo "xorg"
     elif [ ${fdopkg} = "drm" -o  ${fdopkg} = "mesa" ]; then
         echo "mesa"
-    elif [ ${fdopkg} = "nouveau" ]; then
+    elif [ ${fdopkg} = "xf86-video-nouveau" ]; then
         echo "nouveau"
+    elif [ ${fdopkg} = "xf86-video-avivo" ]; then
+        echo "avivo"
     elif [ ${fdopkg#xf86-} != ${fdopkg} ]; then
         echo "xorg/driver"
     elif [ ${fdopkg#lib} != ${fdopkg} ]; then
@@ -141,7 +143,7 @@ debgitdir_for_debpkg() {
         echo ""
     elif [ ${debpkg} = "xorg-server" ]; then
         echo "pkg-xorg/xserver"
-    elif [ ${debpkg#xf86-} != ${debpkg} ]; then
+    elif [ ${debpkg#xserver-xorg-} != ${debpkg} ]; then
         echo "pkg-xorg/driver"
     elif [ ${debpkg#lib} != ${debpkg} -o ${debpkg} = "mesa" -o ${debpkg} = "pixman" -o ${debpkg} = "xft" -o ${debpkg} = "xtrans" ]; then
         echo "pkg-xorg/lib"
@@ -450,40 +452,25 @@ msg "Package_version=$PACKAGE_VERSION"
 msg "MANUAL_MERGE=$MANUAL_MERGE"
 msg "NO_MERGE=$NO_MERGE"
 
-if [ -z "$PACKAGE" ]; then
-    DRIVER=$1
-    if [ -z "$DRIVER" ]; then
+if [ -n "$PACKAGE" ]; then
+    DEBPKG=$PACKAGE
+else
+    if [ -n "$1" ]; then
+        # Fix up driver short names
+        DEBPKG="xserver-xorg-video-$1"
+    else
         usage 1
     fi
-
-    # Fix up driver name
-    if [ "$DRIVER" = "xorg-server" -o "$DRIVER" = "xserver" ]; then
-        DEBDIR="pkg-xorg/xserver"
-        DEBPKG="xorg-server"
-        FDODIR="xorg"
-        FDOPKG="xserver"
-    elif [ "$DRIVER" = "avivo" ]; then
-        # TODO:  Can we just drop avivo?
-        DEBDIR="pkg-xorg/driver"
-        DEBPKG="xserver-xorg-video-$DRIVER"
-        FDODIR=$DRIVER
-        FDOPKG="xf86-video-$DRIVER"
-    else
-        DEBDIR="pkg-xorg/driver"
-        DEBPKG="xserver-xorg-video-$DRIVER"
-        FDODIR="xorg/driver"
-        FDOPKG="xf86-video-$DRIVER"
-    fi
-
-    PACKAGE=$DRIVER
-else
-    msg "Using package $PACKAGE"
-    DEBPKG=$PACKAGE
-    DEBDIR=$(debgitdir_for_debpkg $DEBPKG)
-
-    FDOPKG=$(debpkg_to_fdopkg $PACKAGE)
-    FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
 fi
+
+msg "Making package $DEBPKG"
+DEBDIR=$(debgitdir_for_debpkg $DEBPKG)
+FDOPKG=$(debpkg_to_fdopkg $DEBPKG)
+FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
+DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
+FDOGIT=git://anongit.freedesktop.org/git/$FDODIR/$FDOPKG
+msg "Debian: $DEBIANGIT"
+msg "Freedesktop: $FDOGIT"
 
 # make absolute path
 if [ -n "$HOOKS" ]; then
@@ -494,11 +481,6 @@ if [ -n "$HOOKS" ]; then
         die "Can not find hooks directory: $HOOKS"
     fi
 fi
-
-DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
-FDOGIT=git://anongit.freedesktop.org/git/$FDODIR/$FDOPKG
-msg "Debian: $DEBIANGIT"
-msg "Freedesktop: $FDOGIT"
 
 cd $WORKING_DIR || die "Could not cd to $WORKING_DIR"
 if [ "$DONE_MERGING" != 1 ]; then
