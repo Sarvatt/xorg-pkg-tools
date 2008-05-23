@@ -5,6 +5,7 @@
 
 # Defaults
 DISTRIBUTION=${DISTRIBUTION:-$(lsb_release -c -s)}
+DISTRIBUTION=${DISTRIBUTION:-UNRELEASED}
 if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
     ADDVERSION=${ADDVERSION:-0ubuntu0$USER}
 else
