@@ -408,7 +408,8 @@ usage() {
     echo " -q                 Operate quietly"
     echo " -r <release>       Distro release (feisty, gutsy, hardy, etc.)"
     echo " -s <version>       Force Build-depends to xserver-xorg-dev <version>"
-    echo " -t separator       Separator between version and date [+]"
+    echo " -t <separator>     Separator between version and date [+]"
+    echo " -u <upstream-repo> Specify non-standard git repository"
     echo " -S <strategy>      Override merge strategy"
     echo " -v <pkg-version>   Override package version (don't autodetect)"
     echo " -w <working-dir>   Tmp location for checkouts (defaults to cwd)"
@@ -418,7 +419,7 @@ usage() {
 # main starts here
 
 # Command line options
-while getopts "a:b:d:De:fgH:mnp:qr:s:t:S:v:w:h\?" opt $*; do
+while getopts "a:b:d:De:fgH:mnp:qr:s:t:u:S:v:w:h\?" opt $*; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"                   ;;
         b ) BRANCH="$OPTARG";
@@ -437,6 +438,7 @@ while getopts "a:b:d:De:fgH:mnp:qr:s:t:S:v:w:h\?" opt $*; do
         S ) MERGE_STRATEGY="-s $OPTARG"            ;;
         s ) XSERVER_VERSION="$OPTARG"              ;;
         t ) DATE_PREFIX="$OPTARG"                  ;;
+        u ) UPSTREAMGIT="$OPTARG"                  ;;
         v ) PACKAGE_VERSION="$OPTARG"              ;;
         w ) WORKING_DIR="$OPTARG"                  ;;
         h ) usage 0;                               ;;
@@ -467,10 +469,14 @@ fi
 
 msg "Making package $DEBPKG"
 DEBDIR=$(debgitdir_for_debpkg $DEBPKG)
-FDOPKG=$(debpkg_to_fdopkg $DEBPKG)
-FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
 DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
-FDOGIT=git://anongit.freedesktop.org/git/${FDODIR:+$FDODIR/}$FDOPKG
+if [ -z "$UPSTREAMGIT" ]; then
+    FDOPKG=$(debpkg_to_fdopkg $DEBPKG)
+    FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
+    FDOGIT=git://anongit.freedesktop.org/git/${FDODIR:+$FDODIR/}$FDOPKG
+else
+    FDOGIT=$UPSTREAMGIT
+fi
 msg "Debian: $DEBIANGIT"
 msg "Freedesktop: $FDOGIT"
 
@@ -506,8 +512,10 @@ fi
 hooks prepatch
 interact "apply patches and reconfigure"
 debian_patches
-msg "Running autoreconf"
-autoreconf -i -f || die "autoreconf: $?"
+if [ -e configure.ac ] || [ -e configure.in ]; then
+    msg "Running autoreconf"
+    autoreconf -i -f || die "autoreconf: $?"
+fi
 
 # Relax Build-depends (for backporting) in debian/control
 if [ -n "$XSERVER_VERSION" ]; then
