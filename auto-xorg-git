@@ -111,6 +111,8 @@ fdogitdir_for_fdopkg() {
     fdopkg=$1
     if [ -z "${fdopkg}" ]; then
         echo ""
+    elif [ ${fdopkg} = "pixman" ]; then
+        echo ""
     elif [ ${fdopkg} = "xserver" ]; then
         echo "xorg"
     elif [ ${fdopkg} = "drm" -o  ${fdopkg} = "mesa" ]; then
@@ -131,7 +133,7 @@ fdogitdir_for_fdopkg() {
         echo "xorg/doc"
     else
         # Hard to say, could be xorg/app, xorg/font, or xorg/util
-        echo "unknown"
+        die "Unknown Freedesktop git directory"
     fi
 }
 
@@ -165,7 +167,7 @@ debgitdir_for_debpkg() {
         echo "pkg-xorg/debian"
     else
         # Hard to say, could be xorg/app, xorg/font, or xorg/util
-        echo "unknown"
+        die "Unknown Debian git directory"
     fi
 }
 
@@ -468,7 +470,7 @@ DEBDIR=$(debgitdir_for_debpkg $DEBPKG)
 FDOPKG=$(debpkg_to_fdopkg $DEBPKG)
 FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
 DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
-FDOGIT=git://anongit.freedesktop.org/git/$FDODIR/$FDOPKG
+FDOGIT=git://anongit.freedesktop.org/git/${FDODIR:+$FDODIR/}$FDOPKG
 msg "Debian: $DEBIANGIT"
 msg "Freedesktop: $FDOGIT"
 
