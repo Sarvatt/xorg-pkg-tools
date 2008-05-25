@@ -42,3 +42,4 @@ Currently some issues:
 auto-xorg-git -p xserver-xorg-input-synaptics -d origin/debian-unstable
 auto-xorg-git -p xserver-xorg-input-evdev -H ../xorg-pkg-tools/hooks
 
+auto-xorg-git -d origin/debian-unstable -u http://web.telia.com/~u89404340/touchpad/synaptics/.git -p xserver-xorg-input-synaptics -v 0.14.7 -t "~" -H hooks
