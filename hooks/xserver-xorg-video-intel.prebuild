@@ -1,0 +1,11 @@
+# This will be sourced as a bash script
+
+# Tormod Volden 2008-05-25
+# Debian dpkg-shlibdeps has a new option, not yet in Ubuntu dpkg-dev
+
+sed -i '/dh_shlibdeps/s/ --warnings=6//' debian/rules
+sed -i '/^Build-Depends:/s/, dpkg-dev (>= 1.14.17)//' debian/control
+
+CHANGES+=("Drop --warnings=6 from dh_shlibdeps in debian/rules")
+CHANGES+=("Drop build-dep on versioned dpkg-dev")
+
