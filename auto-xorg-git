@@ -379,7 +379,8 @@ make_orig_tarball() {
     PKG=`basename ${CURDIR}`
     cd ..
     if [ "$PKG" != "${DEBPKG}-${NO_EPOCH_VER}" ]; then
-        msg "Our current working directory has the wrong name. Renaming..."
+        msg "Our current working directory has the wrong name,"
+        msg "renaming to ${DEBPKG}-${NO_EPOCH_VER}"
         mv ${CURDIR} ${DEBPKG}-${NO_EPOCH_VER}
     fi
     tar --exclude=debian --exclude=debian/* \

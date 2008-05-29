@@ -24,6 +24,7 @@ Status
 ------
 Examples that work:
 
+auto-xorg-git -d origin/debian-unstable -p x11proto-xext
 auto-xorg-git -d origin/debian-unstable -H hooks -p x11proto-dri2
 auto-xorg-git -t "~" -g -p libdrm
 auto-xorg-git -t "~" -g -H hooks -d origin/debian-unstable -p mesa
@@ -43,3 +44,6 @@ auto-xorg-git -p xserver-xorg-input-synaptics -d origin/debian-unstable
 auto-xorg-git -p xserver-xorg-input-evdev -H ../xorg-pkg-tools/hooks
 
 auto-xorg-git -d origin/debian-unstable -u http://web.telia.com/~u89404340/touchpad/synaptics/.git -p xserver-xorg-input-synaptics -v 0.14.7 -t "~" -H hooks
+
+auto-xorg-git -p xserver-xorg-video-radeonhd -u git://people.freedesktop.org/~mhopf/radeonhd  -H ../xorg-pkg-tools/hooks -d origin/debian-unstable
+

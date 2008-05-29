@@ -8,6 +8,14 @@ sed -i '/^Build-Depends: /s/$/, x11proto-xext-dev/' debian/control
 CHANGES+=("Add Build-depends on x11proto-xext-dev")
 
 
+# 2008-05-27 Tormod Volden
+# Now includes DRI
+
+sed -i '/^Build-Depends: /s/$/, x11proto-gl-dev, libdrm-dev, libgl1-mesa-dev | libgl-dev, x11proto-xf86dri-dev/' debian/control
+
+CHANGES+=("Add Build-depends on x11proto-gl-dev, libdrm-dev, libgl1-mesa-dev | libgl-dev, x11proto-xf86dri-dev")
+
+
 # 2008-05-21 Tormod Volden
 # Debian dpkg-shlibdeps has a new option, not yet in Ubuntu dpkg-dev
 
