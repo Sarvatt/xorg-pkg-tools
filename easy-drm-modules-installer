@@ -12,7 +12,7 @@
 # <module>  kernel module to build (otherwise build all)
 
 # where modules should be installed
-KERNELDIR=/lib/modules/`uname -r`/kernel/drivers/char/drm
+KERNELDIR=${KERNELDIR:-/lib/modules/`uname -r`/kernel/drivers/char/drm}
 
 # use "echo sudo" for debugging
 SUDO="sudo"
