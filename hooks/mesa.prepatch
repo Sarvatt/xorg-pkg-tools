@@ -1,6 +1,6 @@
 # This file will be sourced as bash
 
-# Tormod Volden 2007-03-09
+# Tormod Volden 2008-03-09
 
 sed -i '/^01_fix-makefile.patch/s/^/#/' debian/patches/series
 CHANGES+=("Drop patch 01 (went upstream)")
