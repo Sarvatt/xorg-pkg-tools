@@ -6,7 +6,7 @@
 
 sed -i -e '/--disable-dri/s/disable/enable/' -e '/--disable-glx/s/disable/enable/' debian/rules
 
-CHANGES+=("Reenable glx, dri, dri2")
+CHANGES+=("debian/rules: reenable glx, dri, dri2")
 
 sed -i '/^ mesa-swx11-source (>> 7.0.1~rc2-1),$/s/$/ x11proto-dri2-dev,/' debian/control
 
