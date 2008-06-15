@@ -1,0 +1,84 @@
+#!/bin/sh
+
+# xorg-edgers-live-test v4
+# by Tormod Volden 2008
+# a script to be run in an Ubuntu 8.04 live CD session
+# installs on-the-edge xorg packages
+
+set -e
+
+# If you disable this check you'll break the warranty :)
+if [ "`ls /home`" != "ubuntu" ]; then
+	echo "This doesn't seem like a live session! Aborting..."
+	exit 1
+fi
+
+# We can not run this script inside X because we will restart it
+TTY=`tty`
+if [ "${TTY%?}" != "/dev/tty" ]; then
+	echo "You should run this on a virtual console, since it will restart X"
+	exit 1
+fi
+
+# Copy over saved package cache to save downloading
+echo "Looking for saved packages..."
+rsync --size-only -a `dirname $0`/archives/ /var/cache/apt/archives/ || echo "... will download everything"
+
+# Minimal Software Sources to speed up apt-get update
+SS=/etc/apt/sources.list
+cp -a $SS $SS.bak
+
+# dpkg-dev is needed for apt-get source
+if ! which dpkg-source >/dev/null; then
+	echo "deb http://ch.archive.ubuntu.com/ubuntu/ hardy main" > $SS
+	apt-get update
+	apt-get install --assume-yes dpkg-dev
+fi
+
+echo "#deb http://ch.archive.ubuntu.com/ubuntu/ hardy main universe" > $SS
+echo "deb http://ppa.launchpad.net/xorg-edgers/ubuntu hardy main" >> $SS
+echo "deb-src http://ppa.launchpad.net/xorg-edgers/ubuntu hardy main" >> $SS
+#echo "deb http://ppa.launchpad.net/tormodvolden/ubuntu hardy main" >> $SS
+apt-get update
+
+# Upgrade mesa first, then xserver-xorg-core
+apt-get install --assume-yes --force-yes libdrm2 libgl1-mesa-dri libgl1-mesa-glx libglu1-mesa mesa-utils
+apt-get install --assume-yes --force-yes xserver-xorg-video-ati xserver-xorg-input-kbd xserver-xorg-input-mouse xserver-xorg-core
+
+# Add your preferred driver here
+#apt-get install --assume-yes --force-yes xserver-xorg-video-radeonhd
+
+# Upgrade anything else available
+apt-get upgrade --assume-yes --force-yes || UPGRADEMESS=1
+
+# Get the source to build the drm kernel modules
+apt-get source --assume-yes libdrm2
+
+# Find current drm module in use and build only that one to save time
+MOD=`lsmod|grep ^drm|awk '{print $4}'`
+
+# fixme: must be a better URL somewhere
+[ -e ./easy-drm-modules-installer ] ||
+  wget http://bazaar.launchpad.net/~xorg-edgers/xorg-server/xorg-pkg-tools/download/debian.tormod%40gmail.com-20080519215804-kr5ybq3l9qlxxofj/easydrmmodulesinstal-20080503213337-ex8iyz7xkve9vvwl-1/easy-drm-modules-installer
+chmod +x easy-drm-modules-installer
+./easy-drm-modules-installer -y ${MOD:+$MOD.ko}
+
+killall gdm
+sleep 2
+
+modprobe -r $MOD
+modprobe -r drm
+
+# A broken kernel module *might* mess with your hard drive
+echo "Disabling all swap for safety reasons"
+swapoff -a
+
+if [ $UPGRADEMESS ]; then
+	echo Package upgrade failed. You might need to fix it.
+	echo Press Enter to restart X, or crtl-c to exit.
+	read nothing
+fi
+
+sleep 3
+/etc/init.d/gdm start
+
