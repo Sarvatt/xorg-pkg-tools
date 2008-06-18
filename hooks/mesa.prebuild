@@ -1,17 +1,5 @@
 # This file will be sourced as bash
 
-# Tormod Volden 2008-03-09
-# Ugly hack part 2
-# copy in configs files that were retrieved in mesa.preupstream
-# and stored away in HOOKS_MESA_TMPDEB
-
-cp -p $HOOKS_MESA_TMPDEB/configs/debian-* configs/
-cp -p $HOOKS_MESA_TMPDEB/configs/linux-osmesa*-static configs/
-cp -p $HOOKS_MESA_TMPDEB/configs/linux-dri-bp configs/
-cp -p $HOOKS_MESA_TMPDEB/configs/linux-tcc configs/
-rm -r $HOOKS_MESA_TMPDEB
-CHANGES+=('Copy in selected files from debian/configs')
-
 
 # Tormod Volden 2008-05-03
 # mesa now builds with DRI2 headers

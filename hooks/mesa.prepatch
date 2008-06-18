@@ -1,11 +1,14 @@
 # This file will be sourced as bash
 
+
 # Tormod Volden 2008-03-09
 
 sed -i '/^01_fix-makefile.patch/s/^/#/' debian/patches/series
 CHANGES+=("Drop patch 01 (went upstream)")
-sed -i '/^04_cleanup-osmesa-configs.patch/s/^/#/' debian/patches/series
-CHANGES+=("Drop patch 04 (will not apply)")
+
+# refresh patch 02
+sed -i '/^     defined(__amd64__)/s:defined(__amd64__) || ::' debian/patches/02_use-ieee-fp-on-s390-and-m68k.patch
+CHANGES+=("Refresh patch 02 so it applies")
 
 # refresh patch 03
 sed -i -e '/^+PROGS ?=/a \
@@ -13,6 +16,7 @@ sed -i -e '/^+PROGS ?=/a \
 ' -e '/^ 	glxgears \\$/d' debian/patches/03_optional-progs-and-install.patch
 CHANGES+=("Refresh patch 03 so it applies")
 
-# refresh patch 02
-sed -i '/^     defined(__amd64__)/s:defined(__amd64__) || ::' debian/patches/02_use-ieee-fp-on-s390-and-m68k.patch
-CHANGES+=("Refresh patch 02 so it applies")
+# refresh patch 04
+sed -i -e '/^ APP_LIB_DEPS =/s/-lOSMesa -lGLU/-lm -lpthread/' -e '/-APP_LIB_DEPS =/s/-lOSMesa../-lm -lpthread/' debian/patches/04_debian-configs.patch
+CHANGES+=("Refresh patch 04 so it applies")
+
