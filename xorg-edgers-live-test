@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# xorg-edgers-live-test v4
+# xorg-edgers-live-test v5
 # by Tormod Volden 2008
 # a script to be run in an Ubuntu 8.04 live CD session
 # installs on-the-edge xorg packages
@@ -8,7 +8,7 @@
 set -e
 
 # If you disable this check you'll break the warranty :)
-if [ "`ls /home`" != "ubuntu" ]; then
+if [ "`ls /home`" != "ubuntu" ] || [ ! -d /cdrom/casper ]; then
 	echo "This doesn't seem like a live session! Aborting..."
 	exit 1
 fi
@@ -26,7 +26,7 @@ rsync --size-only -a `dirname $0`/archives/ /var/cache/apt/archives/ || echo "..
 
 # Minimal Software Sources to speed up apt-get update
 SS=/etc/apt/sources.list
-cp -a $SS $SS.bak
+[ -e $SS.bak ] || cp -a $SS $SS.bak
 
 # dpkg-dev is needed for apt-get source
 if ! which dpkg-source >/dev/null; then
