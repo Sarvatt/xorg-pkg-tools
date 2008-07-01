@@ -1,7 +1,10 @@
 # This file will be sourced as bash
 
 
-# Tormod Volden 2008-03-09
+# Tormod Volden 2008-07-01
+
+sed -i '/^00_create-libdir.patch/s/^/#/' debian/patches/series
+CHANGES+=("Drop patch 00 (went upstream)")
 
 sed -i '/^01_fix-makefile.patch/s/^/#/' debian/patches/series
 CHANGES+=("Drop patch 01 (went upstream)")
@@ -17,6 +20,6 @@ sed -i -e '/^+PROGS ?=/a \
 CHANGES+=("Refresh patch 03 so it applies")
 
 # refresh patch 04
-sed -i -e '/^ APP_LIB_DEPS =/s/-lOSMesa -lGLU/-lm -lpthread/' -e '/-APP_LIB_DEPS =/s/-lOSMesa../-lm -lpthread/' debian/patches/04_debian-configs.patch
-CHANGES+=("Refresh patch 04 so it applies")
+#sed -i -e '/^ APP_LIB_DEPS =/s/-lOSMesa -lGLU/-lm -lpthread/' -e '/-APP_LIB_DEPS =/s/-lOSMesa../-lm -lpthread/' debian/patches/04_debian-configs.patch
+#CHANGES+=("Refresh patch 04 so it applies")
 
