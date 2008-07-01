@@ -1,14 +1,12 @@
 # This will be sourced as a bash script
 
-# 2008-05-24 Tormod Volden
+# 2008-07-01 Tormod Volden
 # Unlike Debian experimental, we build with glx&dri&dri2
 # Add build-dep on x11proto-dri2-dev
 
 sed -i -e '/--disable-dri/s/disable/enable/' -e '/--disable-glx/s/disable/enable/' debian/rules
-
 CHANGES+=("debian/rules: reenable glx, dri, dri2")
 
-sed -i '/^ mesa-swx11-source (>> 7.0.1~rc2-1),$/s/$/ x11proto-dri2-dev,/' debian/control
-
+sed -i '/^ x11proto-input-dev (>= 1.4.2),$/s/$/ x11proto-dri2-dev,/' debian/control
 CHANGES+=("Add build-dep on x11proto-dri2-dev")
 
