@@ -1,15 +1,8 @@
 # This file will be sourced as bash
 
 
-# Tormod Volden 2008-05-03
-# mesa now builds with DRI2 headers
-
-sed -i '/^Build-Depends: /s/$/, x11proto-dri2-dev/' debian/control
-CHANGES+=('Add build-dep on x11proto-dri2-dev')
-
-
 # Tormod Volden 2008-06-01
-# ship gl.pc in libgl1-mesa-dev
+# ship gl.pc in libgl1-mesa-dev to satisfy xorg-server build
 
 echo "usr/lib/pkgconfig/gl.pc" >> debian/libgl1-mesa-dev.install
 CHANGES+=('Add usr/lib/pkgconfig/gl.pc to debian/libgl1-mesa-dev.install')

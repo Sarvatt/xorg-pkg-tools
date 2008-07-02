@@ -27,7 +27,7 @@ Examples that just work:
 auto-xorg-git -d origin/debian-unstable -p x11proto-xext
 auto-xorg-git -d origin/debian-unstable -H hooks -p x11proto-dri2
 auto-xorg-git -t "~" -g -p libdrm
-auto-xorg-git -t "~" -g -H hooks -d origin/debian-unstable -p mesa
+auto-xorg-git -t "~" -H hooks -p mesa
 
 auto-xorg-git -e 1 -p xserver-xorg-input-mouse
 auto-xorg-git -e 1 -p xserver-xorg-input-keyboard
