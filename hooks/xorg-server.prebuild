@@ -22,7 +22,7 @@ CHANGES+=("debian/control: drop depends on xserver-xorg for now")
 # Do not build dmx (fails to build)
 
 sed -i -e '/--enable-dmx /s/enable/disable/' debian/rules
-sed -i -e '/^Package: xdmx$/,/^$/d debian/control
-sed -i -e '/^Package: xdmx-tools$/,/^$/d debian/control
+sed -i -e '/^Package: xdmx$/,/^$/d' debian/control
+sed -i -e '/^Package: xdmx-tools$/,/^$/d' debian/control
 CHANGES+=("disable dmx (fails to build)")
 
