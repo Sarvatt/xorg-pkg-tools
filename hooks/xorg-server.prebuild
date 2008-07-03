@@ -1,15 +1,5 @@
 # This will be sourced as a bash script
 
-# 2008-07-03 Tormod Volden
-# Unlike Debian experimental, we build with dri2
-# Add build-dep on x11proto-dri2-dev
-
-sed -i -e '/--disable-dri2/s/disable/enable/' debian/rules
-CHANGES+=("debian/rules: enable dri2")
-
-sed -i '/^ x11proto-input-dev (>= 1.4.2),$/s/$/ x11proto-dri2-dev,/' debian/control
-CHANGES+=("Add build-dep on x11proto-dri2-dev")
-
 
 # 2008-07-03 Tormod Volden
 # For easier test installation, drop depends on xserver-xorg
