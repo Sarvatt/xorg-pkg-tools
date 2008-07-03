@@ -1,0 +1,9 @@
+# This will be sourced as a bash script
+
+# 2008-07-03 Tormod Volden
+
+sed -i -e '/^confflags-swx11+glu/a \
+	     --disable-glut \\
+' debian/rules
+CHANGES+=("debian/rules: --disable-glut also in swx configurations")
+
