@@ -1,6 +1,0 @@
-# Tormod Volden 2008-05-03
-# Needs aclocal from automake
-
-sed -i '/^Build-Depends: /s/$/, automake/' debian/control
-CHANGES+=('Add build-dep on automake')
-

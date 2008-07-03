@@ -1,9 +1,0 @@
-# This file will be sourced as bash
-
-# Tormod Volden 2008-03-08
-# pciaccess revert fails
-
-sed -i '/^02_temporary_revert_pciaccess.diff/s/^/#/' debian/patches/series
-
-CHANGES+=("Disable 02_temporary_revert_pciaccess.diff")
-

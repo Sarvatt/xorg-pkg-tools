@@ -1,12 +1,28 @@
 # This will be sourced as a bash script
 
-# 2008-07-01 Tormod Volden
-# Unlike Debian experimental, we build with glx&dri&dri2
+# 2008-07-03 Tormod Volden
+# Unlike Debian experimental, we build with dri2
 # Add build-dep on x11proto-dri2-dev
 
-sed -i -e '/--disable-dri/s/disable/enable/' -e '/--disable-glx/s/disable/enable/' debian/rules
-CHANGES+=("debian/rules: reenable glx, dri, dri2")
+sed -i -e '/--disable-dri2/s/disable/enable/' debian/rules
+CHANGES+=("debian/rules: enable dri2")
 
 sed -i '/^ x11proto-input-dev (>= 1.4.2),$/s/$/ x11proto-dri2-dev,/' debian/control
 CHANGES+=("Add build-dep on x11proto-dri2-dev")
+
+
+# 2008-07-03 Tormod Volden
+# For easier test installation, drop depends on xserver-xorg
+
+sed -i -e '/^Depends: /s/, xserver-xorg//' debian/control
+CHANGES+=("debian/control: drop depends on xserver-xorg for now")
+
+
+# 2008-07-03 Tormod Volden
+# Do not build dmx (fails to build)
+
+sed -i -e '/--enable-dmx /s/enable/disable/' debian/rules
+sed -i -e '/^Package: xdmx$/,/^$/d debian/control
+sed -i -e '/^Package: xdmx-tools$/,/^$/d debian/control
+CHANGES+=("disable dmx (fails to build)")
 
