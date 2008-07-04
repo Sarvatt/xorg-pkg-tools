@@ -38,6 +38,7 @@ auto-xorg-git -d origin/debian-unstable -e 1 -H hooks ati
 auto-xorg-git -d origin/debian-unstable -H hooks radeonhd
 auto-xorg-git -d origin/debian-unstable -e 1 savage
 auto-xorg-git -d origin/debian-unstable -e 2 -H hooks -g intel
+auto-xorg-git -d origin/debian-unstable -e 1 -H hooks vesa
 auto-xorg-git -e 1 -t "~" nouveau
 
 Currently some issues (see changelogs in repository):
