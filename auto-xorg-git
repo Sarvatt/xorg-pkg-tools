@@ -363,7 +363,8 @@ update_changelogs() {
     dch -b --distribution $DISTRIBUTION --newversion ${EPOCH}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
     
     # Change Maintainer if on Ubuntu
-    if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
+    if [ "$(lsb_release -i -s)" = "Ubuntu" ] &&
+       ! grep -q "^Maintainer: .*ubuntu" debian/control; then
         sed -i -e "s/^Maintainer:/Maintainer: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>\nXSBC-Original-Maintainer:/" debian/control
         dch --append "Change to Ubuntu maintainers"
     fi
