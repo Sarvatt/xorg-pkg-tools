@@ -1,11 +1,21 @@
 #!/bin/sh
 
-# xorg-edgers-live-test v5
+# xorg-edgers-live-test v6
 # by Tormod Volden 2008
 # a script to be run in an Ubuntu 8.04 live CD session
-# installs on-the-edge xorg packages
+# installs xorg test packages from xorg-edgers PPA
 
 set -e
+
+# Save downloaded packages for next time
+if [ "$1" = "savedebs" ]; then
+  CDDEV=`grep /cdrom /proc/mounts|cut -d" " -f1`
+  mount -o remount,rw $CDDEV /cdrom
+  echo "Saving downloaded packages"
+  rsync --size-only -a /var/cache/apt/archives/*.deb `dirname $0`/archives/ 
+  mount -o remount,ro $CDDEV /cdrom
+  exit 0
+fi
 
 # If you disable this check you'll break the warranty :)
 if [ "`ls /home`" != "ubuntu" ] || [ ! -d /cdrom/casper ]; then
@@ -63,6 +73,7 @@ MOD=`lsmod|grep ^drm|awk '{print $4}'`
 chmod +x easy-drm-modules-installer
 ./easy-drm-modules-installer -y ${MOD:+$MOD.ko}
 
+# Shutdown Xorg (/etc/init.d/gdm breaks on live CD)
 killall gdm
 sleep 2
 
@@ -73,6 +84,15 @@ modprobe -r drm
 echo "Disabling all swap for safety reasons"
 swapoff -a
 
+# Modify xorg.conf to use EXA (for e.g. radeon)
+if [ $EXA ]; then
+  echo "Setting AccelMethod to EXA"
+  sed -i -e '/Section "Device"/a \
+        Option          "AccelMethod"   "EXA"
+' /etc/X11/xorg.conf
+fi
+
+# Let operator clean up if needed
 if [ $UPGRADEMESS ]; then
 	echo Package upgrade failed. You might need to fix it.
 	echo Press Enter to restart X, or crtl-c to exit.
