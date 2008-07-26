@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# xorg-edgers-live-test v6
+# xorg-edgers-live-test v50
 # by Tormod Volden 2008
 # a script to be run in an Ubuntu 8.04 live CD session
 # installs xorg test packages from xorg-edgers PPA
@@ -53,7 +53,7 @@ apt-get update
 
 # Upgrade mesa first, then xserver-xorg-core
 apt-get install --assume-yes --force-yes libdrm2 libgl1-mesa-dri libgl1-mesa-glx libglu1-mesa mesa-utils
-apt-get install --assume-yes --force-yes xserver-xorg-video-ati xserver-xorg-input-kbd xserver-xorg-input-mouse xserver-xorg-core xserver-xorg-video-vesa
+apt-get install --assume-yes --force-yes xserver-xorg-video-ati xserver-xorg-input-kbd xserver-xorg-input-mouse xserver-xorg-core xserver-xorg-video-vesa xserver-xorg-input-evdev
 
 # Add your preferred driver here
 #apt-get install --assume-yes --force-yes xserver-xorg-video-radeonhd

@@ -2,7 +2,7 @@
 
 # Fool-proof script for building and installing drm modules from git
 # Tormod Volden 2008 https://wiki.ubuntu.com/TormodVolden
-# Version 4.20
+# Version 4.50
 
 # end-user usage: double-clicking on this script should be enough
 # hint for packager: ship this script together with a known-good drm version
