@@ -1,0 +1,9 @@
+# This will be sourced as a bash script
+
+# 2008-07-29 Tormod Volden
+
+TODAY=`date +%Y%m%d`
+sed -i -e "/^#define CORE_DATE/s/20060810/${TODAY}git/" linux-core/drm_core.h
+
+CHANGES+=("Update CORE_DATE in linux-core/drm_core.h for easier identification when debugging")
+
