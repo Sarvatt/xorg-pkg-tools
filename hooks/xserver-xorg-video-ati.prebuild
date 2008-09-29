@@ -5,7 +5,8 @@
 # Needed as long as Ubuntu doesn't ship the new packages
 
 sed -i '/^Depends:/s/, xserver-xorg-video-r128, xserver-xorg-video-mach64//' debian/control
-CHANGES+=("Drop depends on xserver-xorg-video-r128 and xserver-xorg-video-mach64 since they don't exist in Ubuntu yet")
+sed -i '/^Depends:/s/, xserver-xorg-video-mach64-dbg, xserver-xorg-video-r128-dbg//' debian/control
+CHANGES+=("Drop depends on xserver-xorg-video-r128 and xserver-xorg-video-mach64 (and their -dbg packages) since they don't exist in Ubuntu yet")
 
 
 # Tormod Volden 2008-04-29

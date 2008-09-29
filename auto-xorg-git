@@ -425,7 +425,7 @@ while getopts "a:b:d:De:fgH:mnp:qr:s:t:u:S:v:w:h\?" opt $*; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"                   ;;
         b ) BRANCH="$OPTARG";
-            ADDBRANCH="+${BRANCH}"                 ;;
+            ADDBRANCH="+${BRANCH//_/-}"            ;;
         D ) DROP_DEBIAN_PATCHES="yes"              ;;
         d ) DEBIANREPO="$OPTARG"                   ;;
         e ) EPOCH="${OPTARG}:"                     ;;
