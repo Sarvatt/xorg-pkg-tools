@@ -12,7 +12,11 @@
 # <module>  kernel module to build (otherwise build all)
 
 # where modules should be installed
-KERNELDIR=${KERNELDIR:-/lib/modules/`uname -r`/kernel/drivers/char/drm}
+if [ -z "$KERNELDIR" ]; then
+    KERNELDIR=/lib/modules/`uname -r`/kernel/drivers/gpu/drm
+    [ -d $KERNELDIR ] ||
+        KERNELDIR=/lib/modules/`uname -r`/kernel/drivers/char/drm
+fi
 
 # use "echo sudo" for debugging
 SUDO="sudo"
@@ -140,14 +144,24 @@ fi
 for M in $MODULES
 do
 	strip --strip-debug $TMPMODULES/$M
-	if [ -f ${KERNELDIR}/${M}.orig ]; then
+	if [ $M = drm.ko ]; then
+	    MOD=${KERNELDIR}/$M
+	else
+	    # check for new gpu/<driver>/<driver>.ko layout (2.6.27)
+	    if [ -d ${KERNELDIR}/${M%.ko} ]; then
+	        MOD=${KERNELDIR}/${M%.ko}/$M
+	    else
+		MOD=${KERNELDIR}/$M
+	    fi
+	fi
+	if [ -f ${MOD}.orig ]; then
 		echo "Module $M is already backed up."
-	elif [ -f ${KERNELDIR}/${M} ]; then
+	elif [ -f ${MOD} ]; then
 		echo "Making backup module ${M}.orig"
-		$SUDO mv ${KERNELDIR}/${M} ${KERNELDIR}/${M}.orig || leave_script 1
+		$SUDO mv ${MOD} ${MOD}.orig || leave_script 1
 	fi
 	echo "Installing new module $M"
-	$SUDO cp $TMPMODULES/$M ${KERNELDIR}/$M || leave_script 1
+	$SUDO cp $TMPMODULES/$M $MOD || leave_script 1
 done
 
 echo "Running depmod -a ..."
