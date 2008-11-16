@@ -204,11 +204,28 @@ get_debian() {
     cd ..
 }
 
+update_debian() {
+    msg "Updating from Debian repository"
+    cd $DEBPKG
+    git checkout $DEBIANREPO
+    git pull
+    cd ..
+}
+
 get_upstream() {
     msg "Fetching from freedesktop repository..."
     git remote add freedesktop $FDOGIT
     git fetch freedesktop refs/heads/$BRANCH:refs/heads/upstream-head || die "git fetch freedesktop: $?"
-    git checkout -b mybranch upstream-head || die "git checkout -b mybranch upstream-head: $?"
+    git checkout -b autoxorggit upstream-head || die "git checkout -b autoxorggit upstream-head: $?"
+    LASTCOMMIT=$(git log|head -1)
+    echo $LASTCOMMIT > .lastcommit 
+}
+
+update_upstream() {
+    git checkout upstream-head
+    git pull freedesktop $BRANCH
+    git branch -D autoxorggit
+    git checkout -b autoxorggit upstream-head || die "git checkout -b autoxorggit upstream-head: $?"
     LASTCOMMIT=$(git log|head -1)
     echo $LASTCOMMIT > .lastcommit 
 }
@@ -325,7 +342,7 @@ add_debian() {
 	TMPDEB=`mktemp -d`
 	git checkout $DEBIANREPO
 	cp -a debian $TMPDEB
-	git checkout mybranch
+	git checkout autoxorggit
 	cp -a $TMPDEB/debian debian
 	rm -r $TMPDEB
         CHANGES+=("Only added debian/ tree from $DEBIANREPO")
@@ -366,7 +383,6 @@ update_changelogs() {
     if [ "$(lsb_release -i -s)" = "Ubuntu" ] &&
        ! grep -q "^Maintainer: .*ubuntu" debian/control; then
         sed -i -e "s/^Maintainer:/Maintainer: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>\nXSBC-Original-Maintainer:/" debian/control
-        dch --append "Change to Ubuntu maintainers"
     fi
     
     # Add previously generated changelog entries
@@ -376,19 +392,23 @@ update_changelogs() {
 }
 
 make_orig_tarball() {
-    CURDIR=`pwd`
-    PKG=`basename ${CURDIR}`
+    CURDIR=$(basename $(pwd))
+    TARDIR=${DEBPKG}-${NO_EPOCH_VER}
     cd ..
-    if [ "$PKG" != "${DEBPKG}-${NO_EPOCH_VER}" ]; then
+    if [ $CURDIR != $TARDIR ]; then
         msg "Our current working directory has the wrong name,"
-        msg "renaming to ${DEBPKG}-${NO_EPOCH_VER}"
-        mv ${CURDIR} ${DEBPKG}-${NO_EPOCH_VER}
+        msg "renaming to $TARDIR"
+        mv $CURDIR $TARDIR
     fi
     tar --exclude=debian --exclude=debian/* \
         --exclude=.git --exclude=.git/* \
-        -cf - ${DEBPKG}-${NO_EPOCH_VER} \
+        -cf - $TARDIR \
         | gzip -9 >${DEBPKG}_${NO_EPOCH_VER}.orig.tar.gz
-    cd ${DEBPKG}-${NO_EPOCH_VER}
+    if [ $CURDIR != $TARDIR ]; then
+        msg "renaming back to ${CURDIR}"
+        mv ${TARDIR} ${CURDIR}
+    fi
+    cd ${CURDIR}
 }
 
 usage() {
