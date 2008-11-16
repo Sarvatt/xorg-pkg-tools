@@ -184,18 +184,6 @@ discard() {
     CHANGES+=("Dropped Debian's ${file}")
 }
 
-check_directory() {
-    # Check for existing checkout directory
-    # TODO:  Maybe just update existing repo?
-    if [ -e $DEBPKG ]; then
-        if [ ! $FORCE_OVERWRITE ]; then
-            die "can't overwrite existing $DEBPKG without -f option"
-        fi
-        warn "overwriting existing dir $DEBPKG"
-        rm -rf $DEBPKG
-    fi
-}
-    
 get_debian() {
     msg "Cloning from Debian repository..."
     git clone $DEBIANGIT || die "git clone: code $?"
@@ -208,7 +196,7 @@ update_debian() {
     msg "Updating from Debian repository"
     cd $DEBPKG
     git checkout $DEBIANREPO
-    git pull
+    git fetch
     cd ..
 }
 
@@ -420,7 +408,7 @@ usage() {
     echo " -d <git repo>      Debian git repository [origin/debian-experimental]"
     echo " -D                 Drop existing debian patches before merging"
     echo " -e <epoch>         Add epoch to autodetected package version"
-    echo " -f                 Force overwrite of existing directories"
+    echo " -f                 Delete old directories instead of updating"
     echo " -g                 No merge, just add debian/ tree"
     echo " -h                 This help text"
     echo " -H <hooks-dir>     Adds hooks from directory"
@@ -514,21 +502,32 @@ fi
 
 cd $WORKING_DIR || die "Could not cd to $WORKING_DIR"
 if [ "$DONE_MERGING" != 1 ]; then
-	check_directory
-	get_debian
-	cd $DEBPKG
-	hooks preupstream
-	get_upstream
+    if [ -d $DEBPKG ] && [ $FORCE_OVERWRITE ]; then
+        warn "Removing old directory"
+        rm -rf $DEBPKG
+    fi
 
-	hooks premerge
-	if [ "$NO_MERGE" != "yes" ]; then
-	    interact "merge"
-	    merge_debian
-	else
-	    add_debian
-	fi
+    if [ ! -d $DEBPKG ]; then
+        get_debian
+        cd $DEBPKG
+        hooks preupstream
+        get_upstream
+    else
+        update_debian
+        cd $DEBPKG
+        hooks preupstream
+        update_upstream
+    fi
+
+    hooks premerge
+    if [ "$NO_MERGE" != "yes" ]; then
+        interact "merge"
+        merge_debian
+    else
+        add_debian
+    fi
 else
-	cd $DEBPKG || die "Could not find existing $DEBPKG"
+    cd $DEBPKG || die "Could not find existing $DEBPKG"
 fi
 
 hooks prepatch
@@ -551,6 +550,9 @@ update_changelogs
 fakeroot ./debian/rules clean || die "rules clean: $?"
 
 make_orig_tarball
+
+# Commit all changes
+git commit -a -m "Packaged for $DISTRIBUTION"
 
 interact "build packages"
 msg "Building source and binary packages"
