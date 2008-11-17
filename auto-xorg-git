@@ -210,6 +210,7 @@ get_upstream() {
 }
 
 update_upstream() {
+    msg "Updating from freedesktop repository"
     git checkout upstream-head
     git pull freedesktop $BRANCH
     git branch -D autoxorggit
@@ -557,6 +558,6 @@ git commit -a -m "Packaged for $DISTRIBUTION"
 interact "build packages"
 msg "Building source and binary packages"
 # -d forces building even if missing (version) dependency
-dpkg-buildpackage -d -us -uc -i -rfakeroot
+debuild -S -sa -i -d
 
 exit 0
