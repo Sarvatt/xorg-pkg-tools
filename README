@@ -1,45 +1,44 @@
 Scripts for helping with updating and building X.org packages,
 particularly for automation purposes.
 
-Examples
---------
-The following checks out current git head of the -ati driver and
-generates a package, prompting for manually fixing up merge issues and
-such as you go.
+auto-xorg-git
+=============
+This tool is for building current git snapshots, merging against the
+debian's current packaging from git.  This is a good tool to use when
+you want to get debs as close as possible to the bleeding edge of
+current development.
 
-  ./auto-xorg-git -p xserver-xorg-video-ati
-
-The following retrieves the current git head of libxrender from xorg
-overwriting any existing checkout, and generates a package of it with
-version <VERSION>-0ubuntu0bwh non-interactively, dropping all Debian
-patches to sidestep merge conflicts.  This could be appropriate if
-you're processing a large number of packages for testing purposes and
-wish to do things completedly automatically:
-
-  ./auto-xorg-git -Dfn -p libxrender -a 0ubuntu0bwh -r gutsy
+See:
+ * README.auto-xorg-git
+ * auto-xorg-git
+ * data/*
+ * hooks/*
 
 
-Status
-------
-Examples that just work:
+xorg-pkg-all.sh
+===============
+Wrapper script for auto-xorg-git which runs it for all Xorg packages.
+Useful if you want to generate all .debs for all Xorg packages.
 
-auto-xorg-git -d origin/debian-unstable -p x11proto-xext
-auto-xorg-git -d origin/debian-unstable -p x11proto-dri2
-auto-xorg-git -g -H hooks -p libdrm
-auto-xorg-git -d origin/ubuntu -t "~" -p mesa
 
-auto-xorg-git -d origin/debian-unstable -p x11proto-input
-auto-xorg-git -e 2 -H hooks -p xorg-server -b server-1.5-branch
+easy-drm-modules-installer
+==========================
+Fool-proof script for building and installing drm modules from git.
+Useful if you need to install a driver requiring the latest drm
+versions.
 
-auto-xorg-git -e 1 -p xserver-xorg-input-mouse
-auto-xorg-git -e 1 -p xserver-xorg-input-keyboard
-auto-xorg-git -e 1 -p xserver-xorg-input-evdev -H ../xorg-pkg-tools/hooks
-auto-xorg-git -d origin/debian-unstable -u http://web.telia.com/~u89404340/touchpad/synaptics/.git -p xserver-xorg-input-synaptics -v 0.14.7 -t "~" -H hooks
 
-auto-xorg-git -d origin/debian-unstable -e 1 -H hooks ati
-auto-xorg-git -d origin/debian-unstable -H hooks radeonhd
-auto-xorg-git -d origin/debian-unstable -e 1 savage
-auto-xorg-git -d origin/debian-unstable -e 2 -H hooks -g intel
-auto-xorg-git -d origin/debian-unstable -e 1 -H hooks vesa
-auto-xorg-git -e 1 -t "~" nouveau
+Historical Package Scripts (hist-*)
+===================================
+Set of scripts to build debs for historical git versions of a package.
+This is a good tool if you are investigating a regression in a driver,
+and wish to test earlier versions to narrow down when the regression
+started.
+
+See:
+ * README.hist-snap
+ * git-commit-log
+ * git-pkg
+ * hist-pkg
+ * hist-build
 

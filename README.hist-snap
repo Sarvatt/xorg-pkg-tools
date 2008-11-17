@@ -1,0 +1,11 @@
+
+Setup git repositories
+======================
+mkdir hist-snap
+cd hist-snap
+git clone git://git.freedesktop.org/git/xorg/driver/xf86-video-intel
+git clone git://git.freedesktop.org/git/xorg/driver/xf86-video-ati
+git clone git://git.freedesktop.org/git/xorg/driver/xf86-video-nv
+git clone git://git.freedesktop.org/git/xorg/driver/xf86-input-evdev
+
+

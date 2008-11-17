@@ -3,6 +3,12 @@
 # Must run as root, from inside the dir with all the .dsc files.
 # Results assumed to go to /var/cache/pbuilder/result/
 
+if [ ! -d hist-snap ]; then
+    echo "Error:  No directory hist-snap"
+    exit
+fi
+cd hist-snap
+
 for file in *.dsc ; do
     if [ -e /var/cache/pbuilder/result/${file%.dsc}*.deb ]; then
         echo "Already built:  $file"

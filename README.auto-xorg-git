@@ -1,0 +1,44 @@
+                        --== auto-xorg-git ==--
+
+Examples
+--------
+The following checks out current git head of the -ati driver and
+generates a package, prompting for manually fixing up merge issues and
+such as you go.
+
+  ./auto-xorg-git -p xserver-xorg-video-ati
+
+The following retrieves the current git head of libxrender from xorg
+overwriting any existing checkout, and generates a package of it with
+version <VERSION>-0ubuntu0bwh non-interactively, dropping all Debian
+patches to sidestep merge conflicts.  This could be appropriate if
+you're processing a large number of packages for testing purposes and
+wish to do things completedly automatically:
+
+  ./auto-xorg-git -Dfn -p libxrender -a 0ubuntu0bwh -r gutsy
+
+
+Status
+------
+Examples that just work:
+
+auto-xorg-git -d origin/debian-unstable -p x11proto-xext
+auto-xorg-git -d origin/debian-unstable -p x11proto-dri2
+auto-xorg-git -g -H hooks -p libdrm
+auto-xorg-git -d origin/ubuntu -t "~" -p mesa
+
+auto-xorg-git -d origin/debian-unstable -p x11proto-input
+auto-xorg-git -e 2 -H hooks -p xorg-server -b server-1.5-branch
+
+auto-xorg-git -e 1 -p xserver-xorg-input-mouse
+auto-xorg-git -e 1 -p xserver-xorg-input-keyboard
+auto-xorg-git -e 1 -p xserver-xorg-input-evdev -H ../xorg-pkg-tools/hooks
+auto-xorg-git -d origin/debian-unstable -u http://web.telia.com/~u89404340/touchpad/synaptics/.git -p xserver-xorg-input-synaptics -v 0.14.7 -t "~" -H hooks
+
+auto-xorg-git -d origin/debian-unstable -e 1 -H hooks ati
+auto-xorg-git -d origin/debian-unstable -H hooks radeonhd
+auto-xorg-git -d origin/debian-unstable -e 1 savage
+auto-xorg-git -d origin/debian-unstable -e 2 -H hooks -g intel
+auto-xorg-git -d origin/debian-unstable -e 1 -H hooks vesa
+auto-xorg-git -e 1 -t "~" nouveau
+

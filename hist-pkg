@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ ! -d hist-snap ]; then
+    mkdir hist-snap
+fi
+
+for commit in $(cat commits.lst) ; do
+    echo -n "Processing $commit"
+    git-pkg $commit > bisect/$commit-pkg.log 2>&1
+    if [ $? == 0 ]; then
+        echo " succeeded"
+    else
+        echo " failed"
+    fi
+done
