@@ -28,7 +28,7 @@ use Getopt::Long qw(:config no_ignore_case bundling);
 # Global variables
 #------------------------------------------------------------------------
 use vars qw($VERSION $NAME $YEAR);
-$VERSION                  = '1.00';
+$VERSION                  = '1.01';
 $NAME                     = 'git-commit-log';
 $YEAR                     = '2008';
 
@@ -37,14 +37,21 @@ our $opt_help             = 0;
 our $opt_helplong         = 0;
 our $opt_man              = 0;
 our $opt_commits          = 0;
-
+our $opt_interval         = 1;
+our $opt_skip             = 0;
+our $opt_begin;
+our $opt_end;
 Getopt::Long::Configure ("bundling", "no_ignore_case");
 GetOptions(
            "version|V",
            "help|h",
            "helplong|H",
            "man|M",
+           "begin|b=s",
            "commits|c",
+           "end|e=s",
+           "interval|i=n",
+           "skip|s",
            ) or pod2usage(-verbose => 0, -exitstatus => 0);
 
 version_and_exit() if $opt_version;
@@ -60,7 +67,11 @@ sub usage {
     print "  $0 nv\n";
     print "\n";
     print "Options:\n";
+    print "  -b CMMT  Start with given commit id\n";
     print "  -c       Only display commit id's\n";
+    print "  -e CMMT  Stop with given commit id\n";
+    print "  -i N     Interval level\n";
+    print "  -s       Skip printing non-interval commits\n";
     exit 0;
 }
 
@@ -71,10 +82,9 @@ my $prev = pop @commits;
 my $display = $prev;
 my $select = '';
 my $count = 0;
-my $interval = 8;
-my $hide_non_intervals = 1;
+my $do_print = ($opt_begin || $opt_end)? undef : 1;
 while (my $next = pop @commits) {
-    my ($commit, $date, $time);
+    my ($commit, $date, $time, $comment);
     foreach my $line (`git log $next..$prev | grep -A2 commit`) {
         next if $line =~ /^Author/ or $line =~ /^--/;
         if ($line =~ /commit\s*(\w+)/) {
@@ -84,24 +94,35 @@ while (my $next = pop @commits) {
             $date = $3 . ' ' . $1;
             $time = $2;
             $count++;
-            if (!$display && $count % $interval) {
-                next if $hide_non_intervals;
+            if (!$display && $count % $opt_interval) {
+                next if $opt_skip;
                 $select = '      ';
-            } elsif (!$display && $count % ($interval*2)) {
+            } elsif (!$display && $count % ($opt_interval*2)) {
                 $select = '    ';
-            } elsif (!$display && $count % ($interval*4)) {
+            } elsif (!$display && $count % ($opt_interval*4)) {
                 $select = '   ';
-            } elsif (!$display && $count % ($interval*8)) {
+            } elsif (!$display && $count % ($opt_interval*8)) {
                 $select = '  ';
             } elsif (!$display) {
                 $select = ' ';
             } else {
                 $select = '';
             }
-            if ($opt_commits) {
-                print "$short\n";
-            } else {
-                printf("%-46s %-11s %s r%s %s\n", $select . $commit, $date, $time, $short, $display || '');
+
+            if ($opt_begin && $commit =~ /^$opt_begin/) {
+                $do_print = 0;
+                print "Ending printing\n";
+            } elsif ($opt_end && $commit =~ /^$opt_end/) {
+                $do_print = 1;
+                print "Starting printing\n";
+            }
+
+            if ($do_print) {
+                if ($opt_commits) {
+                    print "$short\n";
+                } else {
+                    printf("%-46s %-11s %s r%s %s\n", $select . $commit, $date, $time, $short, $display || '');
+                }
             }
             $display = undef;
         }
