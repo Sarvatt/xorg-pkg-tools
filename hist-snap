@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Must run as root, from inside the dir with all the .dsc files.
+# Results assumed to go to /var/cache/pbuilder/result/
+
+for file in *.dsc ; do
+    if [ -e /var/cache/pbuilder/result/${file%.dsc}*.deb ]; then
+        echo "Already built:  $file"
+    else
+        echo "Building ${file%.dsc}"
+        pbuilder build $file > ${file%.dsc}.log 2>&1
+    fi
+done
