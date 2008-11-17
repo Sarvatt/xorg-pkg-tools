@@ -21,6 +21,7 @@ NO_MERGE="no"
 MERGE_STRATEGY=""
 DROP_DEBIAN_PATCHES="no"
 PACKAGE_VERSION=
+EPOCH=AUTO
 QUIET=0
 declare -a CHANGES
 
@@ -365,8 +366,12 @@ update_changelogs() {
     GITVER="${PACKAGE_VERSION}${DATE_PREFIX}git${TODAY}${ADDBRANCH}.${LASTCOMMIT:7:8}"
     NO_EPOCH_VER=`echo $GITVER | sed 's/^.://'`
     
+    if [ "$EPOCH" = "AUTO" ]; then
+        EPOCH=$(dpkg-parsechangelog | sed -n 's/^Version: \(.\):.*/\1/p')
+    fi
+
     # -b forces version even if missing epoch
-    dch -b --distribution $DISTRIBUTION --newversion ${EPOCH}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
+    dch -b --distribution $DISTRIBUTION --newversion ${EPOCH:+$EPOCH:}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
     
     # Change Maintainer if on Ubuntu
     if [ "$(lsb_release -i -s)" = "Ubuntu" ] &&
@@ -437,7 +442,7 @@ while getopts "a:b:d:De:fgH:mnp:qr:s:t:u:S:v:w:h\?" opt $*; do
             ADDBRANCH="+${BRANCH//_/-}"            ;;
         D ) DROP_DEBIAN_PATCHES="yes"              ;;
         d ) DEBIANREPO="$OPTARG"                   ;;
-        e ) EPOCH="${OPTARG}:"                     ;;
+        e ) EPOCH="${OPTARG}"                      ;;
         f ) FORCE_OVERWRITE=1                      ;;
         g ) NO_MERGE="yes"                         ;;
         H ) HOOKS="$OPTARG"                        ;;
@@ -556,7 +561,7 @@ make_orig_tarball
 git commit -a -m "Packaged for $DISTRIBUTION"
 
 interact "build packages"
-msg "Building source and binary packages"
+msg "Building source package"
 # -d forces building even if missing (version) dependency
 debuild -S -sa -i -d
 
