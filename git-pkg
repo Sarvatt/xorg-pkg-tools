@@ -28,7 +28,7 @@ fi
 
 # Update the git repository to the commit id
 git reset --hard $COMMIT
-date=$(git log | head | grep Date | sed -e "s/Date: *//" | sed -e "s/\+.*$//")
+date=$(git log | head | grep Date | head -n 1| sed -e "s/Date: *//" | sed -e "s/[\+\-].*$//")
 DATE=`date +%Y%m%d -d "$date"`
 
 # Copy to new working directory
