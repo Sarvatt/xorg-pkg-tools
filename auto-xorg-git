@@ -217,6 +217,10 @@ update_upstream() {
     git branch -D autoxorggit
     git checkout -b autoxorggit upstream-head || die "git checkout -b autoxorggit upstream-head: $?"
     LASTCOMMIT=$(git log|head -1)
+    if [ "$LASTCOMMIT" = "$(< .lastcommit)" ]; then
+        warn "Nothing new from freedesktop"
+        [ $NOREBUILD ] && exit
+    fi
     echo $LASTCOMMIT > .lastcommit 
 }
 
@@ -420,6 +424,7 @@ usage() {
     echo " -H <hooks-dir>     Adds hooks from directory"
     echo " -m                 Pause for manual merging"
     echo " -n                 Non-interactive"
+    echo " -o                 No rebuild if up to date with upstream"
     echo " -p <pkg-name>      Explicit package name (no automunge)"
     echo " -q                 Operate quietly"
     echo " -r <release>       Distro release (feisty, gutsy, hardy, etc.)"
@@ -435,7 +440,7 @@ usage() {
 # main starts here
 
 # Command line options
-while getopts "a:b:d:De:fgH:mnp:qr:s:t:u:S:v:w:h\?" opt; do
+while getopts "a:b:d:De:fgH:mnop:qr:s:t:u:S:v:w:h\?" opt; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"                   ;;
         b ) BRANCH="$OPTARG";
@@ -448,8 +453,9 @@ while getopts "a:b:d:De:fgH:mnp:qr:s:t:u:S:v:w:h\?" opt; do
         H ) HOOKS="$OPTARG"                        ;;
         m ) MANUAL_MERGE="yes"                     ;;
         n ) INTERACTIVE="no"                       ;;
+        o ) NOREBUILD=1                            ;;
         p ) PACKAGE="$OPTARG"                      ;;
-        q ) QUIET=$(($QUIET + 1))                 ;;
+        q ) QUIET=$(($QUIET + 1))                  ;;
         r ) DISTRIBUTION="$OPTARG"                 ;;
         S ) MERGE_STRATEGY="-s $OPTARG"            ;;
         s ) XSERVER_VERSION="$OPTARG"              ;;
