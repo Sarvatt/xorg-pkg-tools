@@ -1,0 +1,7 @@
+Convenience wrapper to use with multi-dist, multi-arch pbuilder setups.
+It builds a range of debs serially, and prints out a summary of the .debs
+when it completes them.
+
+You'll need to customize the script a bit with your own preferences
+(username, allowed dists, etc.)
+
