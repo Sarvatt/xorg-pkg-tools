@@ -15,7 +15,7 @@ for PACKAGE in $DRIVERS; do
     echo "Building $PACKAGE"
     echo "=================================="
     mkdir -p auto-$PACKAGE/uploaded
-    mv auto-$PACKAGE/*source.changes auto-$PACKAGE/uploaded
+    mv auto-$PACKAGE/*source.changes auto-$PACKAGE/uploaded 2>/dev/null
     $AUTOXORGGIT -o -n -w auto-$PACKAGE $PACKAGE
     dput auto-$PACKAGE/*source.changes
 done
