@@ -1,0 +1,19 @@
+#!/bin/bash
+
+GIT_DIR=$1
+GIT_REPO=$2
+TAG_PATTERN=$3
+
+# Include the bash library functions
+. $(dirname $0)/xorg-pkg-tools.lib
+
+cd hist-snap/
+git clone $GIT_REPO
+
+# TODO:
+#  * Validate input parameters as non-blank
+#  * Check exit code for git clone
+#  * Parse a global config file to get the working dir
+#  * Add cmdline opts to set parameters
+#  * Maybe auto-detect stored git directory name?
+#  * Write out a .conf file for the package

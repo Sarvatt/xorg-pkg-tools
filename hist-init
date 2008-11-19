@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Include the bash library functions
+. $(dirname $0)/xorg-pkg-tools.lib
+
+# So far, all we do is create the base directory to store everything in
+mkdir hist-snap/
+
+# TODO:
+# * Check if it already exists?
+# * Maybe allow creating the path in any arbitrary location,
+#   and store a config file there to point to paths of things
