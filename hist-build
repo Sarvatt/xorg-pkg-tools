@@ -3,6 +3,9 @@
 # Must run as root, from inside the dir with all the .dsc files.
 # Results assumed to go to /var/cache/pbuilder/result/
 
+# Include the bash library functions
+. $(dirname $0)/xorg-pkg-tools.lib
+
 if [ ! -d hist-snap ]; then
     echo "Error:  No directory hist-snap"
     exit
