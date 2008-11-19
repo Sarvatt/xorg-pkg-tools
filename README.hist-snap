@@ -1,11 +1,70 @@
+                    --== Historical Snapshotter ==--
+
+hist-snap is a set of tools for creating a collection of past git
+snapshots of a given package.  This is useful for testing for when a
+given regression entered upstream, when one normally would need to do a
+git-bisect search.
 
 Setup git repositories
 ======================
-mkdir hist-snap
-cd hist-snap
-git clone git://git.freedesktop.org/git/xorg/driver/xf86-video-intel
-git clone git://git.freedesktop.org/git/xorg/driver/xf86-video-ati
-git clone git://git.freedesktop.org/git/xorg/driver/xf86-video-nv
-git clone git://git.freedesktop.org/git/xorg/driver/xf86-input-evdev
+Select the packages to build and pull down the appropriate git
+repositories.  Examples:
+
+ hist-init
+
+ hist-add xf86-video-intel git://git.freedesktop.org/git/xorg/driver/xf86-video-intel xf86-video-intel
+ hist-add xf86-video-ati   git://git.freedesktop.org/git/xorg/driver/xf86-video-ati xf86-video-ati
+ hist-add xf86-video-nv    git://git.freedesktop.org/git/xorg/driver/xf86-video-nv nv
+ hist-add xf86-input-evdev git://git.freedesktop.org/git/xorg/driver/xf86-input-evdev xf86-input-evdev
+
+ cd hist-snap
+ # TODO:  New tool that uses the pkg config file... (hist-add?)
+ git clone 
+
+
+Package-specific settings
+=========================
+For each package, set up a configuration file with details about the
+package.  The config files are sourced as Bash, so the full syntax of
+Bash is available.  An example config file:
+
+ # hist-snap/xserver-xorg-video-intel.conf
+ GIT_DIR="xf86-video-intel"
+ GIT_REPO="git://git.freedesktop.org/git/xorg/driver/xf86-video-intel"
+ TAG_PATTERN="xf86-video-intel"
+
+
+Generating git commit list
+==========================
+Next step is to generate the listing of git commits to be pulled and
+built.  The tool 'git-commit-log' can be used for doing this:
+
+ hist-mkcommits xserver-xorg-video-intel
+
+
+# TODO:  Where does the debian/ dir come in?
+# TODO:  Need to generate .json's here as well
+
+Create packaging
+================
+The git-pkg script can be used to generate the packaging for a given
+commit id.  hist-pkg is a wrapper script around this, which runs git-pkg
+for all the git commits generated in the previous step.
+
+ # TODO: Update to allow specification of which driver to do
+ #       I.e., change commits.lst to be more generalized
+ hist-pkg
+
+
+Build packages
+==============
+Once the packaging is generated, the packages can be built into debs.
+These scripts use pbuilder configured for multi-arch, multi-dist
+building.
+
+ # TODO:  Update wrapper to use DIST and ARCH
+ #        or maybe use pball?
+ hist-build
+
 
 
