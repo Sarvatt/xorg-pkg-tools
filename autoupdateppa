@@ -1,0 +1,22 @@
+#!/bin/sh
+
+DRIVERS="vesa ati radeonhd savage"
+
+AUTOXORGGIT=$(dirname $0)/auto-xorg-git
+
+if [ ! -x $AUTOXORGGIT ]; then
+    echo "Can not execute $AUTOXORGGIT"
+    exit 1
+fi
+
+for PACKAGE in $DRIVERS; do
+    echo
+    echo "=================================="
+    echo "Building $PACKAGE"
+    echo "=================================="
+    mkdir -p auto-$PACKAGE/uploaded
+    mv auto-$PACKAGE/*source.changes auto-$PACKAGE/uploaded 2>/dev/null
+    $AUTOXORGGIT -o -n -w auto-$PACKAGE $PACKAGE
+    dput auto-$PACKAGE/*source.changes
+done
+

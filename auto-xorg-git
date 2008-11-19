@@ -21,6 +21,7 @@ NO_MERGE="no"
 MERGE_STRATEGY=""
 DROP_DEBIAN_PATCHES="no"
 PACKAGE_VERSION=
+EPOCH=AUTO
 QUIET=0
 declare -a CHANGES
 
@@ -216,6 +217,10 @@ update_upstream() {
     git branch -D autoxorggit
     git checkout -b autoxorggit upstream-head || die "git checkout -b autoxorggit upstream-head: $?"
     LASTCOMMIT=$(git log|head -1)
+    if [ "$LASTCOMMIT" = "$(< .lastcommit)" ]; then
+        warn "Nothing new from freedesktop"
+        [ $NOREBUILD ] && exit
+    fi
     echo $LASTCOMMIT > .lastcommit 
 }
 
@@ -365,8 +370,12 @@ update_changelogs() {
     GITVER="${PACKAGE_VERSION}${DATE_PREFIX}git${TODAY}${ADDBRANCH}.${LASTCOMMIT:7:8}"
     NO_EPOCH_VER=`echo $GITVER | sed 's/^.://'`
     
+    if [ "$EPOCH" = "AUTO" ]; then
+        EPOCH=$(dpkg-parsechangelog | sed -n 's/^Version: \(.\):.*/\1/p')
+    fi
+
     # -b forces version even if missing epoch
-    dch -b --distribution $DISTRIBUTION --newversion ${EPOCH}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
+    dch -b --distribution $DISTRIBUTION --newversion ${EPOCH:+$EPOCH:}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
     
     # Change Maintainer if on Ubuntu
     if [ "$(lsb_release -i -s)" = "Ubuntu" ] &&
@@ -415,6 +424,7 @@ usage() {
     echo " -H <hooks-dir>     Adds hooks from directory"
     echo " -m                 Pause for manual merging"
     echo " -n                 Non-interactive"
+    echo " -o                 No rebuild if up to date with upstream"
     echo " -p <pkg-name>      Explicit package name (no automunge)"
     echo " -q                 Operate quietly"
     echo " -r <release>       Distro release (feisty, gutsy, hardy, etc.)"
@@ -430,21 +440,22 @@ usage() {
 # main starts here
 
 # Command line options
-while getopts "a:b:d:De:fgH:mnp:qr:s:t:u:S:v:w:h\?" opt $*; do
+while getopts "a:b:d:De:fgH:mnop:qr:s:t:u:S:v:w:h\?" opt; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"                   ;;
         b ) BRANCH="$OPTARG";
             ADDBRANCH="+${BRANCH//_/-}"            ;;
         D ) DROP_DEBIAN_PATCHES="yes"              ;;
         d ) DEBIANREPO="$OPTARG"                   ;;
-        e ) EPOCH="${OPTARG}:"                     ;;
+        e ) EPOCH="$OPTARG"                        ;;
         f ) FORCE_OVERWRITE=1                      ;;
         g ) NO_MERGE="yes"                         ;;
         H ) HOOKS="$OPTARG"                        ;;
         m ) MANUAL_MERGE="yes"                     ;;
         n ) INTERACTIVE="no"                       ;;
+        o ) NOREBUILD=1                            ;;
         p ) PACKAGE="$OPTARG"                      ;;
-        q ) QUIET=${QUIET}+1                       ;;
+        q ) QUIET=$(($QUIET + 1))                  ;;
         r ) DISTRIBUTION="$OPTARG"                 ;;
         S ) MERGE_STRATEGY="-s $OPTARG"            ;;
         s ) XSERVER_VERSION="$OPTARG"              ;;
@@ -556,7 +567,7 @@ make_orig_tarball
 git commit -a -m "Packaged for $DISTRIBUTION"
 
 interact "build packages"
-msg "Building source and binary packages"
+msg "Building source package"
 # -d forces building even if missing (version) dependency
 debuild -S -sa -i -d
 
