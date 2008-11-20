@@ -1,0 +1,22 @@
+                        --== git-commit-log ==--
+
+Usage:
+       git-commit-log [-c] <tag-pattern>
+
+       Examples:
+
+         git-commit-log xf86-video-intel
+
+         git-commit-log -c nv
+
+Description:
+       This program displays a listing of commits and commit date from a git
+       tree, sorted by releases.  The 'tag-pattern' allows distinguishing tags
+       that correspond to releases; only tags containing this text will be
+       used as valid tags.
+
+       See 'perldoc git-commit-log' for options and more info.
+
+Prerequisites:
+       Pod::Usage, Getopt::Long
+
