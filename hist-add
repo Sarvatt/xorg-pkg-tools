@@ -1,19 +1,39 @@
 #!/bin/bash
 
-GIT_DIR=$1
-GIT_REPO=$2
-TAG_PATTERN=$3
-
 # Include the bash library functions
 . $(dirname $0)/xorg-pkg-tools.lib
 
-cd hist-snap/
-git clone $GIT_REPO
+usage() {
+    write_msg "Usage:  $0 -d <git-dir> -r <git-repo> -t <tag-pattern>"
+    write_msg ""
+    write_msg "Initializes a git clone in current directory for historical snapshots."
+    exit 1
+}
+
+while getopts "d:r:t:h\?" opt; do
+    case "$opt" in
+        d ) GIT_DIR="$OPTARG"     ;;
+        r ) GIT_REPO="$OPTARG"    ;;
+        t ) TAG_PATTERN="$OPTARG" ;;
+        h ) usage                 ;;
+        \?) usage                 ;;
+        * ) usage                 ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+[ -z "${GIT_DIR}" ] && usage
+[ -z "${GIT_REPO}" ] && usage
+[ -z "${TAG_PATTERN}" ] && usage
+
+git clone $GIT_REPO || die "Clone of $GIT_REPO failed"
+
+cat <<EOF >${GIT_DIR}.config 
+GIT_DIR=${GIT_DIR}
+GIT_REPO=${GIT_REPO}
+TAG_PATTERN=${TAG_PATTERN}
+EOF
 
 # TODO:
-#  * Validate input parameters as non-blank
-#  * Check exit code for git clone
-#  * Parse a global config file to get the working dir
-#  * Add cmdline opts to set parameters
 #  * Maybe auto-detect stored git directory name?
-#  * Write out a .conf file for the package
+
