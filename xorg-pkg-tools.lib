@@ -12,17 +12,29 @@ QUIET=${QUIET:-0}
 ## General Purpose Routines
 msg() {
     if [ ${QUIET:-0} -lt 1 ]; then
-        echo $1
+        echo $1 | fold -s -w "${COLUMNS:-80}"
     fi
 }
 
 warn() {
-    echo "Warning:  $1" 1>&2
+    echo "Warning:  $1" | fold -s -w "${COLUMNS:-80}" 1>&2
 }
 
 die() {
-    echo "ERROR:  $1" 1>&2
+    echo "ERROR:  $1" | fold -s -w "${COLUMNS:-80}" 1>&2
     exit 1
+}
+
+is_installed() {
+    prog=$1
+    need=$2
+    /usr/bin/which $prog > /dev/null 2>&1
+    err=$?
+    if [ ! $err = 0 ]; then
+        warn "Could not $need because $prog is not installed ($err)"
+        return $err
+    fi
+    return 0
 }
 
 ########################################################################
@@ -161,6 +173,22 @@ s" ]; then
     fi
 }
 
+get_debian_version() {
+    pkg=$1
+    dpkg -l $pkg  | cat \
+        | egrep '^ii' \
+        | sed -e "s/ \+/ /g" \
+        | cut -d' ' -f 3
+}
+
+get_installed_version() {
+    get_debian_version $1 \
+        | sed -e "s/^.*+//" \
+        | cut -d- -f1 \
+        | sed -e "s/^[0-9]://" \
+        | sed -e "s/ubuntu.*$//"
+}
+
 
 # Check for existence if given driver is present
 check_for_driver()
@@ -173,4 +201,32 @@ check_for_driver()
         msg "Checking for $driver: missing."
         return 1;
     fi
+}
+
+get_xorg_drivers() {
+    pid=`pidof X`
+    if [ -z "$pid" ]; then
+        echo "Error:  X is not running"
+        return 1
+    fi
+    cat /proc/$pid/smaps | \
+        egrep '_drv.so|_dri.so' | \
+        cut -d '/' -f 7 | \
+        cut -d "_" -f 1 | \
+        uniq
+}
+
+# Tests if the given pciids are in numerical order from least to
+# greatest (e.g., $a <= $b <= $c <= ...)
+pciids_in_order() {
+    lastid=0
+    for pciid in $* ; do
+        # Strip embedded : and convert hex to dec
+        id=$((0x${pciid/:/}))
+        if [ $id -lt $lastid ]; then
+            return 1
+        fi
+        lastid=$id
+    done
+    return 0
 }
