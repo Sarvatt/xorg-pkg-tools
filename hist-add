@@ -4,15 +4,16 @@
 . $(dirname $0)/xorg-pkg-tools.lib
 
 usage() {
-    write_msg "Usage:  $0 -d <git-dir> -r <git-repo> -t <tag-pattern>"
+    write_msg "Usage:  $0 -p <pkg> -d <git-dir> -r <git-repo> -t <tag-pattern>"
     write_msg ""
     write_msg "Initializes a git clone in current directory for historical snapshots."
     exit 1
 }
 
-while getopts "d:r:t:h\?" opt; do
+while getopts "d:p:r:t:h\?" opt; do
     case "$opt" in
         d ) GIT_DIR="$OPTARG"     ;;
+        p ) PKG_NAME="$OPTARG"    ;;
         r ) GIT_REPO="$OPTARG"    ;;
         t ) TAG_PATTERN="$OPTARG" ;;
         h ) usage                 ;;
@@ -22,18 +23,17 @@ while getopts "d:r:t:h\?" opt; do
 done
 shift $(($OPTIND - 1))
 
+[ -z "${PKG_NAME}" ] && usage
 [ -z "${GIT_DIR}" ] && usage
 [ -z "${GIT_REPO}" ] && usage
 [ -z "${TAG_PATTERN}" ] && usage
 
-git clone $GIT_REPO || die "Clone of $GIT_REPO failed"
+msg "git clone $GIT_REPO"
+git clone ${GIT_REPO} ${GIT_DIR} || die "Clone of $GIT_REPO failed"
 
-cat <<EOF >${GIT_DIR}.config 
+cat <<EOF >${PKG_NAME}.config 
+PKG_NAME=${PKG_NAME}
 GIT_DIR=${GIT_DIR}
 GIT_REPO=${GIT_REPO}
 TAG_PATTERN=${TAG_PATTERN}
 EOF
-
-# TODO:
-#  * Maybe auto-detect stored git directory name?
-
