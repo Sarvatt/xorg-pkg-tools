@@ -3,7 +3,7 @@
 # Library of general purpose bash routines to share amongst
 # the xorg-pkg-tools scripts.
 #
-# All routines in this library must be runnable non-interactively.
+# All routines in this library must not require user interaction.
 
 # Defaults
 QUIET=${QUIET:-0}
@@ -158,5 +158,19 @@ s" ]; then
     else
         # Hard to say, could be xorg/app, xorg/font, or xorg/util
         die "Unknown Debian git directory"
+    fi
+}
+
+
+# Check for existence if given driver is present
+check_for_driver()
+{
+    driver=$1
+    if xdpyinfo | grep -q $driver ; then
+        msg "Checking for $driver: present."
+        return 0;
+    else
+        msg "Checking for $driver: missing."
+        return 1;
     fi
 }
