@@ -10,18 +10,22 @@ QUIET=${QUIET:-0}
 
 ########################################################################
 ## General Purpose Routines
+write_msg() {
+    echo "$*" | fold -s -w "${COLUMNS:-80}"
+}
+
 msg() {
     if [ ${QUIET:-0} -lt 1 ]; then
-        echo $1 | fold -s -w "${COLUMNS:-80}"
+        write_msg "$*"
     fi
 }
 
 warn() {
-    echo "Warning:  $1" | fold -s -w "${COLUMNS:-80}" 1>&2
+    write_msg "Warning:  $*" 1>&2
 }
 
 die() {
-    echo "ERROR:  $1" | fold -s -w "${COLUMNS:-80}" 1>&2
+    write_msg "ERROR:  $*" 1>&2
     exit 1
 }
 
@@ -37,6 +41,20 @@ is_installed() {
     return 0
 }
 
+# Recursively copies a directory, preserving timestamps
+copy_dir() {
+    FROM=$1
+    TO=$2
+    if [ -e ${TO} ]; then
+        warn "Removing existing $DIR dir"
+        rm -rf ${TO}
+    fi
+
+    msg "cp -a ${FROM} ${TO}"
+    cp -a ${FROM} ${TO}
+}
+
+
 ########################################################################
 ## Git Routines
 
@@ -47,6 +65,12 @@ git_branch_id() {
     echo ${branch_id#v}
 }
 
+# Returns date of the last git commit
+git_last_commit_date() {
+    dateline=$(git log | grep Date | head -n 1)
+    date=$(echo $dateline | sed -e "s/^Date: *\([\+\-]*\).*/\1/p;T;q")
+    echo `date +%Y%m%d -d "$date"`
+}
 
 ########################################################################
 ## Xorg-specific Routines
@@ -62,7 +86,7 @@ debpkg_to_fdopkg() {
          "$pkg" = "libxkbui" -o \
          "$pkg" = "libxkbfile" -o \
          "$pkg" = "libxtrans" ]; then
-        echo $pkg
+        echo "$pkg"
         return
     fi
 
