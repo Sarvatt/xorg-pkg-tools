@@ -5,45 +5,44 @@ snapshots of a given package.  This is useful for testing for when a
 given regression entered upstream, when one normally would need to do a
 git-bisect search.
 
-Setup git repositories
-======================
-Select the packages to build and pull down the appropriate git
-repositories.  Examples:
+Initialize git repositories
+===========================
+The hist-add tool can be used to create the git repositories that the
+tools need, and to generate a config file for the other hist-* tools to
+use.  For example:
 
- hist-init
+ mkdir snapshots
+ cd snapshots
 
- hist-add xf86-video-intel git://git.freedesktop.org/git/xorg/driver/xf86-video-intel xf86-video-intel
- hist-add xf86-video-ati   git://git.freedesktop.org/git/xorg/driver/xf86-video-ati xf86-video-ati
- hist-add xf86-video-nv    git://git.freedesktop.org/git/xorg/driver/xf86-video-nv nv
- hist-add xf86-input-evdev git://git.freedesktop.org/git/xorg/driver/xf86-input-evdev xf86-input-evdev
-
- cd hist-snap
- # TODO:  New tool that uses the pkg config file... (hist-add?)
- git clone 
-
-
-Package-specific settings
-=========================
-For each package, set up a configuration file with details about the
-package.  The config files are sourced as Bash, so the full syntax of
-Bash is available.  An example config file:
-
- # hist-snap/xserver-xorg-video-intel.conf
- GIT_DIR="xf86-video-intel"
- GIT_REPO="git://git.freedesktop.org/git/xorg/driver/xf86-video-intel"
- TAG_PATTERN="xf86-video-intel"
+ # -intel driver
+ hist-add -p xserver-xorg-video-intel \
+          -d xf86-video-intel \
+          -r git://git.freedesktop.org/git/xorg/driver/xf86-video-intel \
+          -t xf86-video-intel
+ # -ati driver
+ hist-add -p xserver-xorg-video-ati \
+          -d xf86-video-ati \
+          -r git://git.freedesktop.org/git/xorg/driver/xf86-video-ati \
+          -t xf86-video-ati
+ # -nv driver
+ hist-add -p xserver-xorg-video-nv \
+          -d xf86-video-nv \
+          -r git://git.freedesktop.org/git/xorg/driver/xf86-video-nv \
+          -t nv
+ # -evdev driver
+ hist-add -p xserver-xorg-input-evdev \
+          -d xf86-input-evdev \
+          -r git://git.freedesktop.org/git/xorg/driver/xf86-input-evdev \
+          -t xf86-input-evdev
 
 
 Generating git commit list
 ==========================
 Next step is to generate the listing of git commits to be pulled and
-built.  The tool 'git-commit-log' can be used for doing this:
+built:
 
- hist-mkcommits xserver-xorg-video-intel
+ hist-mkcommits xserver-xorg-video-intel.config
 
-
-# TODO:  Where does the debian/ dir come in?
-# TODO:  Need to generate .json's here as well
 
 Create packaging
 ================
@@ -51,20 +50,16 @@ The git-pkg script can be used to generate the packaging for a given
 commit id.  hist-pkg is a wrapper script around this, which runs git-pkg
 for all the git commits generated in the previous step.
 
- # TODO: Update to allow specification of which driver to do
- #       I.e., change commits.lst to be more generalized
- hist-pkg
+ hist-pkg xserver-xorg-video-intel.commits ./my-debian-dir
 
 
 Build packages
 ==============
-Once the packaging is generated, the packages can be built into debs.
-These scripts use pbuilder configured for multi-arch, multi-dist
-building.
+Once the packaging is generated, the packages can be built into debs
+using hist-build, which calls pball in turn.  These scripts use pbuilder
+configured for multi-arch, multi-dist building.
 
- # TODO:  Update wrapper to use DIST and ARCH
- #        or maybe use pball?
- hist-build
+ hist-build xserver-xorg-video-intel
 
 
 
