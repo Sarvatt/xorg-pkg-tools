@@ -7,6 +7,13 @@ DEST_URL="people.ubuntu.com"    # replace with your remote site
 DEST_PATH="public_html/Testing" # replace with your remote subdir (must exist)
 UPLOAD=0
 
+. $(dirname $0)/xorg-pkg-tools.lib
+
+usage() {
+    write_msg "Usage: $0"
+    exit 1
+}
+
 while getopts "u" opt $*; do
     case "$opt" in
         u ) UPLOAD=1                           ;;
@@ -77,5 +84,4 @@ for arch in $ARCHS ; do
 done
 
 echo "$REPORT"
-
 
