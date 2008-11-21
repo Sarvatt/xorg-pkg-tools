@@ -3,27 +3,17 @@
 # Include the bash library functions
 . $(dirname $0)/xorg-pkg-tools.lib
 
-PKG=$1
+usage() {
+    write_msg "Usage: $0 <pkg-conf-file>"
+    exit 1
+}
 
-if [ -z $PKG ] ; then
-   echo "Usage:  $0 <package-name>"
-   exit 1
-fi
+PKG_CONF=$1
+[ ! -e "${PKG_CONF}" ] && usage
+. ${PKG_CONF}
 
-if [ -d "hist-snap" ] ; then
-   cd hist-snap
-fi
-
-if [ ! -e "${PKG}.conf" ] ; then
-   echo "Error:  Cannot find ${PKG}.conf."
-   exit 1
-fi
-. ${PKG}.conf
-
-if [ ! -d ${GIT_DIR} ] ; then
-   echo "Error:  Missing directory ${GIT_DIR}"
-   exit 1
-fi
+[ -d ${GIT_DIR} ] || die "Error:  Missing directory ${GIT_DIR}"
 cd ${GIT_DIR}
 
-../../git-commit-log ${TAG_PATTERN} > ../${PKG}.commits
+msg "git-commit-log -c $TAG_PATTERN > ../${PKG_CONF%.config}.commits"
+git-commit-log -cr ${TAG_PATTERN} > ../${PKG_CONF%.config}.commits
