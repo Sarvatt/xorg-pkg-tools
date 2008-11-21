@@ -6,17 +6,26 @@
 # Include the bash library functions
 . $(dirname $0)/xorg-pkg-tools.lib
 
-if [ ! -d hist-snap ]; then
-    echo "Error:  No directory hist-snap"
-    exit
-fi
-cd hist-snap
+usage() {
+    write_msg "Usage: $0"
+    exit 1
+}
 
+# TODO:  Should this work on a per-package basis?
 for file in *.dsc ; do
-    if [ -e /var/cache/pbuilder/result/${file%.dsc}*.deb ]; then
-        echo "Already built:  $file"
-    else
-        echo "Building ${file%.dsc}"
-        pbuilder build $file > ${file%.dsc}.log 2>&1
-    fi
+    pball $file > ${file%.dsc}.log 2>&1
+
+    # TODO:  Parse output from pball to get info about debs
+
+    # TODO:  Copy deb(s) to destination place and rename
+
+    # TODO:  Link to the package json file?
+    # Generate new JSON file for the deb
+    echo > ${file%.dsc}.json <<EOF
+{
+    "debs":         "",
+    "dbg-debs":     "",
+    "distro":       "${distro}"
+}
+EOF
 done
