@@ -90,7 +90,7 @@ debpkg_to_fdopkg() {
         return
     fi
 
-    if [ "$pkg" = "libdrm" ]; then
+    if [ "$pkg" = "libdrm" -o "$pkg" = "drm-snapshot" ]; then
         echo "drm"
         return
     fi
@@ -136,22 +136,22 @@ fdogitdir_for_fdopkg() {
         echo ""
     elif [ ${fdopkg} = "xserver" ]; then
         echo "xorg"
-    elif [ ${fdopkg} = "drm" -o  ${fdopkg} = "mesa" ]; then
+    elif [ ${fdopkg} = "drm" -o ${fdopkg} = "mesa" ]; then
         echo "mesa"
     elif [ ${fdopkg} = "xf86-video-nouveau" ]; then
-    echo "nouveau"
+        echo "nouveau"
     elif [ ${fdopkg} = "xf86-video-avivo" ]; then
         echo "avivo"
     elif [ ${fdopkg#xf86-} != ${fdopkg} ]; then
-    echo "xorg/driver"
+        echo "xorg/driver"
     elif [ ${fdopkg#lib} != ${fdopkg} ]; then
         echo "xorg/lib"
     elif [ ${fdopkg%proto} != ${fdopkg} ]; then
         echo "xorg/proto"
     elif [ ${fdopkg} = "bitmaps" -o ${fdopkg} = "cursors" ]; then
         echo "xorg/data"
-    elif [ ${fdopkg} = "xorg-docs" -o ${fdopkg} = "xorg-sgml-doctools"
-    ]; then
+    elif [ ${fdopkg} = "xorg-docs" -o \
+        ${fdopkg} = "xorg-sgml-doctools" ]; then
         echo "xorg/doc"
     else
         # Hard to say, could be xorg/app, xorg/font, or xorg/util
@@ -169,17 +169,17 @@ debgitdir_for_debpkg() {
         echo "pkg-xorg/xserver"
     elif [ ${debpkg#xserver-xorg-} != ${debpkg} ]; then
         echo "pkg-xorg/driver"
-    elif [ ${debpkg#lib} != ${debpkg} -o ${debpkg} = "mesa" -o ${debpkg}
-        = "pixman" -o ${debpkg} = "xft" -o ${debpkg} = "xtran\
-s" ]; then
+    elif [ ${debpkg#lib} != ${debpkg} -o ${debpkg} = "mesa" -o \
+        ${debpkg} = "pixman" -o ${debpkg} = "xft" -o \
+        ${debpkg} = "xtrans" -o ${debpkg} = "drm-snapshot" ]; then
         echo "pkg-xorg/lib"
     elif [ ${debpkg#x11proto-} != ${debpkg} ]; then
         echo "pkg-xorg/proto"
-    elif [ ${debpkg} = "xbitmaps" -o ${debpkg} = "xcursors-themes" -o
+    elif [ ${debpkg} = "xbitmaps" -o ${debpkg} = "xcursors-themes" -o \
         ${debpkg} = "xkb-data" ]; then
         echo "pkg-xorg/data"
-    elif [ ${debpkg} = "xorg-docs" -o ${debpkg} = "xorg-sgml-doctools"
-        ]; then
+    elif [ ${debpkg} = "xorg-docs" -o \
+        ${debpkg} = "xorg-sgml-doctools" ]; then
         echo "pkg-xorg/doc"
     elif [ ${debpkg/compiz/} != ${debpkg} ]; then
         echo "pkg-xorg/bling"
