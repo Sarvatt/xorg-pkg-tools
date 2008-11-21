@@ -38,6 +38,7 @@ our $opt_helplong         = 0;
 our $opt_man              = 0;
 our $opt_commits          = 0;
 our $opt_interval         = 1;
+our $opt_releases         = 0;
 our $opt_skip             = 0;
 our $opt_begin;
 our $opt_end;
@@ -49,6 +50,7 @@ GetOptions(
            "man|M",
            "begin|b=s",
            "commits|c",
+           "releases|r",
            "end|e=s",
            "interval|i=n",
            "skip|s",
@@ -119,7 +121,11 @@ while (my $next = pop @commits) {
 
             if ($do_print) {
                 if ($opt_commits) {
-                    print "$short\n";
+                    if ($opt_releases) {
+                        printf("%s %s\n", $short, $display || '');
+                    } else {
+                        printf("%s\n", $short);
+                    }
                 } else {
                     printf("%-46s %-11s %s r%s %s\n", $select . $commit, $date, $time, $short, $display || '');
                 }
