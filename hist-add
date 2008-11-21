@@ -10,15 +10,23 @@ usage() {
     exit 1
 }
 
-while getopts "d:p:r:t:h\?" opt; do
+# Defaults
+EPOCH='2:'
+ADDVERSION="-1"
+UPDATE_AUTOCONF=1
+
+while getopts "a:d:e:p:r:t:h\?" opt; do
     case "$opt" in
-        d ) GIT_DIR="$OPTARG"     ;;
-        p ) PKG_NAME="$OPTARG"    ;;
-        r ) GIT_REPO="$OPTARG"    ;;
-        t ) TAG_PATTERN="$OPTARG" ;;
-        h ) usage                 ;;
-        \?) usage                 ;;
-        * ) usage                 ;;
+        a ) ADDVERSION="$OPTARG"       ;;
+        c ) UPDATE_AUTOCONF="$OPTARG"  ;;
+        d ) GIT_DIR="$OPTARG"          ;;
+        e ) EPOCH="$OPTARG"            ;;
+        p ) PKG_NAME="$OPTARG"         ;;
+        r ) GIT_REPO="$OPTARG"         ;;
+        t ) TAG_PATTERN="$OPTARG"      ;;
+        h ) usage                      ;;
+        \?) usage                      ;;
+        * ) usage                      ;;
     esac
 done
 shift $(($OPTIND - 1))
@@ -36,4 +44,7 @@ PKG_NAME=${PKG_NAME}
 GIT_DIR=${GIT_DIR}
 GIT_REPO=${GIT_REPO}
 TAG_PATTERN=${TAG_PATTERN}
+EPOCH=${EPOCH}
+ADDVERSION=${ADDVERSION}
+UPDATE_AUTOCONF=${UPDATE_AUTOCONF}
 EOF
