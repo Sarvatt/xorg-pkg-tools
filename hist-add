@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO:  Document the options
+
 # Include the bash library functions
 . $(dirname $0)/xorg-pkg-tools.lib
 
@@ -12,10 +14,12 @@ usage() {
 
 # Defaults
 EPOCH='2:'
-ADDVERSION="-1"
+ADDVERSION="-0ubuntu1"
 UPDATE_AUTOCONF=1
+#AUTOSIGN=${AUTOSIGN:-55955A6B}
+AUTOSIGN=${AUTOSIGN:-E0E67611}
 
-while getopts "a:d:e:p:r:t:h\?" opt; do
+while getopts "a:d:e:p:r:s:t:h\?" opt; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"       ;;
         c ) UPDATE_AUTOCONF="$OPTARG"  ;;
@@ -23,6 +27,7 @@ while getopts "a:d:e:p:r:t:h\?" opt; do
         e ) EPOCH="$OPTARG"            ;;
         p ) PKG_NAME="$OPTARG"         ;;
         r ) GIT_REPO="$OPTARG"         ;;
+        s ) AUTOSIGN="$OPTARG"         ;;
         t ) TAG_PATTERN="$OPTARG"      ;;
         h ) usage                      ;;
         \?) usage                      ;;
@@ -47,4 +52,5 @@ TAG_PATTERN=${TAG_PATTERN}
 EPOCH=${EPOCH}
 ADDVERSION=${ADDVERSION}
 UPDATE_AUTOCONF=${UPDATE_AUTOCONF}
+AUTOSIGN=${AUTOSIGN}
 EOF
