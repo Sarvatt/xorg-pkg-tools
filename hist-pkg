@@ -4,7 +4,8 @@
 . $(dirname $0)/xorg-pkg-tools.lib
 
 # TODO:  Load this from a user config file
-AUTOSIGN=${AUTOSIGN:-55955A6B}
+#AUTOSIGN=${AUTOSIGN:-55955A6B}
+AUTOSIGN=${AUTOSIGN:-E0E67611}
 
 usage() {
     write_msg "Usage: $0 <commits-file> <debian-dir>"
@@ -24,12 +25,12 @@ if [ ! -e "${PKG}.config" ] ; then
 fi
 . ${PKG}.config
 
-BASEDIR=$(dirname "${COMMITS_FILE}")
+BASEDIR=$(abspath "${COMMITS_FILE}")
 if [ ! -d ${BASEDIR} ]; then
     die "directory ${BASEDIR} not found"
 fi
 
-REPO="${BASEDIR}/${GIT_DIR}"
+REPO="${BASEDIR%/}/${GIT_DIR}"
 
 # Constructs a version string for a given version control system commit
 vcs_snapshot_version_string() {
@@ -44,7 +45,7 @@ vcs_snapshot_version_string() {
     [ -z "$PACKAGE_VERSION" ] && die "No PACKAGE_VERSION in configure"
 
     # Get the date for the most recent git commit
-    DATE=git_last_commit_date
+    DATE=$(git_last_commit_date)
 
     echo "${PACKAGE_VERSION}${DATE_PREFIX}${VCS_TYPE}${DATE}.${COMMIT}"
 }
@@ -56,85 +57,98 @@ git_pkg() {
     COMMIT=$1
     DEBIAN=$2
 
-    echo "COMMIT:  $COMMIT"
-    echo "DEBIAN:  $DEBIAN"
-    echo "REPO:    $REPO"
+    DISTRO="UNRELEASED"
+    ORIGDIR=${REPO}.orig
+
+    echo "BASEDIR:  "$BASEDIR
+    echo "COMMIT:   "$COMMIT
+    echo "DISTRO:   "$DISTRO
+    echo "DEBIAN:   "${DEBIAN%/}
+    echo "REPO:     "${REPO/$BASEDIR/[BASEDIR]/}
+    echo "ORIGDIR:  "${ORIGDIR/$BASEDIR/[BASEDIR]/}
+    echo "----------"
 
     # Update the git repository to the commit id
     cd ${REPO}
-    git reset --hard $COMMIT
-
-    ORIGDIR=${REPO}.orig
-    echo "Origdir: $ORIGDIR"
+    msg "Resetting to $COMMIT"
+    git reset --hard $COMMIT || return $?
 
     # Copy to new working directory
-    copy_dir ${REPO} ${ORIGDIR}
+    copy_dir ${REPO} ${ORIGDIR} || return $?
     cd ${ORIGDIR}
-    return
 
     # Update autoconfage if desired
-    [ ${UPDATE_AUTOCONF} ] && ./autogen.sh
+    if [ ${UPDATE_AUTOCONF} ] ; then
+        autoreconf || return $?
+    fi
+    rm -rf autom4te/ .git 
+    # TODO:  Remove autom4te, cache, .git, etc.
 
     # Set the version string
-    GITVER=`vcs_snapshot_version_string "git" $COMMIT`
-    msg $GITVER
+    GITVER=$(vcs_snapshot_version_string "git" $COMMIT)
+    VERSION=${EPOCH}${GITVER}${ADDVERSION}
 
     # Create the source dir
-    SOURCE=${BASEDIR}/${PKG}-${GITVER}.orig
-    copy_dir ${ORIGDIR} ${SOURCE}
-    rm -rf ${ORIGDIR}
+    SOURCE=${BASEDIR%/}/${PKG}-${GITVER}.orig
+    copy_dir ${ORIGDIR} ${SOURCE} || return $?
+    rm -rf ${ORIGDIR} || return $?
 
-    # TODO:  Remove autom4te, cache, .git, etc.
-    # TODO:  Doesn't the tarball need generated at this point?
     # TODO:  Above this line should be one function, below another
 
     # Create the target dir
-    TARGET=${BASEDIR}/${PKG}-${GITVER}
-    copy_dir ${SOURCE} ${TARGET}
+    TARGET=${BASEDIR%/}/${PKG}-${GITVER}
+    copy_dir ${SOURCE} ${TARGET} || return $?
     cd ${TARGET}
 
     # Copy in the given debian/ directory
-    copy_dir ${DEBIAN} ${TARGET}/
+    copy_dir ${BASEDIR%/}/${DEBIAN%/}/ ${TARGET}/debian || return $?
 
     # Add changelog entry
     msg "Adding changelog entry via dch..."
-    dch -b --distribution UNRELEASED --newversion \
-        ${EPOCH}${GITVER}${ADDVERSION} \
-        "Checkout from git up to $COMMIT ($date)" \
-        || die "dch: $?"
+    dch -b --distribution ${DISTRO} --newversion ${VERSION} \
+        "Checkout from git up to $COMMIT ($date)"
+    if [ ! $? ] ; then
+        warn "dch:  Failed to add changelog entry"
+        return $?
+    fi
 
     # Create package
     msg "debuild -sa -S"
-    debuild -sa -S -k${AUTOSIGN}
+    debuild -sa -S -k${AUTOSIGN} || warn "debuild: $?"
 
     # Generate JSON output file
-    echo  > ${TARGET}.json <<EOF
+    cat > ${TARGET}.json <<EOF
 {
     "pkg":          "${PKG}",
+    "version":      "${VERSION}",
     "commit":       "${COMMIT}",
-    "date":         "${DATE}",
-    "debian":       "${DEBIAN}",
-    "source":       "${SOURCE}",
-    "target":       "${TARGET}",
+    "debian":       "${DEBIAN%/}",
+    "target":       "${TARGET/$BASEDIR/}",
+    "pubkey":       "${AUTOSIGN}",
     "dependencies": ""
 }
 EOF
+    echo "VERSION:  $VERSION"
+    return 0
 }
 
 exec < ${COMMITS_FILE}
-while read commit ; do
+while read line ; do
+    commit=${line%% *}
+    name=${line/$commit/}
+    name=${name/ /}
     [ -z "${commit}" ] && continue
+    case $commit in
+        \#* ) continue ;;
+    esac
 
-    echo "Processing $commit..."
-    continue
     git_pkg ${commit} ${DEBIAN_DIR} | tee ${BASEDIR}/$commit-pkg.log 2>&1
-    if [ $? = 0 ]; then
-        msg "Processing $commit succeeded"
-        msg ""
+    if [ ! $? ] ; then
+        msg "FAILED"
     else
-        msg "Processing $commit failed"
-        msg ""
+        msg "DONE"
     fi
+    msg ""
 
 done
 
