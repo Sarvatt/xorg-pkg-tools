@@ -240,6 +240,9 @@ treport [options] [ [ options ] ]
    -H, --helplong=boolean        Prints a long help message
        --man=boolean             Prints a manual page (detailed help)
    -D, --debug=integer           Prints debug messages
+       --summary                 Prints a summary of the log
+       --devices                 Prints list of devices loaded
+       --modules                 Prints list of modules loaded
 
 =head1 DESCRIPTION
 
