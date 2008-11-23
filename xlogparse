@@ -27,7 +27,7 @@ use Getopt::Long qw(:config no_ignore_case bundling);
 # Global variables
 #------------------------------------------------------------------------
 use vars qw($VERSION $NAME);
-$VERSION              = '1.00';
+$VERSION              = '1.01';
 $NAME                 = 'xlogparse';
 
 our $opt_version      = 0;
@@ -45,31 +45,30 @@ Getopt::Long::Configure ("bundling", "no_ignore_case");
 GetOptions(
     "version|V",        # Prints the version and exits
     "help|h",           # Prints a brief help message
-    "helplong|H",       # Prints a long help message
-    "man|M",            # Prints a manual page (detailed help)
+    "helplong|H",       # Prints a longer help message
+    "man|M",            # Prints a full manual page
     "debug|D=i",        # Prints debug messages
     "summary",          # Prints a summary of the xorg log
     "devices",          # List configured drivers
+    "modules",          # List loaded modules
     "errors",           # Lists errors present
     "warnings",         # List warnings present
-    "modules",          # List loaded modules
     ) or pod2usage(-verbose => 0, -exitstatus => 0);
 
 version_and_exit() if $opt_version;
 pod2usage(-verbose => 0, -exitstatus => 0) if $opt_help;
 pod2usage(-verbose => 1, -exitstatus => 0) if $opt_helplong;
+pod2usage(-verbose => 2, -exitstatus => 0) if $opt_man;
 
+if (! $opt_devices && ! $opt_modules && ! $opt_errors && !$opt_warnings) {
+    $opt_summary = 1;
+}
 
 #========================================================================
 # Subroutines
 #------------------------------------------------------------------------
 
-=head2 version_and_exit()
-
-Displays text describing the version of the script
-
-=cut
-
+# Displays text describing the version of the script
 sub version_and_exit
 {
     print "$NAME version $VERSION\n";
@@ -123,8 +122,12 @@ sub process_record {
 }
 
 my @Log;
-
 my $buffer = '';
+
+if (@ARGV == 0) {
+    unshift @ARGV, "/var/log/Xorg.0.log";
+}
+
 foreach my $line (<>) {
     if ($line =~ m/^\(/) {
         if (defined $buffer) {
@@ -178,11 +181,15 @@ if ($opt_warnings) {
 
 if ($opt_summary) {
     print "\n";
-    print "Log contains $log_count entries\n";
+    print "Log file contains $log_count entries\n";
+    print "  - $notice_count notice messages\n";
     print "  - $info_count info messages\n";
+    print "  - $device_count devices\n";
+    print "  - $module_count modules\n";
     print "  - $error_count errors\n";
     print "  - $warning_count warnings\n";
-    print "  - $device_count devices\n";
+    print "\n";
+    print "See --devices, --modules, --errors, --warnings for details\n";
 }
 
 if ($opt_devices) {
@@ -242,13 +249,13 @@ __END__
 
 =head1 NAME
 
-B<xlogparse> - Parses Xlog.*.log format files and allows looking up data
-from it
+B<xlogparse> - Parses Xlog.*.log format files and displays summaries of
+information from them.
 
 
 =head1 SYNOPSIS
 
-treport [options] [ [ options ] ]
+xlogparse [options] [Xorg.0.log]
 
  Options:
    -V, --version=boolean         Prints the version and exits
@@ -259,10 +266,17 @@ treport [options] [ [ options ] ]
        --summary                 Prints a summary of the log
        --devices                 Prints list of devices loaded
        --modules                 Prints list of modules loaded
+       --errors                  Prints error messages from log
+       --warnings                Prints warnings from log
 
 =head1 DESCRIPTION
 
-Parses Xlog.*.log format files and allows looking up data from it
+B<xlogparse> is able to interpret the X.org file format, and displays
+summary information from them, such as the list of error messages,
+loaded devices, etc.
+
+If called with no arguments it will parse and use the system's
+/var/log/Xorg.0.log file.
 
 =head1 OPTIONS
 
@@ -278,7 +292,7 @@ Prints a brief help message
 
 =item B<-H>, B<--helplong>
 
-Prints a long help message
+Prints a longer help message
 
 =item B<--man>
 
@@ -288,6 +302,26 @@ Prints a manual page (detailed help)
 
 Prints debug messages
 
+=item B<--summary>
+
+Displays a short summary of the contents of the log file, including
+numbers of devices, modules, errors, warnings, and info messages.
+
+=item B<--devices>
+
+Displays a table summarizing the devices loaded in the system.
+
+=item B<--modules>
+
+Displays a table itemizing the modules loaded.
+
+=item B<--errors>
+
+Lists the error messages present in the Xorg log file.
+
+=item B<--warnings>
+
+Lists the warning messages present in the Xorg log file.
 
 =back
 
@@ -299,24 +333,20 @@ See B<xlogparse> -h for a summary of options.
 L<Pod::Usage>,
 L<Getopt::Long>
 
-=head1 BUGS
-
-None known.
-
 =head1 VERSION
 
-1.00
+1.01
 
 =head1 SEE ALSO
 
-L<perl(1)>
+L<xorg.conf(5)>, L<xorg(1)>, L<xserver(1)>
 
 
 =head1 AUTHOR
 
 Bryce W. Harrington E<lt>bryce@bryceharrington.orgE<gt>
 
-L<http://www.bryceharrington.org|http://www.bryceharrington.org>
+L<http://www.bryceharrington.org>
 
 =head1 COPYRIGHT
 
