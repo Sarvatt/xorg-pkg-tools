@@ -4,16 +4,18 @@
 . $(dirname $0)/xorg-pkg-tools.lib
 
 usage() {
-    write_msg "Usage: $0 <pkg-conf-file>"
+    write_msg "Usage: $0 <pkg-config> [pkg-config ...]"
     exit 1
 }
 
-PKG_CONF=$1
-[ ! -e "${PKG_CONF}" ] && usage
-. ${PKG_CONF}
+BASEDIR=$PWD
+for PKG_CONF in $* ; do
+    ls $PKG_CONF
+    [ -f "${PKG_CONF}" ] || usage
+    . ${PKG_CONF}
 
-[ -d ${GIT_DIR} ] || die "Error:  Missing directory ${GIT_DIR}"
-cd ${GIT_DIR}
+    [ -d ${GIT_DIR} ] || die "Error:  Missing directory ${GIT_DIR}"
 
-msg "git-commit-log -c $TAG_PATTERN > ../${PKG_CONF%.config}.commits"
-git-commit-log -cr ${TAG_PATTERN} > ../${PKG_CONF%.config}.commits
+    msg "git-commit-log -c $TAG_PATTERN > ../${PKG_CONF%.config}.commits"
+    $( cd ${GIT_DIR} && git-commit-log -cr ${TAG_PATTERN} > $BASEDIR/${PKG_CONF%.config}.commits )
+done

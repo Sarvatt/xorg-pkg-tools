@@ -78,6 +78,10 @@ for all the git commits generated in the previous step.
 
  hist-pkg xserver-xorg-video-intel.commits ./my-debian-dir
 
+The second argument is a debian directory to copy into the package.  Any
+customizations for the build (such as dependencies, patches, and so on)
+can be put into the debian directory and passed.
+
 
 Build packages
 ==============
