@@ -39,6 +39,22 @@ use.  For example:
           -r git://git.freedesktop.org/git/xorg/driver/xf86-input-evdev \
           -t xf86-input-evdev
 
+The general form is:
+
+ hist-add -p <package-name> \
+          -d <git-directory-name> \
+          -e <epoch> \
+          -r <git-repo> \
+          -t <tag-pattern>
+
+The the epoch is the "N:" prefix present on many Xorg package versions,
+which can be checked via 'apt-get madison <package>'.  The tag-pattern
+is text typically used in upstream's version tags; review `git tags` to
+get a sense for how upstream tags their releases.
+
+All of this information is stored in the *.config file, which can be
+customized further as needed.
+
 
 Generating git commit list
 ==========================
@@ -46,6 +62,12 @@ Next step is to generate the listing of git commits to be pulled and
 built:
 
  hist-mkcommits xserver-xorg-video-intel.config
+
+This results in a *.commits file containing a listing of commits to be
+packaged, for passing to hist-pkg in the next step.  It can be modified
+further, such as splitting it into multiple files to allow running
+hist-pkg with different arguments against different portions of the git
+tree history.
 
 
 Create packaging

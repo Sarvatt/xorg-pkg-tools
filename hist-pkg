@@ -114,7 +114,7 @@ git_pkg() {
 
     # Create package
     msg "debuild -sa -S"
-    debuild -sa -S -k${AUTOSIGN} || warn "debuild: $?"
+    debuild -sa -S ${AUTOSIGN:+- $AUTOSIGN} || warn "debuild: $?"
 
     # Generate JSON output file
     cat > ${TARGET}.json <<EOF

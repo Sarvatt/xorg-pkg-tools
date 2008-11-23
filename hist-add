@@ -19,15 +19,15 @@ UPDATE_AUTOCONF=1
 #AUTOSIGN=${AUTOSIGN:-55955A6B}
 AUTOSIGN=${AUTOSIGN:-E0E67611}
 
-while getopts "a:d:e:p:r:s:t:h\?" opt; do
+while getopts "a:d:e:k:p:r:t:h\?" opt; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"       ;;
         c ) UPDATE_AUTOCONF="$OPTARG"  ;;
         d ) GIT_DIR="$OPTARG"          ;;
         e ) EPOCH="$OPTARG"            ;;
+        k ) AUTOSIGN="$OPTARG"         ;;
         p ) PKG_NAME="$OPTARG"         ;;
         r ) GIT_REPO="$OPTARG"         ;;
-        s ) AUTOSIGN="$OPTARG"         ;;
         t ) TAG_PATTERN="$OPTARG"      ;;
         h ) usage                      ;;
         \?) usage                      ;;
