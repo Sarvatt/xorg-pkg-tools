@@ -13,7 +13,7 @@ usage() {
 }
 
 # Defaults
-EPOCH='2:'
+EPOCH=''
 ADDVERSION="-0ubuntu1"
 UPDATE_AUTOCONF=1
 #AUTOSIGN=${AUTOSIGN:-55955A6B}
