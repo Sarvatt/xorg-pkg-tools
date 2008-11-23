@@ -7,6 +7,7 @@
 
 # Defaults
 QUIET=${QUIET:-0}
+BASEDIR=${BASEDIR:-''}
 
 ########################################################################
 ## General Purpose Routines
@@ -46,12 +47,22 @@ copy_dir() {
     FROM=$1
     TO=$2
     if [ -e ${TO} ]; then
-        warn "Removing existing $DIR dir"
+        warn "Removing existing dir '${TO/$BASEDIR/[BASEDIR]/}'"
         rm -rf ${TO}
     fi
 
-    msg "cp -a ${FROM} ${TO}"
+    msg "cp -a ${FROM/$BASEDIR/[BASEDIR]/} ${TO/$BASEDIR/[BASEDIR]/}"
     cp -a ${FROM} ${TO}
+}
+
+# Returns absolute path for given file or directory
+abspath() {
+    if [ -d $1 ] ; then
+        dir=${1%/}/
+    else
+        dir=$(dirname $1)/
+    fi
+    echo $(cd ${dir} && echo ${PWD%/}/${dir##*/})
 }
 
 
