@@ -1,0 +1,14 @@
+                          --== xlogparse ==--
+
+Script to summarize the contents of an Xorg.0.log file.
+
+Display a summary of the previous boot, including warnings and errors:
+
+   xlogparse /var/log/Xorg.0.log.old --errors --warnings --summary 
+
+Summarize the modules or input devices currently loaded:
+
+   xlogparse --modules
+   xlogparse --devices
+
+See perldoc xlogparse for more documentation.
