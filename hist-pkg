@@ -3,34 +3,10 @@
 # Include the bash library functions
 . $(dirname $0)/xorg-pkg-tools.lib
 
-# TODO:  Load this from a user config file
-#AUTOSIGN=${AUTOSIGN:-55955A6B}
-AUTOSIGN=${AUTOSIGN:-E0E67611}
-
 usage() {
     write_msg "Usage: $0 <commits-file> <debian-dir>"
     exit 1
 }
-
-# Handle command-line parameters
-COMMITS_FILE=$1
-DEBIAN_DIR=$2
-[ -z "${COMMITS_FILE}" ] && usage
-[ -z "${DEBIAN_DIR}" ] && usage
-
-PKG=${COMMITS_FILE%.commits}
-if [ ! -e "${PKG}.config" ] ; then
-   echo "Error:  Cannot find ${PKG}.config."
-   exit 1
-fi
-. ${PKG}.config
-
-BASEDIR=$(abspath "${COMMITS_FILE}")
-if [ ! -d ${BASEDIR} ]; then
-    die "directory ${BASEDIR} not found"
-fi
-
-REPO="${BASEDIR%/}/${GIT_DIR}"
 
 # Constructs a version string for a given version control system commit
 vcs_snapshot_version_string() {
@@ -132,6 +108,26 @@ EOF
     return 0
 }
 
+# Handle command-line parameters
+COMMITS_FILE=$1
+DEBIAN_DIR=$2
+[ -z "${COMMITS_FILE}" ] && usage
+[ -z "${DEBIAN_DIR}" ] && usage
+
+PKG=${COMMITS_FILE%.commits}
+if [ ! -e "${PKG}.config" ] ; then
+   echo "Error:  Cannot find ${PKG}.config."
+   exit 1
+fi
+. ${PKG}.config
+
+BASEDIR=$(abspath "${COMMITS_FILE}")
+if [ ! -d ${BASEDIR} ]; then
+    die "directory ${BASEDIR} not found"
+fi
+
+REPO="${BASEDIR%/}/${GIT_DIR}"
+
 exec < ${COMMITS_FILE}
 while read line ; do
     commit=${line%% *}
@@ -142,7 +138,8 @@ while read line ; do
         \#* ) continue ;;
     esac
 
-    git_pkg ${commit} ${DEBIAN_DIR} | tee ${BASEDIR}/$commit-pkg.log 2>&1
+    LOGFILE=${PKG}-${commit}.log
+    git_pkg ${commit} ${DEBIAN_DIR} | tee ${BASEDIR}/$LOGFILE 2>&1
     if [ ! $? ] ; then
         msg "FAILED"
     else
@@ -152,3 +149,4 @@ while read line ; do
 
 done
 
+# TODO:  Print a summary of success/failures

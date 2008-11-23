@@ -61,13 +61,13 @@ Generating git commit list
 Next step is to generate the listing of git commits to be pulled and
 built:
 
- hist-mkcommits xserver-xorg-video-intel.config
+ hist-mkcommits *.config
 
-This results in a *.commits file containing a listing of commits to be
-packaged, for passing to hist-pkg in the next step.  It can be modified
-further, such as splitting it into multiple files to allow running
-hist-pkg with different arguments against different portions of the git
-tree history.
+This results in one or more *.commits files, each containing a listing
+of commits to be packaged, for passing to hist-pkg in the next step.
+The .commit files can be modified further, such as splitting into
+multiple files to allow running hist-pkg with different arguments
+against different portions of the git tree history.
 
 
 Create packaging
