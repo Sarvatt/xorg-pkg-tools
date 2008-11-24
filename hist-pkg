@@ -149,4 +149,6 @@ while read line ; do
 
 done
 
-# TODO:  Print a summary of success/failures
+# TODO: Print a summary of success/failures
+# TODO: Running ./autogen.sh requires newer dependency versions than may
+#       be installed on the host

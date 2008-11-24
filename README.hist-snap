@@ -76,7 +76,7 @@ The git-pkg script can be used to generate the packaging for a given
 commit id.  hist-pkg is a wrapper script around this, which runs git-pkg
 for all the git commits generated in the previous step.
 
- hist-pkg xserver-xorg-video-intel.commits ./my-debian-dir
+ hist-pkg xserver-xorg-video-intel.commits ./xserver-xorg-video-intel-debian
 
 The second argument is a debian directory to copy into the package.  Any
 customizations for the build (such as dependencies, patches, and so on)

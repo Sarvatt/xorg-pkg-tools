@@ -16,8 +16,7 @@ usage() {
 EPOCH=''
 ADDVERSION="-0ubuntu0"
 UPDATE_AUTOCONF=1
-#AUTOSIGN=${AUTOSIGN:-55955A6B}
-AUTOSIGN=${AUTOSIGN:-E0E67611}
+AUTOSIGN=${AUTOSIGN:-55955A6B}
 
 while getopts "a:d:e:k:p:r:t:h\?" opt; do
     case "$opt" in
