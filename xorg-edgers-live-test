@@ -1,9 +1,9 @@
 #!/bin/sh
 
-# xorg-edgers-live-test v50
+# xorg-edgers-live-test v106
 # by Tormod Volden 2008
-# a script to be run in an Ubuntu 8.04 live CD session
-# installs xorg test packages from xorg-edgers PPA
+# A script to be run in an Ubuntu live CD session
+# Installs xorg test packages from xorg-edgers PPA
 
 set -e
 
@@ -37,18 +37,12 @@ rsync --size-only -a `dirname $0`/archives/ /var/cache/apt/archives/ || echo "..
 # Minimal Software Sources to speed up apt-get update
 SS=/etc/apt/sources.list
 [ -e $SS.bak ] || cp -a $SS $SS.bak
-
-# dpkg-dev is needed for apt-get source
-if ! which dpkg-source >/dev/null; then
-	echo "deb http://ch.archive.ubuntu.com/ubuntu/ hardy main" > $SS
-	apt-get update
-	apt-get install --assume-yes dpkg-dev
-fi
-
-echo "#deb http://ch.archive.ubuntu.com/ubuntu/ hardy main universe" > $SS
-echo "deb http://ppa.launchpad.net/xorg-edgers/ubuntu hardy main" >> $SS
-echo "deb-src http://ppa.launchpad.net/xorg-edgers/ubuntu hardy main" >> $SS
-#echo "deb http://ppa.launchpad.net/tormodvolden/ubuntu hardy main" >> $SS
+RELEASE=$(lsb_release --short --codename)
+echo "deb http://archive.ubuntu.com/ubuntu/ $RELEASE main" > $SS
+echo "#deb http://archive.ubuntu.com/ubuntu/ $RELEASE universe" >> $SS
+echo "deb http://ppa.launchpad.net/xorg-edgers/ubuntu $RELEASE main" >> $SS
+echo "#deb-src http://ppa.launchpad.net/xorg-edgers/ubuntu $RELEASE main" >> $SS
+echo "#deb http://ppa.launchpad.net/tormodvolden/ubuntu $RELEASE main" >> $SS
 apt-get update
 
 # Upgrade mesa first, then xserver-xorg-core
@@ -62,22 +56,15 @@ apt-get install --assume-yes --force-yes xserver-xorg-video-intel
 # Upgrade anything else available
 apt-get upgrade --assume-yes --force-yes || UPGRADEMESS=1
 
-# Get the source to build the drm kernel modules
-apt-get source --assume-yes libdrm2
+# Get the source and build the drm kernel modules
+apt-get install --assume-yes --force-yes drm-modules-source module-assistant
+module-assistant auto-install drm-modules
 
-# Find current drm module in use and build only that one to save time
-MOD=`lsmod|grep ^drm|awk '{print $4}'`
-
-# fixme: must be a better URL somewhere
-[ -e ./easy-drm-modules-installer ] ||
-  wget http://bazaar.launchpad.net/~xorg-edgers/xorg-server/xorg-pkg-tools/download/debian.tormod%40gmail.com-20080519215804-kr5ybq3l9qlxxofj/easydrmmodulesinstal-20080503213337-ex8iyz7xkve9vvwl-1/easy-drm-modules-installer
-chmod +x easy-drm-modules-installer
-./easy-drm-modules-installer -y ${MOD:+$MOD.ko}
-
-# Shutdown Xorg (/etc/init.d/gdm breaks on live CD)
+# Shutdown Xorg (/etc/init.d/gdm breaks on Hardy live CD)
 killall gdm
 sleep 2
 
+MOD=$( lsmod | awk '/^drm/{print $4}' )
 modprobe -r $MOD
 modprobe -r drm
 
