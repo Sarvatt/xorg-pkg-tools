@@ -61,7 +61,9 @@ apt-get install --assume-yes --force-yes drm-modules-source module-assistant
 module-assistant -t auto-install drm-modules
 
 # Shutdown Xorg (/etc/init.d/gdm breaks on Hardy live CD)
-killall gdm
+/etc/init.d/gdm stop || true
+sleep 2
+killall gdm || true
 sleep 2
 
 MOD=$( lsmod | awk '/^drm/{print $4}' )
@@ -87,6 +89,7 @@ if [ $UPGRADEMESS ]; then
 	read nothing
 fi
 
+echo "Will now restart X"
 sleep 3
 /etc/init.d/gdm start
 
