@@ -39,7 +39,7 @@ SS=/etc/apt/sources.list
 [ -e $SS.bak ] || cp -a $SS $SS.bak
 RELEASE=$(lsb_release --short --codename)
 echo "deb http://archive.ubuntu.com/ubuntu/ $RELEASE main" > $SS
-echo "#deb http://archive.ubuntu.com/ubuntu/ $RELEASE universe" >> $SS
+echo "deb http://archive.ubuntu.com/ubuntu/ $RELEASE universe" >> $SS
 echo "deb http://ppa.launchpad.net/xorg-edgers/ubuntu $RELEASE main" >> $SS
 echo "#deb-src http://ppa.launchpad.net/xorg-edgers/ubuntu $RELEASE main" >> $SS
 echo "#deb http://ppa.launchpad.net/tormodvolden/ubuntu $RELEASE main" >> $SS
@@ -58,7 +58,7 @@ apt-get upgrade --assume-yes --force-yes || UPGRADEMESS=1
 
 # Get the source and build the drm kernel modules
 apt-get install --assume-yes --force-yes drm-modules-source module-assistant
-module-assistant auto-install drm-modules
+module-assistant -t auto-install drm-modules
 
 # Shutdown Xorg (/etc/init.d/gdm breaks on Hardy live CD)
 killall gdm
