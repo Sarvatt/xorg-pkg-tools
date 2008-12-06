@@ -2,7 +2,7 @@
 
 # Tormod Volden 2008-03-07
 # Came after the package split
-# Needed as long as Ubuntu doesn't ship the new packages
+# Needed for Hardy
 
 sed -i '/^Depends:/s/, xserver-xorg-video-r128, xserver-xorg-video-mach64//' debian/control
 sed -i '/^Depends:/s/, xserver-xorg-video-mach64-dbg, xserver-xorg-video-r128-dbg//' debian/control
@@ -10,7 +10,7 @@ CHANGES+=("Drop depends on xserver-xorg-video-r128 and xserver-xorg-video-mach64
 
 
 # Tormod Volden 2008-04-29
-# Debian dpkg-shlibdeps has a new option, not yet in Ubuntu dpkg-dev
+# Debian dpkg-shlibdeps has a new option, not in Hardy dpkg-dev
 
 sed -i '/dh_shlibdeps/s/ --warnings=6//' debian/rules
 sed -i '/^Build-Depends:/s/, dpkg-dev (>= 1.14.17)//' debian/control
