@@ -108,7 +108,7 @@ merge_debian() {
         read nothing
     elif [ $INTERACTIVE = "yes" ]; then
         msg "Interactively merging..."
-        git-mergetool
+        git mergetool
         msg "Press enter to continue with packaging"
         read nothing
     else
