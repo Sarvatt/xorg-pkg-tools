@@ -1,12 +1,14 @@
 
 For automated convenience:
 
-Specify default PPA in ~/.dput.cf
+#Specify default PPA in ~/.dput.cf
 [DEFAULT]
 default_host_main = my-ppa
 
-Specify default gpg key in ~/.gnupg/gpg.conf
-default-key ABCD0123
+#Specify default signing key in ~/.devscripts
+DEBSIGN_KEYID=ABCD0123
+
+#Make gpg use password agent in ~/.gnupg/gpg.conf
 use-agent
 
 And turn on passphrase caching in seahorse-preferences
