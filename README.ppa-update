@@ -1,4 +1,14 @@
 
+Usage: ppa-update <package> [ <package> .. ]
+
+ppa-update will run auto-xorg-git on all packages in the argument list
+and upload the source packages to your PPA.
+
+The $PPA envvar can be used to specify a PPA.
+Example:
+ PPA=my-ppa ppa-update ati vesa intel
+
+
 For automated convenience:
 
 #Specify default PPA in ~/.dput.cf
