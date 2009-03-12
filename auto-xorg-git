@@ -388,6 +388,7 @@ if [ "$DONE_MERGING" != 1 ]; then
         hooks preupstream
         get_upstream
     else
+	[ "$NO_MERGE" = "yes" ] && rm -rf $DEBPKG/debian $DEBPKG/ChangeLog
         update_debian
         cd $DEBPKG
         hooks preupstream
