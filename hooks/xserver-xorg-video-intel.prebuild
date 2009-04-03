@@ -4,8 +4,8 @@
 # 
 
 sed -i '/^Architecture: /s/$/ lpia/' debian/control
-CHANGES+=("Add lpia architecture")
+CHANGES+=("hook: Add lpia architecture")
 
 sed -i '/^Depends: /s/$/, libdrm-intel1/' debian/control
-CHANGES+=("Add depends on libdrm-intel1 (lp 303177)")
+CHANGES+=("hook: Add depends on libdrm-intel1 (lp 303177)")
 

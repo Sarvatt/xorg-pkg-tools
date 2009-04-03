@@ -4,5 +4,5 @@
 # 
 
 sed -i '/\[DRM_MODE=yes\], \[DRM_MODE=no\]/s/yes/no/' configure.ac
-CHANGES+=("Disable kernel mode setting")
+CHANGES+=("hook: Disable kernel mode setting")
 
