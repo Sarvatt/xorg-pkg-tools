@@ -8,3 +8,11 @@ CHANGES+=("Update CORE_DATE in linux-core/drm_core.h for easier identification w
 # 2008-11-20 Tormod Volden
 sed -i -e "/^Build-Depends: /s/$/, pkg-config/" debian/control
 CHANGES+=("Add pkg-config to build dependencies")
+
+# 2009-04-17 Tormod Volden
+# This package might overwrite some Jaunty header files
+sed -i -e '/^Package: libdrm-dev$/a \
+Replaces: linux-libc-dev
+' debian/control
+CHANGES+=("hook: libdrm-dev Replaces linux-libc-dev")
+

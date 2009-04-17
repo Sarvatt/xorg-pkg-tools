@@ -1,8 +1,0 @@
-# This will be sourced as a bash script
-
-# Tormod Volden 2009-03-08
-# 
-
-sed -i '/\[DRM_MODE=yes\], \[DRM_MODE=no\]/s/yes/no/' configure.ac
-CHANGES+=("hook: Disable kernel mode setting")
-
