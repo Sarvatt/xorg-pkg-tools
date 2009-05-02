@@ -4,8 +4,12 @@
 
 if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   sed -i '/^02_use-ieee-fp-on-s390-and-m68k.patch/s/^/#/' debian/patches/series
-  CHANGES+=("Disable 02_use-ieee-fp-on-s390-and-m68k.patch (fails)")
+  CHANGES+=("hook: Disable 02_use-ieee-fp-on-s390-and-m68k.patch (fails)")
+
+  sed -i '/^103_bump_965_texture_limit.diff/s/^/#/' debian/patches/series
+  CHANGES+=("hook: Disable 103_bump_965_texture_limit.diff (applied upstream)")
 
   sed -i '/^104_fix_dri2_ext_tfp.diff/s/^/#/' debian/patches/series
-  CHANGES+=("Disable 104_fix_dri2_ext_tfp.diff (fails)")
+  CHANGES+=("hook: Disable 104_fix_dri2_ext_tfp.diff (applied upstream)")
+
 fi
