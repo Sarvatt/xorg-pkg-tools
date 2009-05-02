@@ -1,0 +1,10 @@
+
+# Tormod Volden 2009-05-03
+# Disable EGL (not packaged anyway) for master
+
+if [ "$BRANCH" != "mesa_7_4_branch" ]; then
+  sed -i -e '/^confflags-[dos]/a \
+	--disable-egl \\
+' debian/rules
+  CHANGES+=("hook: disable EGL" )
+fi
