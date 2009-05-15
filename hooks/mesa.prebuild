@@ -6,5 +6,15 @@ if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   sed -i -e '/^confflags-[dos]/a \
 	--disable-egl \\
 ' debian/rules
-  CHANGES+=("hook: disable EGL" )
+  CHANGES+=("hook: disable EGL")
+
+
+# Tormod Volden 2009-05-15
+# Factor out the glx*.h so that glxew.h is not shipped twice
+
+  sed -i -e '\#^usr/include/GL/glx\*.h#a \
+usr/include/GL/glxext.h\
+usr/include/GL/glx_mangle.h
+' -e  '\#^usr/include/GL/glx\*.h#s#\*##' debian/mesa-common-dev.install
+  CHANGES+=("hook: do not ship glxew.h in mesa-common-dev")
 fi

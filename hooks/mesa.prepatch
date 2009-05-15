@@ -15,4 +15,7 @@ if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   sed -i '/^106_compiz_ring_switcher_xorg_segv_on_radeon.diff/s/^/#/' debian/patches/series
   CHANGES+=("hook: Disable 106_compiz_ring_switcher_xorg_segv_on_radeon.diff (applied upstream)")
 
+  sed -i '/^05_hurd-ftbfs.diff/s/^/#/' debian/patches/series
+  CHANGES+=("hook: Disable 05_hurd-ftbfs.diff (fails)")
+
 fi
