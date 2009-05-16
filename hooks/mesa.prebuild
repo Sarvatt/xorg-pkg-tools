@@ -3,10 +3,11 @@
 # Disable EGL (not packaged anyway) for master
 
 if [ "$BRANCH" != "mesa_7_4_branch" ]; then
+
   sed -i -e '/^confflags-[dos]/a \
 	--disable-egl \\
 ' debian/rules
-  CHANGES+=("hook: disable EGL")
+  CHANGES+=("hook: Disable EGL")
 
 
 # Tormod Volden 2009-05-15
@@ -16,5 +17,13 @@ if [ "$BRANCH" != "mesa_7_4_branch" ]; then
 usr/include/GL/glxext.h\
 usr/include/GL/glx_mangle.h
 ' -e  '\#^usr/include/GL/glx\*.h#s#\*##' debian/mesa-common-dev.install
-  CHANGES+=("hook: do not ship glxew.h in mesa-common-dev")
+  CHANGES+=("hook: Do not ship glxew.h in mesa-common-dev")
+
 fi
+
+# Tormod Volden 2009-05-16
+# Let it build on Jaunty kernel
+
+sed -i '/^ linux-libc-dev /s/2.6.29/2.6.28/' debian/control
+CHANGES+=("hook: Relax linux-libc-dev depends to 2.6.28")
+
