@@ -196,13 +196,21 @@ merge_debian() {
 }
 
 add_debian() {
-	TMPDEB=`mktemp -d`
-	git checkout $DEBIANREPO
-	cp -a debian $TMPDEB
-	git checkout autoxorggit
-	cp -a $TMPDEB/debian debian
-	rm -r $TMPDEB
-        CHANGES+=("Only added debian/ tree from $DEBIANREPO")
+    TMPDEB=`mktemp -d`
+    git checkout $DEBIANREPO
+    cp -a debian $TMPDEB
+    git checkout autoxorggit
+    cp -a $TMPDEB/debian debian
+    rm -r $TMPDEB
+    CHANGES+=("Only added debian/ tree from $DEBIANREPO")
+}
+
+# To be used by package hooks
+drop () {
+    PATCH=$1
+    shift
+    sed -i "/^$PATCH/s/^/#/" debian/patches/series
+    CHANGES+=("hook: Disable $PATCH ($*)")
 }
 
 debian_patches() {
