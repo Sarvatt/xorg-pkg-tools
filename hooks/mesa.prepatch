@@ -8,5 +8,4 @@ if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   drop 103_bump_965_texture_limit.diff applied upstream
   drop 104_fix_dri2_ext_tfp.diff applied upstream
   drop 105_glXWaitX_segfaults.patch applied upstream
-  drop 106_compiz_ring_switcher_xorg_segv_on_radeon.diff applied upstream
 fi
