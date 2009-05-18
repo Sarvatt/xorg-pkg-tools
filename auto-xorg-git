@@ -36,9 +36,9 @@ interact() {
 }
 
 discard() {
-    file=$1
-    head=$2
-    dest=$(dirname $file)
+    local file=$1
+    local head=$2
+    local dest=$(dirname $file)
 
     msg "+ Discarding Debian differences in ${file}"
     mv ./${file} ./${file}.merge
@@ -196,7 +196,7 @@ merge_debian() {
 }
 
 add_debian() {
-    TMPDEB=`mktemp -d`
+    local TMPDEB=`mktemp -d`
     git checkout $DEBIANREPO
     cp -a debian $TMPDEB
     git checkout autoxorggit
@@ -207,7 +207,7 @@ add_debian() {
 
 # To be used by package hooks
 drop () {
-    PATCH=$1
+    local PATCH=$1
     shift
     sed -i "/^$PATCH/s/^/#/" debian/patches/series
     CHANGES+=("hook: Disable $PATCH ($*)")
@@ -232,7 +232,7 @@ update_changelogs() {
     git log > ChangeLog
     
     msg "Updating changelog..."
-    TODAY=`date +%Y%m%d`
+    local TODAY=`date +%Y%m%d`
     if [ -z "$PACKAGE_VERSION" ]; then
         eval `grep PACKAGE_VERSION= configure`
     fi
@@ -261,8 +261,8 @@ update_changelogs() {
 }
 
 make_orig_tarball() {
-    CURDIR=$(basename $(pwd))
-    TARDIR=${DEBPKG}-${NO_EPOCH_VER}
+    local CURDIR=$(basename $(pwd))
+    local TARDIR=${DEBPKG}-${NO_EPOCH_VER}
     cd ..
     if [ $CURDIR != $TARDIR ]; then
         msg "Our current working directory has the wrong name,"
