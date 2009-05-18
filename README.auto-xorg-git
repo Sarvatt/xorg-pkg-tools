@@ -42,3 +42,16 @@ auto-xorg-git -d origin/debian-unstable -e 2 -H hooks -g intel
 auto-xorg-git -d origin/debian-unstable -e 1 -H hooks vesa
 auto-xorg-git -e 1 -t "~" nouveau
 
+Mesa 7.5 branch for Jaunty (if you are not currently on Jaunty):
+auto-xorg-git -H hooks -g -b mesa_7_5_branch -d origin/ubuntu -t "~" -p mesa -r jaunty
+
+Mesa master branch for your current ubuntu release:
+auto-xorg-git -H hooks -g -d origin/ubuntu -t "~" -p mesa
+
+Intel master branch for your current ubuntu release:
+auto-xorg-git -d origin/debian-experimental -e 2 -H hooks -g intel
+
+Intel 2.7 branch:
+auto-xorg-git -d origin/debian-unstable -b 2.7 -e 2 -H hooks -g intel
+
+If on Karmic, use -H hooks-karmic instead of -H hooks
