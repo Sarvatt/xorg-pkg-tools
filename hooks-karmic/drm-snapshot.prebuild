@@ -1,0 +1,31 @@
+# This will be sourced as a bash script
+
+
+# 2009-04-03 Tormod Volden
+# .git-revision is used by module-assistant.
+# Stuff our version in there with some acrobatics since
+# we don't ship a git repo in the source tarball.
+# Note that we can't substitute from the version here directly, since
+# this stub is run before the version is calculated and changelog is updated.
+
+sed -i -e '/^install: /a \
+	dpkg-parsechangelog | sed -n "s/^Version: //p" > .git-revision
+' debian/rules
+CHANGES+=("hook: Create git-revision based on our package version")
+
+
+# 2008-11-22
+# /etc/depmod.d/ubuntu.conf puts "updates" first in the search path
+# Putting our modules here makes sure they are used
+
+sed -i -e 's#/char/drm#/kernel/updates/drm-snapshot#' debian/rules
+CHANGES+=("hook: Install modules to kernel/updates/drm-snapshot")
+
+
+# 2008-07-29 Tormod Volden
+# when are they ever gonna update the CORE_DATE upstream?
+TODAY=`date +%Y%m%d`
+sed -i -e "/^#define CORE_DATE/s/20060810/${TODAY}git/" linux-core/drm_core.h
+CHANGES+=("hook: Update CORE_DATE in linux-core/drm_core.h for easier identification when debugging")
+
+

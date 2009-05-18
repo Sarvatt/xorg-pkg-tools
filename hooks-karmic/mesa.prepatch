@@ -1,0 +1,11 @@
+
+# Tormod Volden 2009-04-28
+# Drop patches for master branch
+
+if [ "$BRANCH" != "mesa_7_4_branch" ]; then
+  drop 02_use-ieee-fp-on-s390-and-m68k.patch fails
+  drop 05_hurd-ftbfs.diff fails
+  drop 103_bump_965_texture_limit.diff applied upstream
+  drop 104_fix_dri2_ext_tfp.diff applied upstream
+  drop 105_glXWaitX_segfaults.patch applied upstream
+fi
