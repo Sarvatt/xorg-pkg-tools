@@ -16,3 +16,37 @@ sed -i -e '/^Package: xdmx$/,/^$/d' debian/control
 sed -i -e '/^Package: xdmx-tools$/,/^$/d' debian/control
 CHANGES+=("disable dmx (fails to build)")
 
+# 2009-05-21 Robert Hooker
+# Do not build xnest (fails to build)
+
+sed -i -e '/--enable-xnest /s/enable/disable/' debian/rules
+sed -i -e '/^Package: xnest$/,/^$/d' debian/control
+CHANGES+=("disable xnest (fails to build)")
+
+# 2009-05-21 Robert Hooker
+# Do not build xserver-xephyr (fails to build)
+
+sed -i -e '/--enable-xephyr /s/enable/disable/' debian/rules
+sed -i -e '/^Package: xserver-xephyr$/,/^$/d' debian/control
+CHANGES+=("disable xserver-xephyr (fails to build)")
+
+# 2009-05-21 Robert Hooker
+# Do not build xfbdev (fails to build)
+
+sed -i -e '/--enable-xfbdev /s/enable/disable/' debian/rules
+sed -i -e '/^Package: xserver-xfbdev$/,/^$/d' debian/control
+CHANGES+=("disable xserver-xfbdev (fails to build)")
+
+# 2009-05-21 Robert Hooker
+# Do not build kdrive (fails to build)
+
+sed -i -e '/--enable-kdrive /s/enable/disable/' debian/rules
+CHANGES+=("disable kdrive (fails to build)")
+
+# 2009-05-21 Robert Hooker
+# Increase input abi version to 5
+
+echo 5 > debian/inputabiver
+CHANGES+=("increase inputabiver to 5")
+
+
