@@ -1,19 +1,18 @@
 # Robert Hooker 2009-05-21
 # Drop patches for master branch
 
-if [ "$BRANCH" != "server-1.6-branch" ]; then
-  drop 13_debian_add_xkbpath_env_variable.diff fails
-  drop 20_hurd-i386.diff fails
-  drop kfreebsd-ftbfs.diff fails
-  drop 0001-xorg.conf-5-refer-to-mousedrv-4-.-Debian-394058.patch fails
-  drop 102_ubuntu_sharevts_load_cpu.patch fails
-  drop 103_psb_auto.patchn fails
-  drop 135_rethrow_signals.patch fails
-  drop 140_quell_acpi_errmsgs.patch fails
-  drop 153_make_dmx_compile.patch fails
-  drop 156_exevents_copykeyclass_nullptrcheck.patch fails
-  drop 158_raise_maxclients.patch fails
-  drop 160_log_timestamping.patch fails
-  drop 169_mipointer_nullptr_checks.patch fails
-  drop 174_set_bg_pixmap_of_cow_to_none.patch fails
-fi
+drop 13_debian_add_xkbpath_env_variable.diff fails
+drop 20_hurd-i386.diff fails
+drop kfreebsd-ftbfs.diff fails
+drop 0001-xorg.conf-5-refer-to-mousedrv-4-.-Debian-394058.patch fails
+drop 102_ubuntu_sharevts_load_cpu.patch fails
+drop 103_psb_auto.patch fails
+drop 135_rethrow_signals.patch fails
+drop 140_quell_acpi_errmsgs.patch fails
+drop 153_make_dmx_compile.patch fails
+drop 156_exevents_copykeyclass_nullptrcheck.patch fails
+drop 158_raise_maxclients.patch fails
+drop 160_log_timestamping.patch fails
+drop 169_mipointer_nullptr_checks.patch fails
+drop 174_set_bg_pixmap_of_cow_to_none.patch fails
+
