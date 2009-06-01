@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# xorg-edgers-live-test v106
+# xorg-edgers-live-test v137
 # by Tormod Volden 2008
 # A script to be run in an Ubuntu live CD session
 # Installs xorg test packages from xorg-edgers PPA
@@ -57,8 +57,10 @@ apt-get install --assume-yes --force-yes xserver-xorg-video-intel
 apt-get upgrade --assume-yes --force-yes || UPGRADEMESS=1
 
 # Get the source and build the drm kernel modules
-apt-get install --assume-yes --force-yes drm-modules-source module-assistant
-module-assistant -t auto-install drm-modules
+if [ $BUILD_DRM ]; then
+    apt-get install --assume-yes --force-yes drm-modules-source module-assistant
+    module-assistant -t auto-install drm-modules
+fi
 
 # Shutdown Xorg (/etc/init.d/gdm breaks on Hardy live CD)
 /etc/init.d/gdm stop || true
@@ -66,9 +68,11 @@ sleep 2
 killall gdm || true
 sleep 2
 
-MOD=$( lsmod | awk '/^drm/{print $4}' )
-modprobe -r $MOD
-modprobe -r drm
+if [ $BUILD_DRM ]; then
+    MOD=$( lsmod | awk '/^drm/{print $4}' )
+    modprobe -r $MOD
+    modprobe -r drm
+fi
 
 # A broken kernel module *might* mess with your hard drive
 echo "Disabling all swap for safety reasons"
