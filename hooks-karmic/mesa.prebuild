@@ -9,6 +9,10 @@ if [ "$BRANCH" != "mesa_7_4_branch" ]; then
 ' debian/rules
   CHANGES+=("hook: Disable EGL")
 
+  sed -i -e '/^confflags-[dos]/a \
+        --disable-gallium \\
+' debian/rules
+  CHANGES+=("hook: Disable Gallium")
 
 # Tormod Volden 2009-05-15
 # Factor out the glx*.h so that glxew.h is not shipped twice
