@@ -101,11 +101,17 @@ $CHROOT apt-get update
 $CHROOT apt-get install php5-cli php5-common patch
 
 # customization and branding
+
 [ -r rc.local ] && sudo cp rc.local $NEWROOT/etc/rc.local && sudo chmod 755 $NEWROOT/etc/rc.local
+
 if [ -r xorg-edgers-bg.png ]; then
     sudo cp xorg-edgers-bg.png $NEWROOT/usr/share/backgrounds
     sudo sed -i 's/warty-final-ubuntu.png/xorg-edgers-bg.png/' $NEWROOT/usr/share/gnome-background-properties/ubuntu-wallpapers.xml
     sudo sed -i 's/warty-final-ubuntu.png/xorg-edgers-bg.png/' $NEWROOT/usr/share/gconf/defaults/16_ubuntu-wallpapers
+fi
+
+if [ -r README.for.CD ]; then
+    sudo cp README.for.CD $CDTREE/README.xorg-edgers
 fi
 
 interact "clean up"
@@ -133,6 +139,7 @@ sudo rm $CDTREE/md5sum.txt
 (cd $CDTREE && find . -type f -print0 | xargs -0 md5sum > ../md5sum.txt)
 sed -i '/boot.cat/d' md5sum.txt
 sudo cp md5sum.txt $CDTREE
+rm md5sum.txt
 
 interact "build ISO image"
 cd $CDTREE
