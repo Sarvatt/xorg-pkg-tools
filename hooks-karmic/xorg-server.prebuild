@@ -5,7 +5,7 @@
 # For easier test installation, drop depends on xserver-xorg
 
 sed -i -e '/^Depends: /s/, xserver-xorg//' debian/control
-CHANGES+=("debian/control: drop depends on xserver-xorg for now")
+CHANGES+=("hook: debian/control: drop depends on xserver-xorg for now")
 
 
 # 2008-07-03 Tormod Volden
@@ -14,39 +14,40 @@ CHANGES+=("debian/control: drop depends on xserver-xorg for now")
 sed -i -e '/--enable-dmx /s/enable/disable/' debian/rules
 sed -i -e '/^Package: xdmx$/,/^$/d' debian/control
 sed -i -e '/^Package: xdmx-tools$/,/^$/d' debian/control
-CHANGES+=("disable dmx (fails to build)")
+CHANGES+=("hook: disable dmx (fails to build)")
 
 # 2009-05-21 Robert Hooker
 # Do not build xnest (fails to build)
 
 sed -i -e '/--enable-xnest /s/enable/disable/' debian/rules
 sed -i -e '/^Package: xnest$/,/^$/d' debian/control
-CHANGES+=("disable xnest (fails to build)")
+CHANGES+=("hook: disable xnest (fails to build)")
 
 # 2009-05-21 Robert Hooker
 # Do not build xserver-xephyr (fails to build)
 
 sed -i -e '/--enable-xephyr /s/enable/disable/' debian/rules
 sed -i -e '/^Package: xserver-xephyr$/,/^$/d' debian/control
-CHANGES+=("disable xserver-xephyr (fails to build)")
+CHANGES+=("hook: disable xserver-xephyr (fails to build)")
 
 # 2009-05-21 Robert Hooker
 # Do not build xfbdev (fails to build)
 
 sed -i -e '/--enable-xfbdev /s/enable/disable/' debian/rules
 sed -i -e '/^Package: xserver-xfbdev$/,/^$/d' debian/control
-CHANGES+=("disable xserver-xfbdev (fails to build)")
+CHANGES+=("hook: disable xserver-xfbdev (fails to build)")
 
 # 2009-05-21 Robert Hooker
 # Do not build kdrive (fails to build)
 
 sed -i -e '/--enable-kdrive /s/enable/disable/' debian/rules
-CHANGES+=("disable kdrive (fails to build)")
+CHANGES+=("hook: disable kdrive (fails to build)")
 
 # 2009-05-21 Robert Hooker
 # Increase input abi version to 5
+# TODO: increase to 6 after xi2 merge 
 
 echo 5 > debian/inputabiver
-CHANGES+=("increase inputabiver to 5")
+CHANGES+=("hook: increase inputabiver to 5")
 
 
