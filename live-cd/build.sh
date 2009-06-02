@@ -6,7 +6,7 @@
 
 # FIXME: use fakeroot instead of sudo etc
 
-CDVERSION=0.1
+CDVERSION=0.11
 ORIGISO="karmic-desktop-i386.iso"
 POCKET="karmic"
 
