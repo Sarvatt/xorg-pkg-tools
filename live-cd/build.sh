@@ -8,13 +8,12 @@
 
 CDVERSION=0.1
 ORIGISO="karmic-desktop-i386.iso"
-ORIGKVER=2.6.30-6
 POCKET="karmic"
 
 ISONAME="xorg-edgers-$CDVERSION-i386.iso"
+CDTREE="extract-cd"
 NEWROOT="edit"
 CHROOT="sudo chroot $NEWROOT"
-CDTREE="extract-cd"
 
 INTERACTIVE=yes
 
@@ -74,18 +73,20 @@ interact "delete unnecessary packages"
 $CHROOT apt-get remove --purge --assume-yes openoffice* ubuntu-docs evolution-common evolution-data-server libmono* mono-jit mono-common
 
 if [ -e linux-image*.deb ]; then
+    interact "delete old kernel"
+    ORIGKVER=$(ls $NEWROOT/boot/config-* | sed 's#.*/config-\(.*\)-generic#\1#')
+    $CHROOT apt-get remove --purge --assume-yes linux-headers-$ORIGKVER-generic linux-headers-$ORIGKVER linux-image-$ORIGKVER-generic
+    sudo rm -f $NEWROOT/lib/modules/$ORIGKVER-generic/modules.*
+    sudo rmdir $NEWROOT/lib/modules/$ORIGKVER-generic
+
     interact "install new kernel"
     sudo cp linux-image*.deb $NEWROOT/var/cache/apt/archives
-    $CHROOT sh -c 'dpkg -i /var/cache/apt/archives/linux-image*.deb'
+    sudo cp linux-headers*.deb $NEWROOT/var/cache/apt/archives
+    $CHROOT sh -c 'dpkg -i /var/cache/apt/archives/linux-*.deb'
     sudo cp $NEWROOT/boot/vmlinuz-* $CDTREE/casper/vmlinuz
     sudo cp $NEWROOT/boot/initrd.img-* $CDTREE/casper/initrd.gz
     sudo rm $NEWROOT/boot/vmlinuz-* $NEWROOT/boot/initrd.img-*
     sudo rm $NEWROOT/vmlinuz* $NEWROOT/initrd.img*
-
-    interact "delete old kernel"
-    $CHROOT apt-get remove --purge --assume-yes linux-headers-$ORIGKVER-generic linux-headers-$ORIGKVER linux-image-$ORIGKVER-generic
-    sudo rm -f $NEWROOT/lib/modules/$ORIGKVER-generic/modules.*
-    sudo rmdir $NEWROOT/lib/modules/$ORIGKVER-generic
 fi
 
 interact "upgrade xorg-edgers packages"
