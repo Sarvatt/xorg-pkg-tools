@@ -70,6 +70,7 @@ $CHROOT mount -t proc none /proc
 $CHROOT mount -t sysfs none /sys
 
 interact "delete unnecessary packages"
+# carefully selected hehe
 $CHROOT apt-get remove --purge --assume-yes openoffice* ubuntu-docs evolution-common evolution-data-server libmono* mono-jit mono-common
 
 if [ -e linux-image*.deb ]; then
@@ -90,6 +91,7 @@ if [ -e linux-image*.deb ]; then
 fi
 
 interact "upgrade xorg-edgers packages"
+# FIXME: add ppa gpg keys
 echo "deb http://ppa.launchpad.net/xorg-edgers/ppa/ubuntu $POCKET main" | sudo tee $NEWROOT/etc/apt/sources.list.d/xorg-edgers.list > /dev/null
 
 sudo mv $NEWROOT/etc/apt/sources.list $NEWROOT/etc/apt/sources.list.bak
@@ -99,7 +101,7 @@ sudo mv $NEWROOT/etc/apt/sources.list.bak $NEWROOT/etc/apt/sources.list
 $CHROOT apt-get update
 
 # useful for PTS
-$CHROOT apt-get install php5-cli php5-common patch
+$CHROOT apt-get install php5-cli php5-common php5-gd patch
 
 # customization and branding
 
@@ -111,9 +113,9 @@ if [ -r xorg-edgers-bg.png ]; then
     sudo sed -i 's/warty-final-ubuntu.png/xorg-edgers-bg.png/' $NEWROOT/usr/share/gconf/defaults/16_ubuntu-wallpapers
 fi
 
-if [ -r README.for.CD ]; then
-    sudo cp README.for.CD $CDTREE/README.xorg-edgers
-fi
+for README in *.README ; do
+    [ -e $README ] && sudo cp $README $CDTREE
+done
 
 interact "clean up"
 $CHROOT apt-get clean
