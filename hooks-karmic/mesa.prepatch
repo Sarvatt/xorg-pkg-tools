@@ -10,7 +10,10 @@ if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   drop 105_glXWaitX_segfaults.patch applied upstream
 fi
 
-CHANGES+=("hook: install dri.pc with libgl1-mesa-dev.")
+# Robert Hooker 2009-05-02
+# Installs dri.pc, needed for xserver 1.7 builds.
+
+CHANGES+=("hook: install dri.pc with libgl1-mesa-dev (lp 379797)")
 echo "901_install_dri_pc.diff" >> debian/patches/series
 << EOF cat > debian/patches/901_install_dri_pc.diff
 diff --git a/debian/libgl1-mesa-dev.install b/debian/libgl1-mesa-dev.install
