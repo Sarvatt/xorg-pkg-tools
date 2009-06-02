@@ -15,7 +15,7 @@ CDTREE="extract-cd"
 NEWROOT="edit"
 CHROOT="sudo chroot $NEWROOT"
 
-INTERACTIVE=yes
+INTERACTIVE=${INTERACTIVE:-yes}
 
 interact() {
     if [ "$INTERACTIVE" = "yes" ]; then
