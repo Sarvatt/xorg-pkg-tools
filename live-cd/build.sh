@@ -106,7 +106,7 @@ $CHROOT apt-get install php5-cli php5-common php5-gd patch
 # customization and branding
 
 grep -q "xorg-edgers.rc" $NEWROOT/etc/rc.local ||
-    sed -i '/^exit 0$/i \
+    sudo sed -i '/^exit 0$/i \
 [ -r /cdrom/xorg-edgers.rc ] && . /cdrom/xorg-edgers.rc
 ' $NEWROOT/etc/rc.local
 
