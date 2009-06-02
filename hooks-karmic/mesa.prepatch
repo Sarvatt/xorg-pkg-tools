@@ -4,8 +4,21 @@
 
 if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   drop 02_use-ieee-fp-on-s390-and-m68k.patch fails
-  drop 05_hurd-ftbfs.diff fails
+  drop 05_hurd-ftbfs.diff applied upstream
   drop 103_bump_965_texture_limit.diff applied upstream
   drop 104_fix_dri2_ext_tfp.diff applied upstream
   drop 105_glXWaitX_segfaults.patch applied upstream
 fi
+
+CHANGES+=("hook: install dri.pc with libgl1-mesa-dev.")
+echo "901_install_dri_pc.diff" >> debian/patches/series
+<< EOF cat > debian/patches/901_install_dri_pc.diff
+diff --git a/debian/libgl1-mesa-dev.install b/debian/libgl1-mesa-dev.install
+index dac5ebd..456c089 100644
+--- a/debian/libgl1-mesa-dev.install
++++ b/debian/libgl1-mesa-dev.install
+@@ -1,2 +1,3 @@
+ usr/lib/libGL.so
+ usr/lib/pkgconfig/gl.pc
++usr/lib/glx/pkgconfig/dri.pc usr/lib/pkgconfig/
+
