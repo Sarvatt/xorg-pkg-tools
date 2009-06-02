@@ -46,26 +46,24 @@ if [ ! -r "$ORIGISO" ]; then
 fi
 
 if [ ! -d $CDTREE ] || [ ! -d $NEWROOT ]; then
-
-interact "unpack original CD image"
-mkdir mnt
-sudo mount -o loop,ro "$ORIGISO" mnt
-mkdir $CDTREE
-rsync --exclude=/casper/filesystem.squashfs -a mnt/ $CDTREE
-mkdir squashfs
-sudo mount -t squashfs -o loop,ro mnt/casper/filesystem.squashfs squashfs
-mkdir $NEWROOT
-sudo cp -a squashfs/* $NEWROOT
-sudo umount squashfs
-sudo umount mnt
-
+  interact "unpack original CD image"
+  mkdir mnt
+  sudo mount -o loop,ro "$ORIGISO" mnt
+  mkdir $CDTREE
+  rsync --exclude=/casper/filesystem.squashfs -a mnt/ $CDTREE
+  mkdir squashfs
+  sudo mount -t squashfs -o loop,ro mnt/casper/filesystem.squashfs squashfs
+  mkdir $NEWROOT
+  sudo cp -a squashfs/* $NEWROOT
+  sudo umount squashfs
+  rmdir squashfs
+  sudo umount mnt
+  rmdir mnt
 fi
 
 # set up for chroot
 sudo cp /etc/resolv.conf $NEWROOT/etc
 sudo mount --bind /dev/ $NEWROOT/dev
-
-#proc and sys
 $CHROOT mount -t proc none /proc
 $CHROOT mount -t sysfs none /sys
 
@@ -137,8 +135,8 @@ sudo mksquashfs $NEWROOT $CDTREE/casper/filesystem.squashfs
 sudo chmod 444 $CDTREE/casper/filesystem.squashfs
 
 # branding in disk labels
-sudo sed -i 's/- Alpha/- xorg-edgers $CDVERSION Alpha/' $CDTREE/.disk/info
-sudo sed -i 's/- Alpha/- xorg-edgers $CDVERSION Alpha/' $CDTREE/README.diskdefines
+sudo sed -i "s/- Alpha/- xorg-edgers $CDVERSION Alpha/" $CDTREE/.disk/info
+sudo sed -i "s/- Alpha/- xorg-edgers $CDVERSION Alpha/" $CDTREE/README.diskdefines
 
 # CD checksums
 sudo rm $CDTREE/md5sum.txt
