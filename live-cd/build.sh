@@ -105,7 +105,10 @@ $CHROOT apt-get install php5-cli php5-common php5-gd patch
 
 # customization and branding
 
-[ -r rc.local ] && sudo cp rc.local $NEWROOT/etc/rc.local && sudo chmod 755 $NEWROOT/etc/rc.local
+grep -q "xorg-edgers.rc" $NEWROOT/etc/rc.local ||
+    sed -i '/^exit 0$/i \
+[ -r /cdrom/xorg-edgers.rc ] && . /cdrom/xorg-edgers.rc
+' $NEWROOT/etc/rc.local
 
 if [ -r xorg-edgers-bg.png ]; then
     sudo cp xorg-edgers-bg.png $NEWROOT/usr/share/backgrounds
