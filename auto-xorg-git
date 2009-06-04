@@ -210,7 +210,7 @@ drop () {
     local PATCH=$1
     shift
     sed -i "/^$PATCH/s/^/#/" debian/patches/series
-    CHANGES+=("hook: Disable $PATCH ($*)")
+    CHANGES+=("hook: Drop $PATCH ($*)")
 }
 
 debian_patches() {
@@ -369,6 +369,7 @@ if [ -z "$UPSTREAMGIT" ]; then
     FDOGIT=git://anongit.freedesktop.org/git/${FDODIR:+$FDODIR/}$FDOPKG
 else
     FDOGIT=$UPSTREAMGIT
+    CHANGES+=("Source: $UPSTREAMGIT")
 fi
 msg "Debian: $DEBIANGIT"
 msg "Freedesktop: $FDOGIT"
