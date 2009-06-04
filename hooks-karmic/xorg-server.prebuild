@@ -43,11 +43,10 @@ CHANGES+=("hook: disable xserver-xfbdev (fails to build)")
 sed -i -e '/--enable-kdrive /s/enable/disable/' debian/rules
 CHANGES+=("hook: disable kdrive (fails to build)")
 
-# 2009-05-21 Robert Hooker
-# Increase input abi version to 5
-# TODO: increase to 6 after xi2 merge 
+# 2009-06-04 Robert Hooker
+# Increase input abi version to 6
 
-echo 5 > debian/inputabiver
-CHANGES+=("hook: increase inputabiver to 5")
+echo 6 > debian/inputabiver
+CHANGES+=("hook: increase inputabiver to 6")
 
 
