@@ -15,4 +15,4 @@ drop 158_raise_maxclients.patch fails
 drop 160_log_timestamping.patch fails
 drop 169_mipointer_nullptr_checks.patch fails
 drop 174_set_bg_pixmap_of_cow_to_none.patch fails
-
+drop 177_animated_cursor_change_master.patch fails
