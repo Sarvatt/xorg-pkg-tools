@@ -1,13 +1,5 @@
 # This will be sourced as a bash script
 
-
-# 2008-07-03 Tormod Volden
-# For easier test installation, drop depends on xserver-xorg
-
-sed -i -e '/^Depends: /s/, xserver-xorg//' debian/control
-CHANGES+=("hook: debian/control: drop depends on xserver-xorg for now")
-
-
 # 2008-07-03 Tormod Volden
 # Do not build dmx (fails to build)
 
@@ -42,6 +34,10 @@ CHANGES+=("hook: disable xserver-xfbdev (fails to build)")
 
 sed -i -e '/--enable-kdrive /s/enable/disable/' debian/rules
 CHANGES+=("hook: disable kdrive (fails to build)")
+
+
+sed -i -e '/--enable-config-debus /s/enable/disable/' debian/rules
+CHANGES+=("hook: disable-config-dbus (fails to build)")
 
 # 2009-06-04 Robert Hooker
 # Increase input abi version to 6
