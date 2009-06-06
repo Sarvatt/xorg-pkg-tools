@@ -10,8 +10,10 @@ CDVERSION=0.11
 ORIGISO="karmic-desktop-i386.iso"
 POCKET="karmic"
 WALLPAPER="xorg-edgers-bg.png"
-
 ISONAME="xorg-edgers-$CDVERSION-i386.iso"
+CDLABEL="xorg-edgers $CDVERSION"
+PPA="deb http://ppa.launchpad.net/xorg-edgers/ppa/ubuntu $POCKET main"
+
 CDTREE="extract-cd"
 NEWROOT="edit"
 CHROOT="sudo chroot $NEWROOT"
@@ -89,9 +91,9 @@ if [ -e linux-image*.deb ]; then
     sudo rm $NEWROOT/vmlinuz* $NEWROOT/initrd.img*
 fi
 
-interact "upgrade xorg-edgers packages"
+interact "upgrade PPA packages"
 # FIXME: add ppa gpg keys
-echo "deb http://ppa.launchpad.net/xorg-edgers/ppa/ubuntu $POCKET main" | sudo tee $NEWROOT/etc/apt/sources.list.d/xorg-edgers.list > /dev/null
+echo $PPA | sudo tee $NEWROOT/etc/apt/sources.list.d/xorg-edgers.list > /dev/null
 
 sudo mv $NEWROOT/etc/apt/sources.list $NEWROOT/etc/apt/sources.list.bak
 $CHROOT apt-get update
@@ -136,8 +138,8 @@ sudo mksquashfs $NEWROOT $CDTREE/casper/filesystem.squashfs
 sudo chmod 444 $CDTREE/casper/filesystem.squashfs
 
 # branding in disk labels
-sudo sed -i "s/- Alpha/- xorg-edgers $CDVERSION Alpha/" $CDTREE/.disk/info
-sudo sed -i "s/- Alpha/- xorg-edgers $CDVERSION Alpha/" $CDTREE/README.diskdefines
+sudo sed -i "s/- Alpha/- $CDLABEL/" $CDTREE/.disk/info
+sudo sed -i "s/- Alpha/- $CDLABEL/" $CDTREE/README.diskdefines
 
 # CD checksums
 sudo rm $CDTREE/md5sum.txt
@@ -148,5 +150,5 @@ rm md5sum.txt
 
 interact "build ISO image"
 cd $CDTREE
-sudo mkisofs -D -r -V "xorg-edgers $CDVERSION" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ../$ISONAME .
+sudo mkisofs -D -r -V "$CDLABEL" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ../$ISONAME .
 
