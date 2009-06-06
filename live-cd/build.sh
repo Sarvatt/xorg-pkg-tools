@@ -9,6 +9,7 @@
 CDVERSION=0.11
 ORIGISO="karmic-desktop-i386.iso"
 POCKET="karmic"
+WALLPAPER="xorg-edgers-bg.png"
 
 ISONAME="xorg-edgers-$CDVERSION-i386.iso"
 CDTREE="extract-cd"
@@ -108,10 +109,10 @@ grep -q "xorg-edgers.rc" $NEWROOT/etc/rc.local ||
 [ -r /cdrom/xorg-edgers.rc ] && . /cdrom/xorg-edgers.rc
 ' $NEWROOT/etc/rc.local
 
-if [ -r xorg-edgers-bg.png ]; then
-    sudo cp xorg-edgers-bg.png $NEWROOT/usr/share/backgrounds
-    sudo sed -i 's/warty-final-ubuntu.png/xorg-edgers-bg.png/' $NEWROOT/usr/share/gnome-background-properties/ubuntu-wallpapers.xml
-    sudo sed -i 's/warty-final-ubuntu.png/xorg-edgers-bg.png/' $NEWROOT/usr/share/gconf/defaults/16_ubuntu-wallpapers
+if [ -r $WALLPAPER ]; then
+    sudo cp $WALLPAPER $NEWROOT/usr/share/backgrounds
+    sudo sed -i "s/warty-final-ubuntu.png/$WALLPAPER/" $NEWROOT/usr/share/gnome-background-properties/ubuntu-wallpapers.xml
+    sudo sed -i "s/warty-final-ubuntu.png/$WALLPAPER/" $NEWROOT/usr/share/gconf/defaults/16_ubuntu-wallpapers
 fi
 
 for README in *.README ; do
