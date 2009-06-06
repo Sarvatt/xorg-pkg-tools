@@ -134,7 +134,7 @@ sudo cp $CDTREE/casper/filesystem.manifest $CDTREE/casper/filesystem.manifest-de
 sudo sed -i '/ubiquity/d' $CDTREE/casper/filesystem.manifest-desktop
 
 interact "build squashfs"
-sudo mksquashfs -noappend $NEWROOT $CDTREE/casper/filesystem.squashfs
+sudo mksquashfs $NEWROOT $CDTREE/casper/filesystem.squashfs -noappend
 sudo chmod 444 $CDTREE/casper/filesystem.squashfs
 
 # branding in disk labels
