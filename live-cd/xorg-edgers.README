@@ -1,12 +1,9 @@
 This is a Ubuntu daily-live CD (http://cdimage.ubuntu.com/daily-live/) remastered by the xorg-edgers team.
 
-It is meant to help testing latest Xorg packages from https://launchpad.net/~xorg-edgers/+archive/ppa and is not officially nor unofficially supported.
+The CD is meant to help testing latest Xorg packages from https://launchpad.net/~xorg-edgers and is not officially supported.
 
-Thanks to Kano from Kanotix for the patched kernel from http://kanotix.com/files/excalibur/linux-2.6.30-generic/
+The desktop background was taken from http://dabige.deviantart.com/art/Ubuntu-Emerging-Wallpaper-106144025 (more nice wallpapers here: http://www.hongkiat.com/blog/60-most-execellent-ubuntu-wallpapers/)
 
-The desktop background was taken from http://dabige.deviantart.com/art/Ubuntu-Emerging-Wallpaper-106144025
-(More nice wallpapers here: http://www.hongkiat.com/blog/60-most-execellent-ubuntu-wallpapers/
-
-Remastering instructions are at https://help.ubuntu.com/community/LiveCDCustomization
+The CD was remastered using the live-cd/build.sh from https://code.launchpad.net/~xorg-edgers/xorg-server/xorg-pkg-tools
 
 2009 Tormod Volden
