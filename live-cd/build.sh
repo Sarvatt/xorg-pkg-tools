@@ -6,13 +6,13 @@
 
 # FIXME: use fakeroot instead of sudo etc
 
-CDVERSION=0.11
+CDVERSION=0.12
 ORIGISO="karmic-desktop-i386.iso"
 POCKET="karmic"
-WALLPAPER="xorg-edgers-bg.png"
-ISONAME="xorg-edgers-$CDVERSION-i386.iso"
-CDLABEL="xorg-edgers $CDVERSION"
 PPA="deb http://ppa.launchpad.net/xorg-edgers/ppa/ubuntu $POCKET main"
+WALLPAPER="xorg-edgers-bg.png"
+CDLABEL="xorg-edgers $CDVERSION"
+ISONAME="xorg-edgers-$CDVERSION-i386.iso"
 
 CDTREE="extract-cd"
 NEWROOT="edit"
