@@ -72,12 +72,12 @@ $CHROOT mount -t sysfs none /sys
 
 interact "delete unnecessary packages"
 # carefully selected hehe
-$CHROOT apt-get remove --purge --assume-yes openoffice* ubuntu-docs evolution-common evolution-data-server libmono* mono-jit mono-common
+$CHROOT apt-get purge --assume-yes openoffice* ubuntu-docs evolution-common evolution-data-server libmono* mono-jit mono-common
 
 if [ -e linux-image*.deb ]; then
     interact "delete old kernel"
     ORIGKVER=$(ls $NEWROOT/boot/config-* | sed 's#.*/config-\(.*\)-generic#\1#')
-    $CHROOT apt-get remove --purge --assume-yes linux-headers-$ORIGKVER-generic linux-headers-$ORIGKVER linux-image-$ORIGKVER-generic
+    $CHROOT apt-get purge --assume-yes linux-headers-$ORIGKVER-generic linux-headers-$ORIGKVER linux-image-$ORIGKVER-generic
     sudo rm -f $NEWROOT/lib/modules/$ORIGKVER-generic/modules.*
     sudo rmdir $NEWROOT/lib/modules/$ORIGKVER-generic
 
@@ -102,7 +102,7 @@ sudo mv $NEWROOT/etc/apt/sources.list.bak $NEWROOT/etc/apt/sources.list
 $CHROOT apt-get update
 
 # useful for PTS
-$CHROOT apt-get install php5-cli php5-common php5-gd patch
+$CHROOT apt-get --assume=yes --force=yes install php5-cli php5-common php5-gd patch
 
 # customization and branding
 
