@@ -96,6 +96,7 @@ interact "upgrade PPA packages"
 echo $PPA | sudo tee $NEWROOT/etc/apt/sources.list.d/xorg-edgers.list > /dev/null
 
 sudo mv $NEWROOT/etc/apt/sources.list $NEWROOT/etc/apt/sources.list.bak
+$CHROOT apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 4F191A5A8844C542
 $CHROOT apt-get update
 $CHROOT apt-get --assume-yes --force-yes upgrade
 sudo mv $NEWROOT/etc/apt/sources.list.bak $NEWROOT/etc/apt/sources.list
