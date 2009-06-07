@@ -6,10 +6,11 @@
 
 # FIXME: use fakeroot instead of sudo etc
 
-CDVERSION=0.12
+CDVERSION=0.13
 ORIGISO="karmic-desktop-i386.iso"
-POCKET="karmic"
+POCKET=karmic
 PPA="deb http://ppa.launchpad.net/xorg-edgers/ppa/ubuntu $POCKET main"
+PPAKEY=4F191A5A8844C542
 WALLPAPER="xorg-edgers-bg.png"
 CDLABEL="xorg-edgers $CDVERSION"
 ISONAME="xorg-edgers-$CDVERSION-i386.iso"
@@ -92,13 +93,13 @@ if [ -e linux-image*.deb ]; then
 fi
 
 interact "upgrade PPA packages"
-# FIXME: add ppa gpg keys
 echo $PPA | sudo tee $NEWROOT/etc/apt/sources.list.d/xorg-edgers.list > /dev/null
-
 sudo mv $NEWROOT/etc/apt/sources.list $NEWROOT/etc/apt/sources.list.bak
-$CHROOT apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 4F191A5A8844C542
+if [ $PPAKEY ]; then
+    $CHROOT apt-key add --recv-keys --keyserver keyserver.ubuntu.com $PPAKEY
+fi
 $CHROOT apt-get update
-$CHROOT apt-get --assume-yes --force-yes upgrade
+$CHROOT apt-get --assume-yes --force-yes dist-upgrade
 sudo mv $NEWROOT/etc/apt/sources.list.bak $NEWROOT/etc/apt/sources.list
 $CHROOT apt-get update
 
@@ -135,7 +136,7 @@ sudo cp $CDTREE/casper/filesystem.manifest $CDTREE/casper/filesystem.manifest-de
 sudo sed -i '/ubiquity/d' $CDTREE/casper/filesystem.manifest-desktop
 
 interact "build squashfs"
-sudo mksquashfs $NEWROOT $CDTREE/casper/filesystem.squashfs -noappend
+sudo mksquashfs $NEWROOT $CDTREE/casper/filesystem.squashfs -noappend -all-root
 sudo chmod 444 $CDTREE/casper/filesystem.squashfs
 
 # branding in disk labels
