@@ -96,7 +96,7 @@ interact "upgrade PPA packages"
 echo $PPA | sudo tee $NEWROOT/etc/apt/sources.list.d/xorg-edgers.list > /dev/null
 sudo mv $NEWROOT/etc/apt/sources.list $NEWROOT/etc/apt/sources.list.bak
 if [ $PPAKEY ]; then
-    $CHROOT apt-key add --recv-keys --keyserver keyserver.ubuntu.com $PPAKEY
+    $CHROOT apt-key adv --recv-keys --keyserver keyserver.ubuntu.com $PPAKEY
 fi
 $CHROOT apt-get update
 $CHROOT apt-get --assume-yes --force-yes dist-upgrade
