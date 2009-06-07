@@ -102,7 +102,7 @@ sudo mv $NEWROOT/etc/apt/sources.list.bak $NEWROOT/etc/apt/sources.list
 $CHROOT apt-get update
 
 # useful for PTS
-$CHROOT apt-get --assume=yes --force=yes install php5-cli php5-common php5-gd patch
+$CHROOT apt-get --assume-yes --force=yes install php5-cli php5-common php5-gd patch
 
 # customization and branding
 
