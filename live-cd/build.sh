@@ -1,11 +1,10 @@
 #!/bin/sh
 
-# Build an xorg-edgers live CD
+# Build a customized live CD
 # Based on https://help.ubuntu.com/community/LiveCDCustomization
 # Tormod Volden 2009
 
-# FIXME: use fakeroot instead of sudo etc
-
+# Default values
 CDVERSION=0.13
 ORIGISO="karmic-desktop-i386.iso"
 POCKET=karmic
@@ -18,8 +17,17 @@ ISONAME="xorg-edgers-$CDVERSION-i386.iso"
 CDTREE="extract-cd"
 NEWROOT="edit"
 CHROOT="sudo chroot $NEWROOT"
-
 INTERACTIVE=${INTERACTIVE:-yes}
+
+if [ -n "$1" ]; then
+    CONF="$1"
+    if [ -r "$CONF" ]; then
+	. "$CONF"
+    else
+	echo "$0: can not read configuration file $CONF"
+	exit 1
+    fi
+fi
 
 interact() {
     if [ "$INTERACTIVE" = "yes" ]; then
