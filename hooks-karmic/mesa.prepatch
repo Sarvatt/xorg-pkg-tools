@@ -4,6 +4,7 @@
 
 if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   drop 02_use-ieee-fp-on-s390-and-m68k.patch fails
+  drop 04_osmesa_version.diff fails
   drop 05_hurd-ftbfs.diff applied upstream
   drop 103_bump_965_texture_limit.diff applied upstream
   drop 104_fix_dri2_ext_tfp.diff applied upstream
