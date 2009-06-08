@@ -1,18 +1,19 @@
 #!/bin/sh
 
-# Build a customized live CD
+# Build a customized live CD with packages from PPA
 # Based on https://help.ubuntu.com/community/LiveCDCustomization
 # Tormod Volden 2009
 
 # Default values
-CDVERSION=0.13
+CDVERSION=0.01
 ORIGISO="karmic-desktop-i386.iso"
 POCKET=karmic
 PPA="deb http://ppa.launchpad.net/xorg-edgers/ppa/ubuntu $POCKET main"
 PPAKEY=4F191A5A8844C542
-WALLPAPER="xorg-edgers-bg.png"
-CDLABEL="xorg-edgers $CDVERSION"
-ISONAME="xorg-edgers-$CDVERSION-i386.iso"
+WALLPAPER="ppa.png"
+CDLABEL="ppa $CDVERSION"
+ISONAME="ppa-$CDVERSION-i386.iso"
+ADDDEBS=.
 
 CDTREE="extract-cd"
 NEWROOT="edit"
@@ -79,29 +80,34 @@ sudo mount --bind /dev/ $NEWROOT/dev
 $CHROOT mount -t proc none /proc
 $CHROOT mount -t sysfs none /sys
 
-interact "delete unnecessary packages"
-# carefully selected hehe
-$CHROOT apt-get purge --assume-yes openoffice* ubuntu-docs evolution-common evolution-data-server libmono* mono-jit mono-common
+if [ -n "$DELPACKAGES" ]; then
+    interact "delete unwanted packages"
+    $CHROOT apt-get purge --assume-yes $DELPACKAGES
+fi
 
-if [ -e linux-image*.deb ]; then
+if [ -e $ADDDEBS/linux-image*.deb ]; then
     interact "delete old kernel"
     ORIGKVER=$(ls $NEWROOT/boot/config-* | sed 's#.*/config-\(.*\)-generic#\1#')
     $CHROOT apt-get purge --assume-yes linux-headers-$ORIGKVER-generic linux-headers-$ORIGKVER linux-image-$ORIGKVER-generic
     sudo rm -f $NEWROOT/lib/modules/$ORIGKVER-generic/modules.*
     sudo rmdir $NEWROOT/lib/modules/$ORIGKVER-generic
+fi
 
-    interact "install new kernel"
-    sudo cp linux-image*.deb $NEWROOT/var/cache/apt/archives
-    sudo cp linux-headers*.deb $NEWROOT/var/cache/apt/archives
-    $CHROOT sh -c 'dpkg -i /var/cache/apt/archives/linux-*.deb'
-    sudo cp $NEWROOT/boot/vmlinuz-* $CDTREE/casper/vmlinuz
-    sudo cp $NEWROOT/boot/initrd.img-* $CDTREE/casper/initrd.gz
-    sudo rm $NEWROOT/boot/vmlinuz-* $NEWROOT/boot/initrd.img-*
-    sudo rm $NEWROOT/vmlinuz* $NEWROOT/initrd.img*
+# install local packages
+if [ -d "$ADDDEBS" ]; then
+    interact "install local packages from directory $ADDDEBS"
+    sudo cp $ADDDEBS/*.deb $NEWROOT/var/cache/apt/archives &&
+        $CHROOT sh -c 'dpkg -i /var/cache/apt/archives/*.deb'
+elif [ -n "$ADDDEBS" ]; then
+    interact "install local packages from list"
+    for DEB in $ADDDEBS; do
+	sudo cp $DEB $NEWROOT/var/cache/apt/archives
+	$CHROOT dpkg -i /var/cache/apt/archives/$DEB
+    done
 fi
 
 interact "upgrade PPA packages"
-echo $PPA | sudo tee $NEWROOT/etc/apt/sources.list.d/xorg-edgers.list > /dev/null
+echo $PPA | sudo tee $NEWROOT/etc/apt/sources.list.d/custom-live-cd.list > /dev/null
 sudo mv $NEWROOT/etc/apt/sources.list $NEWROOT/etc/apt/sources.list.bak
 if [ $PPAKEY ]; then
     $CHROOT apt-key adv --recv-keys --keyserver keyserver.ubuntu.com $PPAKEY
@@ -111,17 +117,24 @@ $CHROOT apt-get --assume-yes --force-yes dist-upgrade
 sudo mv $NEWROOT/etc/apt/sources.list.bak $NEWROOT/etc/apt/sources.list
 $CHROOT apt-get update
 
-# useful for PTS
-$CHROOT apt-get --assume-yes --force-yes install php5-cli php5-common php5-gd patch
+if [ -n "$ADDPACKAGES" ]; then
+    $CHROOT apt-get --assume-yes --force-yes install $ADDPACKAGES
+fi
+
+# fix kernel installation
+sudo cp $NEWROOT/boot/vmlinuz-* $CDTREE/casper/vmlinuz
+sudo cp $NEWROOT/boot/initrd.img-* $CDTREE/casper/initrd.gz
+sudo rm -f $NEWROOT/boot/vmlinuz-* $NEWROOT/boot/initrd.img-*
+sudo rm -f $NEWROOT/vmlinuz* $NEWROOT/initrd.img*
 
 # customization and branding
 
-grep -q "xorg-edgers.rc" $NEWROOT/etc/rc.local ||
+grep -q "live-cd.rc" $NEWROOT/etc/rc.local ||
     sudo sed -i '/^exit 0$/i \
-[ -r /cdrom/xorg-edgers.rc ] && . /cdrom/xorg-edgers.rc
+[ -r /cdrom/live-cd.rc ] && . /cdrom/live-cd.rc
 ' $NEWROOT/etc/rc.local
 
-if [ -r $WALLPAPER ]; then
+if [ -r "$WALLPAPER" ]; then
     sudo cp $WALLPAPER $NEWROOT/usr/share/backgrounds
     sudo sed -i "s/warty-final-ubuntu.png/$WALLPAPER/" $NEWROOT/usr/share/gnome-background-properties/ubuntu-wallpapers.xml
     sudo sed -i "s/warty-final-ubuntu.png/$WALLPAPER/" $NEWROOT/usr/share/gconf/defaults/16_ubuntu-wallpapers
