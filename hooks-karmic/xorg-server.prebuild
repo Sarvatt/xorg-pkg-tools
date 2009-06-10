@@ -36,8 +36,8 @@ sed -i -e '/--enable-kdrive /s/enable/disable/' debian/rules
 CHANGES+=("hook: disable kdrive (fails to build)")
 
 
-sed -i -e '/--enable-config-debus /s/enable/disable/' debian/rules
-CHANGES+=("hook: disable-config-dbus (fails to build)")
+sed -i -e '/--enable-config-dbus /s/enable/disable/' debian/rules
+CHANGES+=("hook: disable-config-dbus (unneeded)")
 
 # 2009-06-04 Robert Hooker
 # Increase input abi version to 6
