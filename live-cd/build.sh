@@ -80,6 +80,10 @@ sudo mount --bind /dev/ $NEWROOT/dev
 $CHROOT mount -t proc none /proc
 $CHROOT mount -t sysfs none /sys
 
+# make sure services etc does not start when installing packages
+$CHROOT dpkg-divert --add --local --divert /usr/sbin/invoke-rc.d.live-cd --rename /usr/sbin/invoke-rc.d
+sudo cp $NEWROOT/bin/true $NEWROOT/usr/sbin/invoke-rc.d
+
 if [ -n "$DELPACKAGES" ]; then
     interact "delete unwanted packages"
     $CHROOT apt-get purge --assume-yes $DELPACKAGES
@@ -146,9 +150,15 @@ done
 
 interact "clean up"
 $CHROOT apt-get clean
+# reinstate invoke.rc now that we are done with package installs
+sudo rm -f $NEWROOT/usr/sbin/invoke-rc.d 
+$CHROOT dpkg-divert --remove --rename /usr/sbin/invoke-rc.d
 $CHROOT umount /proc
 $CHROOT umount /sys
 sudo umount $NEWROOT/dev
+sudo rm $NEWROOT/etc/resolv.conf
+# FIXME: delete this when Karmic gets it right again
+sudo rm -f $NEWROOT/etc/X11/xorg.conf
 
 # update some CD files
 chmod +w $CDTREE/casper/filesystem.manifest
