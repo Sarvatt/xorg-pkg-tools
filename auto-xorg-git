@@ -67,18 +67,17 @@ update_debian() {
 get_upstream() {
     msg "Fetching from freedesktop repository..."
     git remote add freedesktop $FDOGIT
-    git fetch freedesktop refs/heads/$BRANCH:refs/heads/upstream-head || die "git fetch freedesktop: $?"
-    git checkout -b autoxorggit upstream-head || die "git checkout -b autoxorggit upstream-head: $?"
+    git fetch freedesktop refs/heads/$BRANCH:refs/heads/upstream-head-$BRANCH || die "git fetch freedesktop: $?"
+    git checkout -b autoxorggit upstream-head-$BRANCH || die "git checkout -b autoxorggit upstream-head-$BRANCH: $?"
     LASTCOMMIT=$(git log|head -1)
     echo $LASTCOMMIT > .lastcommit 
 }
 
 update_upstream() {
     msg "Updating from freedesktop repository"
-    git checkout upstream-head
-    git pull freedesktop $BRANCH
+    git fetch freedesktop refs/heads/$BRANCH:refs/heads/upstream-head-$BRANCH || die "git fetch freedesktop: $?"
     git branch -D autoxorggit
-    git checkout -b autoxorggit upstream-head || die "git checkout -b autoxorggit upstream-head: $?"
+    git checkout -b autoxorggit upstream-head-$BRANCH || die "git checkout -b autoxorggit upstream-head-$BRANCH: $?"
     LASTCOMMIT=$(git log|head -1)
     if [ "$LASTCOMMIT" = "$(< .lastcommit)" ]; then
         warn "Nothing new from freedesktop"
