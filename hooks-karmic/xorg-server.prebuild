@@ -40,9 +40,9 @@ sed -i -e '/--enable-config-dbus /s/enable/disable/' debian/rules
 CHANGES+=("hook: disable-config-dbus (unneeded)")
 
 # 2009-06-04 Robert Hooker
-# Increase input abi version to 6
+# Increase input abi version to 7
 
 echo 6 > debian/inputabiver
-CHANGES+=("hook: increase inputabiver to 6")
+CHANGES+=("hook: increase inputabiver to 7")
 
 
