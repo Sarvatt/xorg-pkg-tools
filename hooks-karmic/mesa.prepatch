@@ -4,20 +4,23 @@
 
 if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   drop 02_use-ieee-fp-on-s390-and-m68k.patch fails
-  drop 04_osmesa_version.diff fails
-  drop 05_hurd-ftbfs.diff applied upstream
-  drop 103_bump_965_texture_limit.diff applied upstream
+  drop 05_hurd-ftbfs.diff fails
   drop 104_fix_dri2_ext_tfp.diff applied upstream
   drop 105_glXWaitX_segfaults.patch applied upstream
   drop 107_glxgears_is_not_a_benchmark.patch testing
   drop 108_destroy_intel_fb.patch applied upstream
   drop 109_release_direct_rendering_resources.patch applied upstream
+  drop 110_null_ptr_during_screen_tear_down.patch applied upstream
 fi
 
 # Robert Hooker 2009-06-04
 # Installs dri.pc, needed for xserver 1.7 builds.
 # TODO: Drop when Ubuntu updates to 7.5+.
 
-CHANGES+=("hook: Install dri.pc with libgl1-mesa-dev (lp 379797)")
-echo "usr/lib/glx/pkgconfig/dri.pc usr/lib/pkgconfig/" >> debian/libgl1-mesa-dev.install
+#CHANGES+=("hook: Install dri.pc with libgl1-mesa-dev (lp 379797)")
+#echo "usr/lib/glx/pkgconfig/dri.pc usr/lib/pkgconfig/" >> debian/libgl1-mesa-dev.install
 
+# Drop when ubuntu picks it up.
+CHANGES+=("hook: Refresh 04_osmesa_version.diff so it applies.")
+rm debian/patches/04_osmesa_version.diff
+wget -O debian/patches/04_osmesa_version.diff http://git.debian.org/?p=pkg-xorg/lib/mesa.git;a=blob_plain;f=debian/patches/04_osmesa_version.diff;h=68c3db0a3e45f765c466d9c3e1666696e281b6c6;hb=ec4c889266934372b158bf54cddb8ea99c82ad8b
