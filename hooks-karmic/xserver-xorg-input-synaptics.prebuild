@@ -1,0 +1,3 @@
+sed -i '/^Architecture: /s/$/ lpia/' debian/control
+CHANGES+=("hook: Add lpia architecture")
+
