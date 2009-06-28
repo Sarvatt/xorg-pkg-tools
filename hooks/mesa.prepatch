@@ -23,4 +23,5 @@ fi
 # Drop when ubuntu picks it up.
 CHANGES+=("hook: Refresh 04_osmesa_version.diff so it applies.")
 rm debian/patches/04_osmesa_version.diff
-wget -O debian/patches/04_osmesa_version.diff http://git.debian.org/?p=pkg-xorg/lib/mesa.git;a=blob_plain;f=debian/patches/04_osmesa_version.diff;h=68c3db0a3e45f765c466d9c3e1666696e281b6c6;hb=ec4c889266934372b158bf54cddb8ea99c82ad8b
+wget -O debian/patches/04_osmesa_version.diff http://sarvatt.com/downloads/04_osmesa_version.diff
+
