@@ -1,9 +1,0 @@
-# This will be sourced as a bash script
-
-# Tormod Volden 2008-07-04
-# be more sloppy about dependencies
-
-sed -i -e '/^Build-Depends: /s/libdrm-dev (= /libdrm-dev (>=/' debian/control
-sed -i -e '/^Depends: /s/, linux-nouveau-modules//' debian/control
-CHANGES+=("Relax dependencies on libdrm-dev and linux-nouveau-modules")
-
