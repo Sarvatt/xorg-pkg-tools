@@ -6,21 +6,3 @@ if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   drop 107_glxgears_is_not_a_benchmark.patch testing
 fi
 
-# Robert Hooker 2009-06-29
-# Stop install targets from operating in parallel causing FTBS.
-
-CHANGES+=("hook: Refresh debian/rules to not install in parallel.")
-patch debian/rules <<"EOPATCH"
-diff --git a/debian/rules b/debian/rules
---- a/debian/rules
-+++ b/debian/rules
-@@ -193,7 +193,9 @@
- 	dh_clean -k
- 	dh_installdirs
--	$(MAKE) -f debian/rules $(INSTALL_TARGETS)
-+	for config in $(CONFIGS); do \
-+		$(MAKE) -f debian/rules install-$$config; \
-+	done
- 
- install-%: $(STAMP)-build-%
-
