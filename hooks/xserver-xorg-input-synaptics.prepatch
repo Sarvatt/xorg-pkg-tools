@@ -23,8 +23,3 @@ echo "106_always_enable_vert_edge_scroll.patch" >> debian/patches/series
 
 CHANGES+=(" - 106_always_enable_vert_edge_scroll.patch")
 
-wget -O debian/patches/110_remove_bound_auto_adjust.patch http://patches.ubuntu.com/x/xfree86-driver-synaptics/extracted/110_remove_bound_auto_adjust.patch
-echo "110_remove_bound_auto_adjust.patch" >> debian/patches/series
-
-CHANGES+=(" - 110_remove_bound_auto_adjust.patch")
-
