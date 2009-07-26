@@ -52,3 +52,9 @@ CHANGES+=("hook: increase inputabiver to 7")
 echo 6 > debian/videoabiver
 CHANGES+=("hook: increase videoabiver to 6")
 
+# 2009-07-07 Robert Hooker
+# Increase serverminver to 2:1.6.99.1
+
+echo 6 > debian/serverminver
+CHANGES+=("hook: increase serverminver to 2:1.6.99.1")
+
