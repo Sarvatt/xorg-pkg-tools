@@ -3,7 +3,7 @@
 
 drop 13_debian_add_xkbpath_env_variable.diff fails
 drop 20_hurd-i386.diff fails
-drop xserver-1.5.0-bad-fbdev-thats-mine.patch applied upstream
+drop xserver-1.5.0-bad-fbdev-thats-mine.patch upstream
 drop kfreebsd-ftbfs.diff fails
 drop 0001-xorg.conf-5-refer-to-mousedrv-4-.-Debian-394058.patch fails
 drop 102_ubuntu_sharevts_load_cpu.patch fails
@@ -11,12 +11,14 @@ drop 103_psb_auto.patch fails
 drop 104_nvidia_autodetect.patch broken
 drop 105_fglrx_autodetect.patch broken
 drop 135_rethrow_signals.patch fails
-drop 140_quell_acpi_errmsgs.patch applied upstream
+drop 140_quell_acpi_errmsgs.patch upstream
 drop 153_make_dmx_compile.patch fails
 drop 156_exevents_copykeyclass_nullptrcheck.patch fails
 drop 158_raise_maxclients.patch fails
 drop 160_log_timestamping.patch fails
 drop 169_mipointer_nullptr_checks.patch fails
-drop 174_set_bg_pixmap_of_cow_to_none.patch applied upstream
+drop 174_set_bg_pixmap_of_cow_to_none.patch upstream
 drop 177_animated_cursor_change_master.patch fails
-
+drop 178_glx_flush_cache.patch upstream
+drop 179_glx_cleanup_drawables.patch upstream
+drop 180_fedora_no_synaptics_mouse_synthesis.patch upstream

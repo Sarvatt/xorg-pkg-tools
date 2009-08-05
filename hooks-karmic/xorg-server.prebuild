@@ -26,18 +26,15 @@ CHANGES+=("hook: disable xserver-xephyr (fails to build)")
 # Do not build xfbdev (fails to build)
 
 sed -i -e '/--enable-xfbdev /s/enable/disable/' debian/rules
+sed -i -e '/--enable-xvfb /s/enable/disable/' debian/rules
 sed -i -e '/^Package: xserver-xfbdev$/,/^$/d' debian/control
-CHANGES+=("hook: disable xserver-xfbdev (fails to build)")
+CHANGES+=("hook: disable xvfb/xvfbdev (fails to build)")
 
 # 2009-05-21 Robert Hooker
 # Do not build kdrive (fails to build)
 
 sed -i -e '/--enable-kdrive /s/enable/disable/' debian/rules
 CHANGES+=("hook: disable kdrive (fails to build)")
-
-
-sed -i -e '/--enable-config-dbus /s/enable/disable/' debian/rules
-CHANGES+=("hook: disable-config-dbus (unneeded)")
 
 # 2009-06-04 Robert Hooker
 # Increase input abi version to 7
