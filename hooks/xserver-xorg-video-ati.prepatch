@@ -1,5 +1,7 @@
 # This will be sourced as a bash script
 
+mkdir -p debian/patches
+
 # Tormod Volden 2009-04-22
 #
 if [ -f ../104_use_exa.patch ]; then
