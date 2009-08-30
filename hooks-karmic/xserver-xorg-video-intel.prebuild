@@ -1,11 +1,1 @@
-# This will be sourced as a bash script
-
-# Tormod Volden 2009-03-08
-# 
-
-sed -i '/^Architecture: /s/$/ lpia/' debian/control
-CHANGES+=("hook: Add lpia architecture.")
-
-sed -i '/^Depends: /s/$/, libdrm-intel1/' debian/control
-CHANGES+=("hook: Add depends on libdrm-intel1 (LP: #303177)")
-
+../hooks/xserver-xorg-video-intel.prebuild
