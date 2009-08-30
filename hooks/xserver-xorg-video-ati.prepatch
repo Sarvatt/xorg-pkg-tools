@@ -1,22 +1,10 @@
 # This will be sourced as a bash script
 
-mkdir -p debian/patches
-
-# Tormod Volden 2009-04-22
-#
-if [ -f ../104_use_exa.patch ]; then
-    cp ../104_use_exa.patch debian/patches
-    echo 104_use_exa.patch >> debian/patches/series
-    CHANGES+=("hook: add 104_use_exa.patch")
-fi
-
-
 # Tormod Volden 2009-03-31
 # 
 CHANGES+=("hook: Log git commit id in RadeonPreInit()")
 echo "#define GIT_VERSION \"$LASTCOMMIT\"" > src/git_version.h
-echo "199_add_git_version_to_log.diff" >> debian/patches/series
-<< EOPATCH1 cat > debian/patches/199_add_git_version_to_log.diff
+<< EOPATCH1 patch -p1
 diff --git a/src/radeon_driver.c b/src/radeon_driver.c
 index 8673f5e..b5e0bc9 100644
 --- a/src/radeon_driver.c
