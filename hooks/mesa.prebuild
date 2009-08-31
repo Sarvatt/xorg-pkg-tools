@@ -1,6 +1,7 @@
 # Tormod Volden 2009-05-16
-# Let it build on Jaunty kernel
+# Let it (try to) build on all Jaunty kernels
 
+if [ $DISTRIBUTION = jaunty ]; then
 sed -i '/^ linux-libc-dev /s/2.6.29/2.6.28/' debian/control
 CHANGES+=("hook: Relax linux-libc-dev depends to 2.6.28")
-
+fi
