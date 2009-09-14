@@ -15,8 +15,8 @@ for PACKAGE in $DRIVERS; do
     echo "Building $PACKAGE"
     echo "=================================="
     mkdir -p auto-$PACKAGE/uploaded
-    mv auto-$PACKAGE/*source.changes auto-$PACKAGE/uploaded 2>/dev/null
-    $AUTOXORGGIT $HOOKS -o -n -w auto-$PACKAGE $PACKAGE
-    dput $PPA auto-$PACKAGE/*source.changes
+    mv auto-$PACKAGE/*source.changes auto-$PACKAGE/uploaded 2>/dev/null || true
+    [ $PACKAGE = mesa ] && P="-p" || P=""
+    $AUTOXORGGIT $HOOKS -o -n -w auto-$PACKAGE $P $PACKAGE
+    dput $PPA auto-$PACKAGE/*source.changes || true
 done
-
