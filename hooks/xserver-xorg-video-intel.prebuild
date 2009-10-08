@@ -9,13 +9,3 @@ CHANGES+=("hook: Add lpia architecture.")
 sed -i '/^Depends: /s/$/, libdrm-intel1/' debian/control
 CHANGES+=("hook: Add depends on libdrm-intel1 (LP: #303177)")
 
-# Tormod Volden 2009-09-08
-# Temporary hack to bump version as long as git master is wrong
-if [ -z "$PACKAGE_VERSION" ]; then
-    eval `grep PACKAGE_VERSION= configure`
-    if [ "$BRANCH" = master ] && [ "$PACKAGE_VERSION" = 2.8.0 ]; then
-	PACKAGE_VERSION=2.8.1
-	CHANGES+=("hook: Bump version to $PACKAGE_VERSION")
-    fi
-fi
-
