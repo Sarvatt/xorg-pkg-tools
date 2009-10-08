@@ -9,6 +9,10 @@ CHANGES+=("hook: Add lpia architecture.")
 sed -i '/^Depends: /s/$/, libdrm-intel1/' debian/control
 CHANGES+=("hook: Add depends on libdrm-intel1 (LP: #303177)")
 
+
+# Tormod Volden 2009-10-08
+# After 2.9.0 these tools are in intel-gpu-tools
+
 sed -i '\:^usr/bin/intel_reg_dumper:d' debian/xserver-xorg-video-intel-dbg.install
 sed -i '\:src/reg_dumper/intel_reg_dumper:d' debian/rules
 CHANGES+=("hook: Do not install reg_dumper")
