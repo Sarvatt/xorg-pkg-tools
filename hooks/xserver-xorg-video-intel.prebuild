@@ -9,3 +9,6 @@ CHANGES+=("hook: Add lpia architecture.")
 sed -i '/^Depends: /s/$/, libdrm-intel1/' debian/control
 CHANGES+=("hook: Add depends on libdrm-intel1 (LP: #303177)")
 
+sed -i '\:^usr/bin/intel_reg_dumper:d' debian/xserver-xorg-video-intel-dbg.install
+sed -i '\:src/reg_dumper/intel_reg_dumper:d' debian/rules
+CHANGES+=("hook: Do not install reg_dumper")
