@@ -269,7 +269,7 @@ make_orig_tarball() {
         mv $CURDIR $TARDIR
     fi
     tar --exclude=debian --exclude=debian/* \
-        --exclude=.git --exclude=.git/* \
+        --exclude=.git --exclude=.git/* $TAR_EXCLUDE \
         -cf - $TARDIR \
         | gzip -9 >${DEBPKG}_${NO_EPOCH_VER}.orig.tar.gz
     if [ $CURDIR != $TARDIR ]; then
