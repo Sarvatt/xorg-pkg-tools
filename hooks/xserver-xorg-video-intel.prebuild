@@ -16,3 +16,10 @@ CHANGES+=("hook: Add depends on libdrm-intel1 (LP: #303177)")
 sed -i '\:^usr/bin/intel_reg_dumper:d' debian/xserver-xorg-video-intel-dbg.install
 sed -i '\:src/reg_dumper/intel_reg_dumper:d' debian/rules
 CHANGES+=("hook: Do not install reg_dumper")
+
+# Tormod Volden 2009-10-19
+# xvmc builds only with xcb-dri2 from libxcb master now, disable for now
+# note for later: will also need: libxcb-aux0-dev libx11-xcb-dev
+sed -i '/XvMC.so/s/^/#/' debian/xserver-xorg-video-intel.install
+CHANGES+=("hook: Disable XvMC for now")
+
