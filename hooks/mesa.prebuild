@@ -25,3 +25,9 @@ TAR_EXCLUDE=--exclude=progs/objviewer
 git rm -r progs/objviewer
 CHANGES+=("hook: Exclude progs/objviewer from orig.tar.gz")
 
+# Tormod Volden 2009-10-23
+# Upstream dropped s3v and trident drivers
+sed -i '/DRI_DRIVERS +=.*s3v/s/ s3v//' debian/rules
+sed -i '/DRI_DRIVERS +=.*trident/s/ trident//' debian/rules
+CHANGES+=("hook: Do not build trident and s3v (removed upstream)")
+
