@@ -12,7 +12,7 @@ else
     ADDVERSION=${ADDVERSION:-0.1}
 fi
 DEBIANREPO="origin/debian-experimental"
-DATE_PREFIX="+"
+DATE_PREFIX="~"
 BRANCH="master"
 WORKING_DIR="."
 INTERACTIVE="yes"
@@ -236,6 +236,14 @@ update_changelogs() {
         eval `grep PACKAGE_VERSION= configure`
     fi
     [ -z "$PACKAGE_VERSION" ] && die "No PACKAGE_VERSION in configure"
+
+    # Force "~" before date if version has increased
+    # (you should create a .lastversion if you use "+")
+    LASTVERSION=$(< .lastversion)
+    if [ -n "$LASTVERSION" ] && [ $PACKAGE_VERSION \> $LASTVERSION ]; then
+	DATE_PREFIX="~"
+    fi
+
     LASTCOMMIT=$(< .lastcommit)
     GITVER="${PACKAGE_VERSION}${DATE_PREFIX}git${TODAY}${ADDBRANCH}.${LASTCOMMIT:7:8}"
     NO_EPOCH_VER=`echo $GITVER | sed 's/^.://'`
