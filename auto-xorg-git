@@ -239,7 +239,9 @@ update_changelogs() {
 
     # Force "~" before date if version has increased
     # (you should create a .lastversion if you use "+")
-    LASTVERSION=$(< .lastversion)
+    if [ -z "$LASTVERSION" ]; then
+	    LASTVERSION=$(< .lastversion)
+    fi
     if [ -n "$LASTVERSION" ] && [ $PACKAGE_VERSION \> $LASTVERSION ]; then
 	DATE_PREFIX="~"
     fi
@@ -300,6 +302,7 @@ usage() {
     echo " -g                 No merge, just add debian/ tree"
     echo " -h                 This help text"
     echo " -H <hooks-dir>     Adds hooks from directory"
+    echo " -l <version>       Force ~ separator if new upstream version is higher"
     echo " -m                 Pause for manual merging"
     echo " -n                 Non-interactive"
     echo " -o                 No rebuild if up to date with upstream"
@@ -307,7 +310,7 @@ usage() {
     echo " -q                 Operate quietly"
     echo " -r <release>       Distro release (feisty, gutsy, hardy, etc.)"
     echo " -s <version>       Force Build-depends to xserver-xorg-dev <version>"
-    echo " -t <separator>     Separator between version and date [+]"
+    echo " -t <separator>     Separator between version and date [~]"
     echo " -u <upstream-repo> Specify non-standard git repository"
     echo " -S <strategy>      Override merge strategy"
     echo " -v <pkg-version>   Override package version (don't autodetect)"
@@ -318,7 +321,7 @@ usage() {
 # main starts here
 
 # Command line options
-while getopts "a:b:d:De:fgH:mnop:qr:s:t:u:S:v:w:h\?" opt; do
+while getopts "a:b:d:De:fgH:l:mnop:qr:s:t:u:S:v:w:h\?" opt; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"                   ;;
         b ) BRANCH="$OPTARG";
@@ -329,6 +332,7 @@ while getopts "a:b:d:De:fgH:mnop:qr:s:t:u:S:v:w:h\?" opt; do
         f ) FORCE_OVERWRITE=1                      ;;
         g ) NO_MERGE="yes"                         ;;
         H ) HOOKS="$OPTARG"                        ;;
+        l ) LASTVERSION="$OPTARG"                  ;;
         m ) MANUAL_MERGE="yes"                     ;;
         n ) INTERACTIVE="no"                       ;;
         o ) NOREBUILD=1                            ;;
