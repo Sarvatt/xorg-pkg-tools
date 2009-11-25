@@ -238,8 +238,10 @@ update_changelogs() {
     [ -z "$PACKAGE_VERSION" ] && die "No PACKAGE_VERSION in configure"
 
     # Force "~" before date if version has increased
-    # (you should create a .lastversion if you use "+")
-    if [ -z "$LASTVERSION" ]; then
+    # (you should use the -l option or create a .lastversion if you
+    # use -t "+")
+    
+    if [ -z "$LASTVERSION" ] && [ -e .lastversion ]; then
 	    LASTVERSION=$(< .lastversion)
     fi
     if [ -n "$LASTVERSION" ] && [ $PACKAGE_VERSION \> $LASTVERSION ]; then
