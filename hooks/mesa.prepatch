@@ -13,6 +13,6 @@ drop 05_hurd-ftbfs.diff fails
 
 # Tormod Volden 2009-12-01
 # Workaround for empty SUBDIR element
-sed -i '/if . -d ..dir /s/\$\$dir/"$$dir"/' debian/patches/03_optional-progs-and-install.patch
+sed -i '/if . -d $$dir /s/$$dir/"$$dir"/' debian/patches/03_optional-progs-and-install.patch
 CHANGES+=("hook: Make 03_optional-progs-and-install.patch handle empty SUBDIRS")
 
