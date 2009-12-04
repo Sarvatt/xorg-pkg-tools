@@ -1,3 +1,10 @@
-drop 104_nvidia_autodetect.patch broken
-drop 105_fglrx_autodetect.patch broken
+if [ "$BRANCH" != "server-1.6-branch" ]; then
+drop 02_Add-libgcrypt-as-an-option-for-sha1.diff upstream
+drop 135_rethrow_signals.patch fails
+drop 164_trap-aspect-ratios.patch fails
+drop 177_animated_cursor_change_master.patch fails
+drop 190_cache-xkbcomp_output_for_fast_start_up.patch fails
 
+wget -O debian/patches/12-Add-libudev-input-hotplug-backend.diff http://sarvatt.com/downloads/patches/12-Add-libudev-input-hotplug-backend.diff
+CHANGES+=("hook: Refresh 12-Add-libudev-input-hotplug-backend.diff")
+fi

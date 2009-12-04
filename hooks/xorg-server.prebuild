@@ -1,18 +1,8 @@
 # This will be sourced as a bash script
 
+## Server 1.8 changes --disable-werror to --disable-strict-compilation
 
-# 2008-07-03 Tormod Volden
-# For easier test installation, drop depends on xserver-xorg
-
-sed -i -e '/^Depends: /s/, xserver-xorg//' debian/control
-CHANGES+=("debian/control: drop depends on xserver-xorg for now")
-
-
-# 2008-07-03 Tormod Volden
-# Do not build dmx (fails to build)
-
-sed -i -e '/--enable-dmx /s/enable/disable/' debian/rules
-sed -i -e '/^Package: xdmx$/,/^$/d' debian/control
-sed -i -e '/^Package: xdmx-tools$/,/^$/d' debian/control
-CHANGES+=("disable dmx (fails to build)")
-
+if [ "$BRANCH" != "server-1.6-branch" ]; then
+sed -i -e '/--disable-werror /s/werror/strict-compilation/' debian/rules
+CHANGES+=("hook: Build with --disable-strict-compilation instead of --disable-werror")
+fi
