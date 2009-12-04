@@ -1,25 +1,21 @@
 # Robert Hooker 2009-06-27
 # Import ubuntu patches for xserver-xorg-input-synaptics.
 
-drop 02-mention-tapping-in-manpage-notes.patch applied upstream
+CHANGES+=("hook: Reenable Ubuntu patches:")
 
-
-CHANGES+=("hook: Reenable Ubuntu patch series.")
-
-wget -O debian/patches/103_enable_cornertapping.patch http://patches.ubuntu.com/x/xfree86-driver-synaptics/extracted/103_enable_cornertapping.patch
+wget -O debian/patches/103_enable_cornertapping.patch http://patches.ubuntu.com/x/xserver-xorg-input-synaptics/extracted/103_enable_cornertapping.patch
 echo "103_enable_cornertapping.patch" >> debian/patches/series
 CHANGES+=(" - 103_enable_cornertapping.patch")
 
-wget -O debian/patches/104_always_enable_tapping.patch http://patches.ubuntu.com/x/xfree86-driver-synaptics/extracted/104_always_enable_tapping.patch
+wget -O debian/patches/104_always_enable_tapping.patch http://patches.ubuntu.com/x/xserver-xorg-input-synaptics/extracted/104_always_enable_tapping.patch
 echo "104_always_enable_tapping.patch" >> debian/patches/series 
 CHANGES+=(" - 104_always_enable_tapping.patch")
 
-wget -O debian/patches/105_correct_multifinger_click.patch http://patches.ubuntu.com/x/xfree86-driver-synaptics/extracted/105_correct_multifinger_click.patch
+wget -O debian/patches/105_correct_multifinger_click.patch http://patches.ubuntu.com/x/xserver-xorg-input-synaptics/extracted/105_correct_multifinger_click.patch
 echo "105_correct_multifinger_click.patch" >> debian/patches/series 
 CHANGES+=(" - 105_correct_multifinger_click.patch")
 
-wget -O debian/patches/106_always_enable_vert_edge_scroll.patch http://patches.ubuntu.com/x/xfree86-driver-synaptics/extracted/106_always_enable_vert_edge_scroll.patch
+wget -O debian/patches/106_always_enable_vert_edge_scroll.patch http://patches.ubuntu.com/x/xserver-xorg-input-synaptics/extracted/106_always_enable_vert_edge_scroll.patch
 echo "106_always_enable_vert_edge_scroll.patch" >> debian/patches/series 
-
 CHANGES+=(" - 106_always_enable_vert_edge_scroll.patch")
 
