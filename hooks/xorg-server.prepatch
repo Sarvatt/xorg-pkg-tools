@@ -5,6 +5,7 @@ drop 164_trap-aspect-ratios.patch fails
 drop 177_animated_cursor_change_master.patch fails
 drop 190_cache-xkbcomp_output_for_fast_start_up.patch fails
 
-wget -O debian/patches/12-Add-libudev-input-hotplug-backend.diff http://sarvatt.com/downloads/patches/12-Add-libudev-input-hotplug-backend.diff
-CHANGES+=("hook: Refresh 12-Add-libudev-input-hotplug-backend.diff")
+p=12-Add-libudev-input-hotplug-backend.diff
+(cd debian/patches; rm $p; wget http://sarvatt.com/downloads/patches/$p)
+CHANGES+=("hook: Refresh $p")
 fi
