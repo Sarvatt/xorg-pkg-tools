@@ -439,6 +439,7 @@ fi
 # Relax Build-depends (for backporting) in debian/control
 if [ -n "$XSERVER_VERSION" ]; then
     sed -i -e "/^Build-Depends:/s/xserver-xorg-dev (>= [0-9:.]*)/xserver-xorg-dev (>= $XSERVER_VERSION)/" debian/control
+    sed -i -e "/^ xserver-xorg-dev /s/xserver-xorg-dev (>= [0-9:.]*)/xserver-xorg-dev (>= $XSERVER_VERSION)/" debian/control
     CHANGES+=("Forcing Build-depends to xserver-xorg-dev $XSERVER_VERSION")
 fi
 
