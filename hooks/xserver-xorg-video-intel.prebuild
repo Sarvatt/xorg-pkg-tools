@@ -24,3 +24,8 @@ CHANGES+=("hook: Do not install reg_dumper")
 sed -i '/XvMC.so/s/^/#/' debian/xserver-xorg-video-intel.install
 CHANGES+=("hook: Disable XvMC for now")
 fi
+
+# Tormod Volden 2009-12-08
+# Debian ships a modprobe file for i915, we don't want that
+sed -i '\:/etc/modprobe.d:s/^/#/' debian/rules
+
