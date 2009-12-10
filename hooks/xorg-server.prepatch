@@ -6,9 +6,9 @@ drop 177_animated_cursor_change_master.patch fails
 drop 190_cache-xkbcomp_output_for_fast_start_up.patch fails
 
 p=12-Add-libudev-input-hotplug-backend.diff
-(cd debian/patches; rm $p; wget http://sarvatt.com/downloads/patches/$p)
+(cd debian/patches; rm $p; wget http://people.ubuntu.com/~sarvatt/$p)
 CHANGES+=("hook: Refresh $p")
-wget -O debian/patches/901_xi_fix.patch http://sarvatt.com/downloads/patches/901_xi_fix.patch
+wget -O debian/patches/901_xi_fix.patch http://people.ubuntu.com/~sarvatt/901_xi_fix.patch
 echo "901_xi_fix.patch" >> debian/patches/series
 CHANGES+=("hook: Add 901_xi_fix.patch (fd.o #25339)")
 fi
