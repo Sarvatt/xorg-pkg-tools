@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# xorg-edgers-live-test v137
+# xorg-edgers-live-test v238
 # by Tormod Volden 2008
 # A script to be run in an Ubuntu live CD session
 # Installs xorg test packages from xorg-edgers PPA
@@ -45,13 +45,12 @@ echo "#deb-src http://ppa.launchpad.net/xorg-edgers/ubuntu $RELEASE main" >> $SS
 echo "#deb http://ppa.launchpad.net/tormodvolden/ubuntu $RELEASE main" >> $SS
 apt-get update
 
-# Upgrade mesa first, then xserver-xorg-core
+# Upgrade mesa first, then xserver-xorg-core with drivers
 apt-get install --assume-yes --force-yes libdrm2 libgl1-mesa-dri libgl1-mesa-glx libglu1-mesa mesa-utils
-apt-get install --assume-yes --force-yes xserver-xorg-video-vesa xserver-xorg-input-kbd xserver-xorg-input-mouse xserver-xorg-core xserver-xorg-input-evdev x11-common xserver-xorg-video-ati
+apt-get install --assume-yes --force-yes xserver-xorg-core xserver-xorg-video-vesa xserver-xorg-input-evdev x11-common xserver-xorg-video-ati xserver-xorg-video-intel
 
 # Add your preferred driver here
 #apt-get install --assume-yes --force-yes xserver-xorg-video-radeonhd
-apt-get install --assume-yes --force-yes xserver-xorg-video-intel
 
 # Upgrade anything else available
 apt-get upgrade --assume-yes --force-yes || UPGRADEMESS=1
