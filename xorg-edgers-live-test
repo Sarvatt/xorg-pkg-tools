@@ -61,9 +61,10 @@ if [ $BUILD_DRM ]; then
     module-assistant -t auto-install drm-modules
 fi
 
-# Shutdown Xorg (/etc/init.d/gdm breaks on Hardy live CD)
-/etc/init.d/gdm stop || true
+# Shutdown Xorg
+service gdm stop || true
 sleep 2
+# just in case gdm stop does not work
 killall gdm || true
 sleep 2
 
@@ -86,5 +87,5 @@ fi
 
 echo "Will now restart X"
 sleep 3
-/etc/init.d/gdm start
+service gdm start
 
