@@ -77,14 +77,6 @@ fi
 echo "Disabling all swap for safety reasons"
 swapoff -a
 
-# Modify xorg.conf to use EXA (for e.g. radeon)
-if [ $EXA ]; then
-  echo "Setting AccelMethod to EXA"
-  sed -i -e '/Section "Device"/a \
-        Option          "AccelMethod"   "EXA"
-' /etc/X11/xorg.conf
-fi
-
 # Let operator clean up if needed
 if [ $UPGRADEMESS ]; then
 	echo Package upgrade failed. You might need to fix it.
