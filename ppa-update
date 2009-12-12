@@ -22,6 +22,6 @@ for PACKAGE in $DRIVERS; do
     mkdir -p auto-$PACKAGE/uploaded
     mv auto-$PACKAGE/*source.changes auto-$PACKAGE/uploaded 2>/dev/null || true
     [ "$FULLPKGNAME" = 1 ] && P="-p" || P=""
-    $AUTOXORGGIT $HOOKS -o -n -w auto-$PACKAGE $P $PACKAGE
+    $AUTOXORGGIT $AOPTS -o -n -w auto-$PACKAGE $P $PACKAGE
     dput $PPA auto-$PACKAGE/*source.changes || true
 done
