@@ -208,8 +208,12 @@ add_debian() {
 drop () {
     local PATCH=$1
     shift
-    sed -i "/^$PATCH/s/^/#/" debian/patches/series
-    CHANGES+=("hook: Drop $PATCH ($*)")
+    if grep -q "^$PATCH" debian/patches/series ; then
+        sed -i "/^$PATCH/s/^/#/" debian/patches/series
+        CHANGES+=("hook: Drop $PATCH ($*)")
+    else
+        warn "no $PATCH to drop"
+    fi
 }
 
 debian_patches() {
