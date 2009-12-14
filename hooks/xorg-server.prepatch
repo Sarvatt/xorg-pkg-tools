@@ -1,5 +1,7 @@
 if [ "$BRANCH" != "server-1.6-branch" ]; then
 drop 02_Add-libgcrypt-as-an-option-for-sha1.diff upstream
+drop 03_fedora_glx_versioning.diff upstream
+drop 04_fedora_glx14-swrast.diff upstream
 drop 11-Move-config_init-after-CreateWellKnownSockets-and-In.diff upstream
 drop 164_trap-aspect-ratios.patch fails
 
