@@ -1,3 +1,1 @@
-p=02_silent_master.diff
-(cd debian/patches; rm $p; wget http://people.ubuntu.com/~sarvatt/$p)
-CHANGES+=("hook: Refresh $p")
+drop 02_silent_master.diff upstream
