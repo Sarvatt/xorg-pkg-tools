@@ -5,6 +5,6 @@
 # depend directly on the nouveau-kernel-source from the PPA
 # This was done in the latest Ubuntu package but not pushed to git
 
-sed -i '/^Depends: /s/linux-nouveau-modules/nouveau-kernel-source/' debian/control
-CHANGES+=("hook: Depend on nouveau-kernel-source")
+#sed -i '/^Depends: /s/linux-nouveau-modules/nouveau-kernel-source/' debian/control
+#CHANGES+=("hook: Depend on nouveau-kernel-source")
 
