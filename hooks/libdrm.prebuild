@@ -8,3 +8,5 @@ Replaces: linux-libc-dev
 ' debian/control
 CHANGES+=("hook: libdrm-dev Replaces linux-libc-dev")
 
+patch -p1 < $HOOKS/disable-libkms-build.patch
+patch -p1 < $HOOKS/libdrm-update-symbols.patch
