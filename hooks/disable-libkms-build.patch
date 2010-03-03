@@ -1,0 +1,12 @@
+diff --git a/debian/rules b/debian/rules
+index b80459c..81f9845 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -71,6 +71,7 @@ build/config.status: configure
+ 		--mandir=\$${prefix}/share/man \
+ 		--infodir=\$${prefix}/share/info \
+ 		--enable-static=yes \
++		--disable-libkms \
+ 		$(confflags) \
+ 		CFLAGS="$(CFLAGS)"
+ 
