@@ -5,7 +5,6 @@
 if [ "$BRANCH" != "mesa_7_4_branch" ]; then
   drop 102_dont_vblank.diff fails
   drop 107_glxgears_is_not_a_benchmark.patch testing
-#  drop 108_bo_assertion.patch applied upstream
 fi
 
 # Tormod Volden 2009-11-03

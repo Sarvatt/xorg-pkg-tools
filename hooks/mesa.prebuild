@@ -13,30 +13,9 @@ sed -i '/DRI_DRIVERS += mach64 mga r128/s/mga/mga nouveau/' debian/rules
 CHANGES+=("hook: Build experimental nouveau mesa classic driver (nv0x-nv2x only)")
 
 
-# Tormod Volden 2009-09-06
-# Bump build-dep for libdrm
-#sed -i '/^ libdrm-dev /s/2.4.3/2.4.13~git/' debian/control
-#CHANGES+=("hook: Build-dep on libdrm 2.4.13")
-
-
 # Tormod Volden 2009-10-18
 # Exclude the 20 MB unused progs/objviewer from tarball
 TAR_EXCLUDE=--exclude=progs/objviewer
 git rm -r progs/objviewer
 CHANGES+=("hook: Exclude progs/objviewer from orig.tar.gz")
-
-# Tormod Volden 2009-10-23
-# Upstream dropped s3v and trident drivers
-sed -i '/DRI_DRIVERS +=.*s3v/s/ s3v//' debian/rules
-sed -i '/DRI_DRIVERS +=.*trident/s/ trident//' debian/rules
-CHANGES+=("hook: Do not build trident and s3v (removed upstream)")
-
-# Tormod Volden 2009-10-30
-# New searchpath for multiarch use (LP: #248392)
-if grep -q "with-dri-searchpath" configure.ac; then
-  sed -i '/with-dri-driverdir=/a \
-	--with-dri-searchpath=/usr/lib/dri:/usr/lib/dri/\$\(DEB_HOST_GNU_TYPE\) \\
-' debian/rules
-  CHANGES+=("hook: Add --with-dri-searchpath (LP: #248392)")
-fi
 
