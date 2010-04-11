@@ -21,21 +21,32 @@ CHANGES+=("hook: Exclude progs/objviewer from orig.tar.gz")
 
 
 # Tormod Volden 2010-04-11
-# Conditionally build radeon gallium version
+# Conditionally build gallium drivers as well
 if [ -n "$GALLIUM" ]; then
-	ADDBRANCH="+r300g"
+	ADDBRANCH="${ADDBRANCH}+gallium"
 	sed -i '/disable-gallium/s/^/#/' debian/rules
 	sed -i '/^confflags-dri = /a \
-	--enable-gallium-radeon --with-state-trackers=dri,glx \\
+	--enable-gallium-radeon \\\
+	--enable-gallium-nouveau \\\
+	--enable-gallium-intel \\\
+	--with-state-trackers=dri,glx \\
 ' debian/rules
 	sed -i '/dh_install -s /a \
 	# For gallium packages\
 	cd $(CURDIR)/debian/libgl1-mesa-dri/usr/lib/dri && mv r300_dri.so r300_dri-classic.so && ln -s radeong_dri.so r300_dri.so
 ' debian/rules
-	CHANGES+=("hook: Build gallium drivers")
+	sed -i '/^confflags-osmesa/a \
+	--disable-gallium \\
+' debian/rules
+	CHANGES+=("hook (GALLIUM): Build gallium drivers")
+fi
+
+# For radeon gallium PPA (on plain lucid)
+if [ -n "$ONLY_R300" ]; then
+	ADDBRANCH="${ADDBRANCH}+r300"
 	sed -i '/^confflags-dri = /i \
 DRI_DRIVERS = r300
 ' debian/rules
-	CHANGES+=("hook: Build only r300 drivers")
+	CHANGES+=("hook (ONLY_R300): Build only r300 drivers")
 fi
 
