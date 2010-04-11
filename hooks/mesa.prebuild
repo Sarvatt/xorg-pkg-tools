@@ -19,3 +19,23 @@ TAR_EXCLUDE=--exclude=progs/objviewer
 git rm -r progs/objviewer
 CHANGES+=("hook: Exclude progs/objviewer from orig.tar.gz")
 
+
+# Tormod Volden 2010-04-11
+# Conditionally build radeon gallium version
+if [ -n "$GALLIUM" ]; then
+	ADDBRANCH="+r300g"
+	sed -i '/disable-gallium/s/^/#/' debian/rules
+	sed -i '/^confflags-dri = /a \
+	--enable-gallium-radeon --with-state-trackers=dri,glx \\
+' debian/rules
+	sed -i '/dh_install -s /a \
+	# For gallium packages\
+	cd $(CURDIR)/debian/libgl1-mesa-dri/usr/lib/dri && mv r300_dri.so r300_dri-classic.so && ln -s radeong_dri.so r300_dri.so
+' debian/rules
+	CHANGES+=("hook: Build gallium drivers")
+	sed -i '/^confflags-dri = /i \
+DRI_DRIVERS = r300
+' debian/rules
+	CHANGES+=("hook: Build only r300 drivers")
+fi
+
