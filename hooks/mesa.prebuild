@@ -20,28 +20,56 @@ git rm -r progs/objviewer
 CHANGES+=("hook: Exclude progs/objviewer from orig.tar.gz")
 
 
-# Tormod Volden 2010-04-11
+# Tormod Volden 2010-04-12
 # Conditionally build gallium drivers as well
 if [ -n "$GALLIUM" ]; then
-	ADDBRANCH="${ADDBRANCH}+gallium"
 	sed -i '/disable-gallium/s/^/#/' debian/rules
+
 	sed -i '/^confflags-dri = /a \
 	--enable-gallium-radeon \\\
 	--enable-gallium-nouveau \\\
 	--enable-gallium-intel \\\
 	--with-state-trackers=dri,glx \\
 ' debian/rules
-	sed -i '/dh_install -s /a \
-	# For gallium packages\
-	cd $(CURDIR)/debian/libgl1-mesa-dri/usr/lib/dri && mv r300_dri.so r300_dri-classic.so && ln -s radeong_dri.so r300_dri.so
-' debian/rules
+
 	sed -i '/^confflags-osmesa/a \
 	--disable-gallium \\
 ' debian/rules
+
+	# upstream should have made this a bit easier...
+	sed -i '/^LIBNAME =/s/i915/i915g/' src/gallium/drivers/i915/Makefile
+	sed -i '/^LIBNAME =/s/i965/i965g/' src/gallium/drivers/i965/Makefile
+	sed -i '/^LIBNAME =/s/i915/i915g/' src/gallium/targets/dri-i915/Makefile
+	sed -i '/^LIBNAME =/s/i965/i965g/' src/gallium/targets/dri-i965/Makefile
+	sed -i 's/libi915\.a/libi915g.a/'  src/gallium/targets/dri-i915/Makefile
+	sed -i 's/libi965\.a/libi965g.a/'  src/gallium/targets/dri-i965/Makefile
+
+	sed -i '/dh_installexamples -s/a \
+	# Move gallium versions into own directory\
+	mkdir debian/tmp/usr/lib/dri-gallium\
+	mv debian/tmp/usr/lib/dri/radeong_dri.so debian/tmp/usr/lib/dri-gallium/r300_dri.so\
+	mv debian/tmp/usr/lib/dri/i915g_dri.so debian/tmp/usr/lib/dri-gallium/i915_dri.so\
+	mv debian/tmp/usr/lib/dri/i965g_dri.so debian/tmp/usr/lib/dri-gallium/i965_dri.so\
+	mv debian/tmp/usr/lib/dri/nouveau_dri.so debian/tmp/usr/lib/dri-gallium\
+	mv debian/tmp/usr/lib/dri/swrastg_dri.so debian/tmp/usr/lib/dri-gallium
+' debian/rules
+
 	CHANGES+=("hook (GALLIUM): Build gallium drivers")
+
+	if [ -n "$GALLIUMDEFAULT" ]; then
+		ADDBRANCH="${ADDBRANCH}+gallium"
+		sed -i '/dh_install -s /a \
+	mv debian/tmp/usr/lib/dri debian/tmp/usr/lib/dri-classic\
+	mv debian/tmp/usr/lib/dri-gallium/ debian/tmp/usr/lib/dri
+' debian/rules
+		echo "usr/lib/dri-classic/*.so" >> debian/libgl1-mesa-dri.install
+		CHANGES+=("hook (GALLIUMDEFAULT): Load gallium drivers by default")
+	else
+		echo "usr/lib/dri-gallium/*.so" >> debian/libgl1-mesa-dri.install
+	fi
 fi
 
-# For radeon gallium PPA (on plain lucid)
+# For radeon PPA (on plain lucid)
 if [ -n "$ONLY_R300" ]; then
 	ADDBRANCH="${ADDBRANCH}+r300"
 	sed -i '/^confflags-dri = /i \
