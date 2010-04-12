@@ -43,14 +43,16 @@ if [ -n "$GALLIUM" ]; then
 	sed -i '/^LIBNAME =/s/i965/i965g/' src/gallium/targets/dri-i965/Makefile
 	sed -i 's/libi915\.a/libi915g.a/'  src/gallium/targets/dri-i915/Makefile
 	sed -i 's/libi965\.a/libi965g.a/'  src/gallium/targets/dri-i965/Makefile
+	sed -i 's/libi915\.a/libi915g.a/'  src/gallium/targets/xorg-i915/Makefile
+	sed -i 's/libi965\.a/libi965g.a/'  src/gallium/targets/xorg-i965/Makefile
 
 	sed -i '/dh_installexamples -s/a \
 	# Move gallium versions into own directory\
 	mkdir debian/tmp/usr/lib/dri-gallium\
 	mv debian/tmp/usr/lib/dri/radeong_dri.so debian/tmp/usr/lib/dri-gallium/r300_dri.so\
-	mv debian/tmp/usr/lib/dri/i915g_dri.so debian/tmp/usr/lib/dri-gallium/i915_dri.so\
-	mv debian/tmp/usr/lib/dri/i965g_dri.so debian/tmp/usr/lib/dri-gallium/i965_dri.so\
-	mv debian/tmp/usr/lib/dri/nouveau_dri.so debian/tmp/usr/lib/dri-gallium\
+	-mv debian/tmp/usr/lib/dri/i915g_dri.so debian/tmp/usr/lib/dri-gallium/i915_dri.so\
+	-mv debian/tmp/usr/lib/dri/i965g_dri.so debian/tmp/usr/lib/dri-gallium/i965_dri.so\
+	-mv debian/tmp/usr/lib/dri/nouveau_dri.so debian/tmp/usr/lib/dri-gallium\
 	mv debian/tmp/usr/lib/dri/swrastg_dri.so debian/tmp/usr/lib/dri-gallium
 ' debian/rules
 
