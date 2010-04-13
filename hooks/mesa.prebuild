@@ -36,31 +36,24 @@ if [ -n "$GALLIUM" ]; then
 	--disable-gallium \\
 ' debian/rules
 
-	# upstream should have made this a bit easier...
-	sed -i '/^LIBNAME =/s/i915/i915g/' src/gallium/drivers/i915/Makefile
-	sed -i '/^LIBNAME =/s/i965/i965g/' src/gallium/drivers/i965/Makefile
-	sed -i '/^LIBNAME =/s/i915/i915g/' src/gallium/targets/dri-i915/Makefile
-	sed -i '/^LIBNAME =/s/i965/i965g/' src/gallium/targets/dri-i965/Makefile
-	sed -i 's/libi915\.a/libi915g.a/'  src/gallium/targets/dri-i915/Makefile
-	sed -i 's/libi965\.a/libi965g.a/'  src/gallium/targets/dri-i965/Makefile
-	sed -i 's/libi915\.a/libi915g.a/'  src/gallium/targets/xorg-i915/Makefile
-	sed -i 's/libi965\.a/libi965g.a/'  src/gallium/targets/xorg-i965/Makefile
-
 	sed -i '/dh_installexamples -s/a \
 	# Move gallium versions into own directory\
 	mkdir debian/tmp/usr/lib/dri-gallium\
-	mv debian/tmp/usr/lib/dri/radeong_dri.so debian/tmp/usr/lib/dri-gallium/r300_dri.so\
-	-mv debian/tmp/usr/lib/dri/i915g_dri.so debian/tmp/usr/lib/dri-gallium/i915_dri.so\
-	-mv debian/tmp/usr/lib/dri/i965g_dri.so debian/tmp/usr/lib/dri-gallium/i965_dri.so\
-	-mv debian/tmp/usr/lib/dri/nouveau_dri.so debian/tmp/usr/lib/dri-gallium\
-	mv debian/tmp/usr/lib/dri/swrastg_dri.so debian/tmp/usr/lib/dri-gallium
+	-mv debian/tmp/usr/lib/dri/radeong_dri.so debian/tmp/usr/lib/dri-gallium/r300_dri.so\
+	-mv debian/tmp/usr/lib/dri/i915_dri.so debian/tmp/usr/lib/dri-gallium\
+	-mv debian/tmp/usr/lib/dri/i965_dri.so debian/tmp/usr/lib/dri-gallium\
+	-cp debian/tmp/usr/lib/dri/nouveau_dri.so debian/tmp/usr/lib/dri-gallium\
+	mv debian/tmp/usr/lib/dri/swrastg_dri.so debian/tmp/usr/lib/dri-gallium\
+	# fish out the classic intel drivers\
+	-cp build/dri/glx/i915_dri.so debian/tmp/usr/lib/dri/i915_dri.so\
+	-cp build/dri/glx/i965_dri.so debian/tmp/usr/lib/dri/i965_dri.so
 ' debian/rules
 
 	CHANGES+=("hook (GALLIUM): Build gallium drivers")
 
 	if [ -n "$GALLIUMDEFAULT" ]; then
 		ADDBRANCH="${ADDBRANCH}+gallium"
-		sed -i '/dh_install -s /a \
+		sed -i '/dh_install -s /i \
 	mv debian/tmp/usr/lib/dri debian/tmp/usr/lib/dri-classic\
 	mv debian/tmp/usr/lib/dri-gallium/ debian/tmp/usr/lib/dri
 ' debian/rules
