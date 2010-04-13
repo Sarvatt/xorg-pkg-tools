@@ -70,6 +70,8 @@ if [ -n "$ONLY_R300" ]; then
 	sed -i '/^confflags-dri = /i \
 DRI_DRIVERS = r300
 ' debian/rules
+	sed -i '/--enable-gallium-nouveau/d' debian/rules
+	sed -i '/--enable-gallium-intel/d' debian/rules
 	CHANGES+=("hook (ONLY_R300): Build only r300 drivers")
 fi
 
