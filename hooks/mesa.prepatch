@@ -16,3 +16,7 @@ drop 05_hurd-ftbfs.diff fails
 sed -i '/if . -d $$dir /s/$$dir/"$$dir"/' debian/patches/03_optional-progs-and-install.patch
 CHANGES+=("hook: Make 03_optional-progs-and-install.patch handle empty SUBDIRS")
 
+# Tormod Volden 2010-04-15
+# Does not apply against master
+drop 103_savage-expose_fbmodes_with_nonzero_alpha.patch fails
+
