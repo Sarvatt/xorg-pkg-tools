@@ -10,7 +10,7 @@ fi
 # Robert Hooker 2010-02-06
 # Add the nouveau driver
 sed -i '/DRI_DRIVERS += mach64 mga r128/s/mga/mga nouveau/' debian/rules
-CHANGES+=("hook: Build experimental nouveau mesa classic driver (nv0x-nv2x only)")
+CHANGES+=("hook: Enable nouveau mesa classic driver (nv0x-nv2x only)")
 
 
 # Tormod Volden 2009-10-18
