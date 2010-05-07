@@ -23,7 +23,7 @@ CHANGES+=("hook: Exclude progs/objviewer from orig.tar.gz")
 # Tormod Volden 2010-04-12
 # Conditionally build gallium drivers as well
 if [ -n "$GALLIUM" ]; then
-	sed -i '/disable-gallium/s/^/#/' debian/rules
+	sed -i '/^confflags.*disable-gallium/s/^/#/' debian/rules
 
 	sed -i '/^confflags-dri = /a \
 	--enable-gallium-radeon \\\
@@ -43,7 +43,7 @@ if [ -n "$GALLIUM" ]; then
 	-mv debian/tmp/usr/lib/dri/i915_dri.so debian/tmp/usr/lib/dri-gallium\
 	-mv debian/tmp/usr/lib/dri/i965_dri.so debian/tmp/usr/lib/dri-gallium\
 	-cp debian/tmp/usr/lib/dri/nouveau_dri.so debian/tmp/usr/lib/dri-gallium\
-	mv debian/tmp/usr/lib/dri/swrastg_dri.so debian/tmp/usr/lib/dri-gallium\
+	mv debian/tmp/usr/lib/dri/swrastg_dri.so debian/tmp/usr/lib/dri-gallium/swrast_dri.so\
 	# fish out the classic intel drivers\
 	-cp build/dri/glx/i915_dri.so debian/tmp/usr/lib/dri/i915_dri.so\
 	-cp build/dri/glx/i965_dri.so debian/tmp/usr/lib/dri/i965_dri.so
