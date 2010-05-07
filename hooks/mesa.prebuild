@@ -13,6 +13,13 @@ sed -i '/DRI_DRIVERS += mach64 mga r128/s/mga/mga nouveau/' debian/rules
 CHANGES+=("hook: Enable nouveau mesa classic driver (nv0x-nv2x only)")
 
 
+# Tormod Volden 2010-05-07
+# New build-dep for gles
+sed -i '/^Build-Depends:/a \
+ python-libxml2,
+' debian/control
+
+
 # Tormod Volden 2009-10-18
 # Exclude the 20 MB unused progs/objviewer from tarball
 TAR_EXCLUDE=--exclude=progs/objviewer
