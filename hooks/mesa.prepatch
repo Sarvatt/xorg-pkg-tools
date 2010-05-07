@@ -10,3 +10,8 @@ drop 107_glxgears_is_not_a_benchmark.patch it is for us
 sed -i '/if . -d $$dir /s/$$dir/"$$dir"/' debian/patches/03_optional-progs-and-install.patch
 CHANGES+=("hook: Make 03_optional-progs-and-install.patch handle empty SUBDIRS")
 
+# Tormod Volden 2010-05-07
+# Source file changed location, ugh
+sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/100_no_abi_tag.patch
+sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/101_ubuntu_hidden_glname.patch
+
