@@ -18,6 +18,7 @@ CHANGES+=("hook: Enable nouveau mesa classic driver (nv0x-nv2x only)")
 sed -i '/^Build-Depends:/a \
  python-libxml2,
 ' debian/control
+CHANGES+=("hook: Add build-dep on python-libxml2")
 
 
 # Tormod Volden 2009-10-18

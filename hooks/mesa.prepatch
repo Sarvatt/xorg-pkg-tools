@@ -14,4 +14,5 @@ CHANGES+=("hook: Make 03_optional-progs-and-install.patch handle empty SUBDIRS")
 # Source file changed location, ugh
 sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/100_no_abi_tag.patch
 sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/101_ubuntu_hidden_glname.patch
+CHANGES+=("hook: Update patches 100,101 for new glapi paths")
 
