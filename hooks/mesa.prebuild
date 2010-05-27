@@ -21,6 +21,13 @@ sed -i '/^Build-Depends:/a \
 CHANGES+=("hook: Add build-dep on python-libxml2")
 
 
+# Tormod Volden 2010-05-23
+# mesa-utils dropped from mesa tree
+sed -i '/with-demos/d' debian/rules
+sed -i '/^Package: mesa-utils/,/^$/s/^/#/' debian/control
+CHANGES+=("hook: do not package mesa-utils")
+
+
 # Tormod Volden 2009-10-18
 # Exclude the 20 MB unused progs/objviewer from tarball
 TAR_EXCLUDE=--exclude=progs/objviewer
