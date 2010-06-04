@@ -1,0 +1,55 @@
+#if [ "$BRANCH" != "server-1.8-branch" ]; then
+#drop 16-xaa-fbcomposite-fix-negative-size.diff upstream
+#drop 109_fix-swcursor-crash.patch upstream
+#drop 190_cache-xkbcomp_output_for_fast_start_up.patch fails
+#drop 196_xvfb-fbscreeninit-handling.patch fails
+#fi
+if [ "$BRANCH" == "server-1.9-branch" ]; then
+drop 100_rethrow_signals.patch gimme back my signal handler!
+
+#drop 196_xvfb-fbscreeninit-handling.patch fails
+#drop 197_xvfb-randr.patch fails
+#drop 108_reenable_record_ext.patch upstream
+#drop 06_dont_trap_access_to_timer_and_keyboard.diff upstream
+#drop 07-xfree86-fix-build-with-xv-disabled.diff ?
+# udev support patches
+#drop 08-config-xorg-conf-d.diff upstream
+#drop 09-inputclass-sans-abi9.diff upstream
+#drop 10-config-libudev-backend.diff upstream
+#drop 11-xfree86-fix-video-fallback.diff ?
+#drop 12-xfree86-dont-complain-about-missing-coredevices.diff upstream
+#drop 13-unbreak-input-abi.diff unneeded ?
+#drop 14-tone-down-nidr-errors.diff unneeded
+#drop 15-keep-udev-x11-driver.diff ?
+
+#drop 109_fix-swcursor-crash.patch upstream
+#drop 110_findglyphbyhash-fix.patch upstream
+#drop 111_armel-drv-fallbacks.patch unneeded
+#drop 112_xaa-fbcomposite-fix-negative-size.patch ?
+#drop 113_quell_nouveau_aiglx.patch unneeded ?
+##drop 114_dri2_make_sure_x_drawable_exists.patch upstream
+#drop 115_xext_fix_cursor_ref_counting.patch upstream
+#drop 116_fix_typos_in_swap_functions.patch upstream
+#drop 118_xkb_fix_garbage_init.patch upsteam
+#drop 121_only_switch_vt_when_active.diff ?
+#drop 122_xext_fix_card32_overflow_in_xauth.patch pending
+
+# For a clean build..
+#drop 157_check_null_modes.patch ?
+#drop 162_null_crtc_in_rotation.patch ?
+#drop 164_trap-aspect-ratios.patch ?
+#drop 165_man_xorg_conf_no_device_ident.patch ?
+#drop 166_nullptr_xinerama_keyrepeat.patch ?
+#drop 167_nullptr_xisbread.patch ?
+#drop 169_mipointer_nullptr_checks.patch ?
+#drop 172_cwgetbackingpicture_nullptr_check.patch ?
+#drop 184_virtual_devices_autodetect.patch unneeded
+#drop 187_edid_quirk_hp_nc8430.patch ?
+#drop 190_cache-xkbcomp_output_for_fast_start_up.patch ?
+#drop 196_xvfb-fbscreeninit-handling.patch ?
+#drop 197_xvfb-randr.patch ?
+#drop 198_nohwaccess.patch unneeded
+#drop 199_xfvb-help-typo.patch ?
+#drop 200_randr-null.patch ?
+#drop 19-exa-handle-pixmap-create-destroy-in-lower-layers.diff upstream
+#drop 123_exa_sys_ptr_nullpointer_check.patch upstream

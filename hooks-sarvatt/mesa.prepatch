@@ -1,0 +1,32 @@
+# Robert Hooker 2010-06-04
+rm -rf debian
+git clone git://sarvatt.com/mesa.git temp
+cp -a temp/debian ./
+rm -rf temp
+CHANGES+=("hook: Replace packaging with git://sarvatt.com/mesa.git")
+
+# Tormod Volden 2009-04-28
+# Drop patches for master branch
+
+#if [ "$BRANCH" != "mesa_7_4_branch" ]; then
+#  drop 102_dont_vblank.diff fails
+#  drop 107_glxgears_is_not_a_benchmark.patch is for us!
+#  drop 103_savage-expose_fbmodes_with_nonzero_alpha.patch upstream
+#  drop 104_savage_init_mesa.patch fails
+#fi
+
+# Tormod Volden 2009-11-03
+# Needs to be refreshed after recent commit but we do not need it
+#drop 05_hurd-ftbfs.diff fails
+
+# Tormod Volden 2009-12-01
+# Workaround for empty SUBDIR element
+#sed -i '/if . -d $$dir /s/$$dir/"$$dir"/' debian/patches/03_optional-progs-and-install.patch
+#CHANGES+=("hook: Make 03_optional-progs-and-install.patch handle empty SUBDIRS")
+
+# Tormod Volden 2010-05-07
+# Source file changed location, ugh
+#sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/100_no_abi_tag.patch
+#sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/101_ubuntu_hidden_glname.patch
+#CHANGES+=("hook: Update patches 100,101 for new glapi paths")
+

@@ -1,0 +1,12 @@
+#sed -i '/^Architecture: /s/$/ lpia/' debian/control
+#CHANGES+=("hook: Add lpia architecture")
+# Robert Hooker 2010-03-30
+# Temporary hack to bump version as long as git master is wrong
+#if [ -z "$PACKAGE_VERSION" ]; then
+#    eval `grep PACKAGE_VERSION= configure`
+#    if [ "$BRANCH" = master ] && [ "$PACKAGE_VERSION" = 1.2.0 ]; then
+#        PACKAGE_VERSION=1.2.2
+#        CHANGES+=("hook: Bump version to $PACKAGE_VERSION")
+#    fi
+#fi
+

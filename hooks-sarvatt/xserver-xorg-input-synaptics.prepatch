@@ -1,0 +1,19 @@
+# Robert Hooker 2009-06-27
+# Import ubuntu patches for xserver-xorg-input-synaptics.
+
+#CHANGES+=("hook: Reenable Ubuntu patches:")
+
+#getp() {
+# (cd debian/patches; rm -f $1
+#  wget http://patches.ubuntu.com/x/xserver-xorg-input-synaptics/extracted/$1)
+# echo $1 >> debian/patches/series
+# CHANGES+=(" - $1")
+#}
+
+#getp 103_enable_cornertapping.patch
+#getp 104_always_enable_tapping.patch
+#getp 105_correct_multifinger_click.patch
+#getp 106_always_enable_vert_edge_scroll.patch
+
+drop 02-do-not-use-synaptics-for-keyboards.patch fails
+drop 114_jumpy_cursor_first_part.patch fails

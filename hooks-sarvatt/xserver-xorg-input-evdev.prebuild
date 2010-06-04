@@ -1,0 +1,12 @@
+# This will be sourced as a bash script
+
+# Tormod Volden 2009-12-08
+# Temporary hack to bump version as long as git master is wrong
+#if [ -z "$PACKAGE_VERSION" ]; then
+#    eval `grep PACKAGE_VERSION= configure`
+#    if [ "$BRANCH" = master ] && [ "$PACKAGE_VERSION" = 2.3.0 ]; then
+#	PACKAGE_VERSION=2.3.2
+#	CHANGES+=("hook: Bump version to $PACKAGE_VERSION")
+#    fi
+#fi
+
