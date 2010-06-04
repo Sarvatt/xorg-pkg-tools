@@ -1,0 +1,168 @@
+#!/bin/bash
+
+# A script to automatically grab all useful pkg-xorg packages from git and add upstream remotes
+# Also used to update them all.
+# 2010 Robert Hooker, Tormod Volden, Bryce Harrington
+
+USERNAME="sarvatt-guest"
+
+VIDEO="apm ark ati chips cirrus dove dummy fbdev glide glint i128 i740 intel ivtvdev mach64 \
+mga neomagic newport nouveau nv openchrome qxl r128 radeonhd rendition s3 s3virge savage \
+siliconmotion sis sisusb suncg14 suncg3 sunffb sunleo suntcx tdfx tga trident tseng v4l vesa \
+vmware voodoo"
+
+INPUT="acecad aiptek citron elographics evdev evtouch fpit hyperpen \
+joystick keyboard mouse mutouch penmount synaptics vmmouse void"
+
+APP="compiz grandr twm x11-apps x11-session-utils x11-utils x11-xfs-utils x11-xkb-utils \
+x11-server-utils xauth xbacklight xdm xfs xinit xprint-utils xterm xutils-dev xutils"
+
+LIBS="libdmx libdrm libfontenc libfs libice libpciaccess libsm libx11 libxau libxaw \
+libxcomposite libxcursor libxdamage libxdmcp libxext libxfixes libxfont libxi libxinerama \
+libxkbfile libxmu libxp libxpm libxprintapputil libxprintutil libxrandr libxrender \
+libxres libxss libxt libxtst libxv libxvmc libxxf86dga libxxf86vm mesa pixman xft xtrans"
+
+PROTO="bigreqs composite core damage dmx dri2 fixes fonts gl input kb print randr record \
+render resource scrnsaver video xcmisc xext xf86bigfont xf86dga xf86dri xf86misc xf86vidmode \
+xinerama"
+
+ROOTDIR=$PWD
+
+# Return the fdo form of a debian package name
+debpkg_to_fdopkg() {
+    pkg=$1
+
+    if [ "$pkg" = "libdmx" -o \
+         "$pkg" = "libfontenc" -o \
+         "$pkg" = "liblbxutil" -o \
+         "$pkg" = "libpciaccess" -o \
+         "$pkg" = "libxkbui" -o \
+         "$pkg" = "libxkbfile" -o \
+         "$pkg" = "libxtrans" ]; then
+        echo "$pkg"
+        return
+    fi
+    
+    if [ "$pkg" = "libdrm" -o "$pkg" = "drm-snapshot" ]; then
+        echo "drm"
+        return
+    fi
+
+    echo ${pkg} \
+    | sed -e "s/^xorg-server$/xserver/" \
+        | sed -e "s/^xserver-xorg-/xf86-/" \
+        | sed -e "s/^x11proto-core$/x11proto/" \
+        | sed -e "s/^x11proto-\(.*\)$/\1proto/" \
+        | sed -e "s/^xfonts-encodings$/encodings/" \
+        | sed -e "s/^libfs$/libFS/" \
+        | sed -e "s/^libice$/libICE/" \
+        | sed -e "s/^libsm$/libSM/" \
+        | sed -e "s/^libxcalibrate$/libXCalibrate/" \
+        | sed -e "s/^libxres$/libXRes/" \
+        | sed -e "s/^libxscrnsaver$/libXScrnSaver/" \
+        | sed -e "s/^libxtrap$/libXTrap/" \
+        | sed -e "s/^libxprintapputil$/libXprintAppUtil/" \
+        | sed -e "s/^libxvmc$/libXvMC/" \
+        | sed -e "s/^libxprintutil$/libXprintUtil/" \
+        | sed -e "s/^lib\([a-z]\)/lib\U\1/" \
+        | sed -e "s/^lib\(.*\)wm$/lib\1WM/" \
+        | sed -e "s/^xtrans/libxtrans/"
+}
+
+# Determines the corresponding git dir for a given fdo package
+fdogitdir_for_fdopkg() {
+    fdopkg=$1
+    if [ -z "${fdopkg}" ]; then
+        echo ""
+    elif [ ${fdopkg} = "pixman" ]; then
+        echo ""
+    elif [ ${fdopkg} = "xserver" ]; then
+        echo "xorg"
+    elif [ ${fdopkg} = "drm" -o ${fdopkg} = "mesa" ]; then
+        echo "mesa"
+    elif [ ${fdopkg} = "xf86-video-nouveau" ]; then
+        echo "nouveau"
+    elif [ ${fdopkg} = "xf86-video-avivo" ]; then
+        echo "avivo"
+    elif [ ${fdopkg#xf86-} != ${fdopkg} ]; then
+        echo "xorg/driver"
+    elif [ ${fdopkg#lib} != ${fdopkg} ]; then
+        echo "xorg/lib"
+    elif [ ${fdopkg%proto} != ${fdopkg} ]; then
+        echo "xorg/proto"
+    elif [ ${fdopkg} = "bitmaps" -o ${fdopkg} = "cursors" ]; then
+        echo "xorg/data"
+    elif [ ${fdopkg} = "xorg-docs" -o \
+        ${fdopkg} = "xorg-sgml-doctools" ]; then
+        echo "xorg/doc"
+    else
+        # Hard to say, could be xorg/app, xorg/font, or xorg/util
+        die "Unknown Freedesktop git directory"
+    fi
+}
+
+echo "Updating using the account $USERNAME"
+echo -e "\e[1;34mStarting with the video drivers..."
+for VPKG in $VIDEO; do
+	echo "xserver-xorg-video-$VPKG:";
+    if [ -d ./xserver-xorg-video-$VPKG ]; then
+        cd xserver-xorg-video-$VPKG; git pull; git fetch; cd $ROOTDIR
+    else
+        git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/driver/xserver-xorg-video-$VPKG.git; \
+        cd xserver-xorg-video-$VPKG; git remote add upstream git://anongit.freedesktop.org/xorg/driver/xf86-video-$VPKG; \
+        git fetch; cd $PWD
+    fi
+	echo;
+done
+
+echo -e "\e[0;32mUpdating the input drivers..."
+for IPKG in $INPUT; do
+    echo -e "\e[0;32mxserver-xorg-video-$VPKG:";
+    if [ -d ./xserver-xorg-input-$IPKG ]; then
+        cd xserver-xorg-input-$IPKG; git pull; git fetch; cd $ROOTDIR
+    else
+        git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/driver/xserver-xorg-input-$IPKG.git; \
+        cd xserver-xorg-input-$IPKG; git remote add upstream git://anongit.freedesktop.org/xorg/driver/xf86-input-$IPKG; \
+        git fetch; cd $ROOTDIR
+    fi
+	echo;
+done
+
+echo -e "\e[1;34mUpdating the apps..."
+echo -e "\e[1;34mNote: debian repos only"
+for APKG in $APP; do
+	echo -e "\e[1;34m$APKG:";
+	if [ -d ./$APKG ]; then
+		cd $APKG && git pull; cd $ROOTDIR
+	else
+		git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/app/$APKG.git
+	fi
+done
+
+echo -e "\e[0;32mUpdating the protos..."
+for PPKG in $PROTO; do
+	echo -e "\e[0;32m$PPKG:";
+	if [ -d ./x11proto-$PPKG ]; then
+		cd x11proto-$PPKG && git pull; git fetch; cd $ROOTDIR
+	else
+		git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/proto/x11proto-$PPKG.git; \
+		cd x11proto-$PPKG && git remote add upstream git://anongit.freedesktop.org/xorg/proto/"$PPKG"proto; \
+		git fetch; cd $ROOTDIR
+	fi
+done
+
+echo -e "\e[1;34mUpdating the libs..."
+for LPKG in $LIBS; do
+	echo -e "\e[1;34m$LPKG:";
+	if [ -d ./$LPKG ]; then
+		cd $LPKG && git pull; git fetch; cd $ROOTDIR
+	else
+		FDOPKG=$(debpkg_to_fdopkg $LPKG)
+		FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
+		FDOGIT=git://anongit.freedesktop.org/git/${FDODIR:+$FDODIR/}$FDOPKG
+		git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/lib/$LPKG.git; \
+		cd $LPKG && git remote add upstream $FDOGIT; git fetch; cd $ROOTDIR
+	fi
+done
+
+exit 0
