@@ -195,12 +195,9 @@ merge_debian() {
 }
 
 add_debian() {
-    local TMPDEB=`mktemp -d`
-    git checkout $DEBIANREPO
-    cp -a debian $TMPDEB
-    git checkout autoxorggit
-    cp -a $TMPDEB/debian debian
-    rm -r $TMPDEB
+    git checkout $DEBIANREPO debian
+    git add debian
+    git commit -m "Add debian tree from $DEBIANREPO"
     CHANGES+=("Only added debian/ tree from $DEBIANREPO")
 }
 
