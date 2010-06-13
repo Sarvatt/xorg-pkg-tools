@@ -30,9 +30,11 @@ CHANGES+=("hook: do not package mesa-utils")
 
 # Tormod Volden 2009-10-18
 # Exclude the 20 MB unused progs/objviewer from tarball
+if [ -d progs/objviewer ]; then
 TAR_EXCLUDE=--exclude=progs/objviewer
 git rm -r progs/objviewer
 CHANGES+=("hook: Exclude progs/objviewer from orig.tar.gz")
+fi
 
 
 # Tormod Volden 2010-04-12
