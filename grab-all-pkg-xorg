@@ -48,7 +48,7 @@ for VPKG in $VIDEO; do
     else
         git clone $PKG_XORG/driver/xserver-xorg-video-$VPKG.git; \
         cd xserver-xorg-video-$VPKG; git remote add upstream $XORG_GIT/driver/xf86-video-$VPKG; \
-        git fetch; cd $PWD
+        git fetch; cd $ROOTDIR
     fi
 	echo;
 done
