@@ -42,7 +42,7 @@ XORG_GIT=git://anongit.freedesktop.org/xorg
 ROOTDIR=$PWD
 echo -e "\e[1;34mStarting with the video drivers..."
 for VPKG in $VIDEO; do
-	echo "xserver-xorg-video-$VPKG:";
+	echo "xserver-xorg-video-$VPKG:"
     if [ -d ./xserver-xorg-video-$VPKG ]; then
         cd xserver-xorg-video-$VPKG; git pull; git fetch; cd $ROOTDIR
     else
@@ -50,12 +50,12 @@ for VPKG in $VIDEO; do
         cd xserver-xorg-video-$VPKG; git remote add upstream $XORG_GIT/driver/xf86-video-$VPKG; \
         git fetch; cd $ROOTDIR
     fi
-	echo;
+	echo
 done
 
 echo -e "\e[0;32mUpdating the input drivers..."
 for IPKG in $INPUT; do
-    echo -e "\e[0;32mxserver-xorg-video-$VPKG:";
+    echo -e "\e[0;32mxserver-xorg-video-$VPKG:"
     if [ -d ./xserver-xorg-input-$IPKG ]; then
         cd xserver-xorg-input-$IPKG; git pull; git fetch; cd $ROOTDIR
     else
@@ -63,13 +63,13 @@ for IPKG in $INPUT; do
         cd xserver-xorg-input-$IPKG; git remote add upstream $XORG_GIT/driver/xf86-input-$IPKG; \
         git fetch; cd $ROOTDIR
     fi
-	echo;
+	echo
 done
 
 echo -e "\e[1;34mUpdating the apps..."
 echo -e "\e[1;34mNote: debian repos only"
 for APKG in $APP; do
-	echo -e "\e[1;34m$APKG:";
+	echo -e "\e[1;34m$APKG:"
 	if [ -d ./$APKG ]; then
 		cd $APKG && git pull; cd $ROOTDIR
 	else
@@ -79,7 +79,7 @@ done
 
 echo -e "\e[0;32mUpdating the protos..."
 for PPKG in $PROTO; do
-	echo -e "\e[0;32m$PPKG:";
+	echo -e "\e[0;32m$PPKG:"
 	if [ -d ./x11proto-$PPKG ]; then
 		cd x11proto-$PPKG && git pull; git fetch; cd $ROOTDIR
 	else
@@ -91,7 +91,7 @@ done
 
 echo -e "\e[1;34mUpdating the libs..."
 for LPKG in $LIBS; do
-	echo -e "\e[1;34m$LPKG:";
+	echo -e "\e[1;34m$LPKG:"
 	if [ -d ./$LPKG ]; then
 		cd $LPKG && git pull; git fetch; cd $ROOTDIR
 	else
