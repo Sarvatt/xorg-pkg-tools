@@ -4,7 +4,8 @@
 # Also used to update them all.
 # 2010 Robert Hooker, Tormod Volden, Bryce Harrington
 
-USERNAME="sarvatt-guest"
+# Set empty to use anonymous access
+ALIOTH_USER="sarvatt-guest"
 
 VIDEO="apm ark ati chips cirrus dove dummy fbdev glide glint i128 i740 intel ivtvdev mach64 \
 mga neomagic newport nouveau nv openchrome qxl r128 radeonhd rendition s3 s3virge savage \
@@ -30,16 +31,23 @@ xinerama"
 # Include the bash library functions
 . $(dirname $0)/xorg-pkg-tools.lib
 
+if [ -n "$ALIOTH_USER" ]; then
+    PKG_XORG=git+ssh://$ALIOTH_USER@alioth.debian.org/git/pkg-xorg
+    echo "Updating using the account $ALIOTH_USER"
+else
+    PKG_XORG=git://git.debian.org/git/pkg-xorg
+fi
+XORG_GIT=git://anongit.freedesktop.org/xorg
+
 ROOTDIR=$PWD
-echo "Updating using the account $USERNAME"
 echo -e "\e[1;34mStarting with the video drivers..."
 for VPKG in $VIDEO; do
 	echo "xserver-xorg-video-$VPKG:";
     if [ -d ./xserver-xorg-video-$VPKG ]; then
         cd xserver-xorg-video-$VPKG; git pull; git fetch; cd $ROOTDIR
     else
-        git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/driver/xserver-xorg-video-$VPKG.git; \
-        cd xserver-xorg-video-$VPKG; git remote add upstream git://anongit.freedesktop.org/xorg/driver/xf86-video-$VPKG; \
+        git clone $PKG_XORG/driver/xserver-xorg-video-$VPKG.git; \
+        cd xserver-xorg-video-$VPKG; git remote add upstream $XORG_GIT/driver/xf86-video-$VPKG; \
         git fetch; cd $PWD
     fi
 	echo;
@@ -51,8 +59,8 @@ for IPKG in $INPUT; do
     if [ -d ./xserver-xorg-input-$IPKG ]; then
         cd xserver-xorg-input-$IPKG; git pull; git fetch; cd $ROOTDIR
     else
-        git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/driver/xserver-xorg-input-$IPKG.git; \
-        cd xserver-xorg-input-$IPKG; git remote add upstream git://anongit.freedesktop.org/xorg/driver/xf86-input-$IPKG; \
+        git clone $PKG_XORG/driver/xserver-xorg-input-$IPKG.git; \
+        cd xserver-xorg-input-$IPKG; git remote add upstream $XORG_GIT/driver/xf86-input-$IPKG; \
         git fetch; cd $ROOTDIR
     fi
 	echo;
@@ -65,7 +73,7 @@ for APKG in $APP; do
 	if [ -d ./$APKG ]; then
 		cd $APKG && git pull; cd $ROOTDIR
 	else
-		git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/app/$APKG.git
+		git clone $PKG_XORG/app/$APKG.git
 	fi
 done
 
@@ -75,8 +83,8 @@ for PPKG in $PROTO; do
 	if [ -d ./x11proto-$PPKG ]; then
 		cd x11proto-$PPKG && git pull; git fetch; cd $ROOTDIR
 	else
-		git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/proto/x11proto-$PPKG.git; \
-		cd x11proto-$PPKG && git remote add upstream git://anongit.freedesktop.org/xorg/proto/"$PPKG"proto; \
+		git clone $PKG_XORG/proto/x11proto-$PPKG.git; \
+		cd x11proto-$PPKG && git remote add upstream $XORG_GIT/proto/"$PPKG"proto; \
 		git fetch; cd $ROOTDIR
 	fi
 done
@@ -90,7 +98,7 @@ for LPKG in $LIBS; do
 		FDOPKG=$(debpkg_to_fdopkg $LPKG)
 		FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
 		FDOGIT=git://anongit.freedesktop.org/git/${FDODIR:+$FDODIR/}$FDOPKG
-		git clone ssh://$USERNAME@alioth.debian.org/git/pkg-xorg/lib/$LPKG.git; \
+		git clone $PKG_XORG/lib/$LPKG.git; \
 		cd $LPKG && git remote add upstream $FDOGIT; git fetch; cd $ROOTDIR
 	fi
 done
