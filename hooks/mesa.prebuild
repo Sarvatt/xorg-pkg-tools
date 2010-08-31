@@ -44,6 +44,7 @@ if [ -n "$GALLIUM" ]; then
 
 	sed -i '/^confflags-dri = /a \
 	--enable-gallium-radeon \\\
+	--enable-gallium-r600 \\\
 	--enable-gallium-nouveau \\\
 	--enable-gallium-intel \\\
 	--with-state-trackers=dri,glx \\
@@ -56,14 +57,18 @@ if [ -n "$GALLIUM" ]; then
 	sed -i '/dh_installexamples -s/a \
 	# Move gallium versions into own directory\
 	mkdir debian/tmp/usr/lib/dri-gallium\
-	-mv debian/tmp/usr/lib/dri/radeong_dri.so debian/tmp/usr/lib/dri-gallium/r300_dri.so\
+	-mv debian/tmp/usr/lib/dri/r300_dri.so debian/tmp/usr/lib/dri-gallium\
+	-mv debian/tmp/usr/lib/dri/r600_dri.so debian/tmp/usr/lib/dri-gallium\
 	-mv debian/tmp/usr/lib/dri/i915_dri.so debian/tmp/usr/lib/dri-gallium\
 	-mv debian/tmp/usr/lib/dri/i965_dri.so debian/tmp/usr/lib/dri-gallium\
 	-cp debian/tmp/usr/lib/dri/nouveau_dri.so debian/tmp/usr/lib/dri-gallium\
 	mv debian/tmp/usr/lib/dri/swrastg_dri.so debian/tmp/usr/lib/dri-gallium/swrast_dri.so\
 	# fish out the classic intel drivers\
 	-cp build/dri/glx/i915_dri.so debian/tmp/usr/lib/dri/i915_dri.so\
-	-cp build/dri/glx/i965_dri.so debian/tmp/usr/lib/dri/i965_dri.so
+	-cp build/dri/glx/i965_dri.so debian/tmp/usr/lib/dri/i965_dri.so\
+	# fish out the classic radeon drivers\
+	-cp build/dri/glx/r300_dri.so debian/tmp/usr/lib/dri/r300_dri.so\
+	-cp build/dri/glx/r600_dri.so debian/tmp/usr/lib/dri/r600_dri.so
 ' debian/rules
 
 	CHANGES+=("hook (GALLIUM): Build gallium drivers")
@@ -89,6 +94,6 @@ DRI_DRIVERS = r300
 ' debian/rules
 	sed -i '/--enable-gallium-nouveau/d' debian/rules
 	sed -i '/--enable-gallium-intel/d' debian/rules
-	CHANGES+=("hook (ONLY_R300): Build only r300 drivers")
+	CHANGES+=("hook (ONLY_R300): Build only r300/r600 drivers")
 fi
 
