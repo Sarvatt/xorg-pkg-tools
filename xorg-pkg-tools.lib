@@ -12,7 +12,7 @@ BASEDIR=${BASEDIR:-''}
 ########################################################################
 ## General Purpose Routines
 write_msg() {
-    echo "$*" | fold -s -w "${COLUMNS:-80}"
+    echo "*** $*" | fold -s -w "${COLUMNS:-80}"
 }
 
 msg() {
