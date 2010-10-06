@@ -4,4 +4,4 @@
 # Tormod Volden 2009-11-08
 
 # It patches configure directly instead of configure.in
-#drop 01_include_snapshot_date fails
+drop 01_include_snapshot_date fails

@@ -1,1 +1,1 @@
-drop pixman-arm-don-t-use-env-vars-to-get-hwcap-platform.patch upstream
+#drop pixman-arm-don-t-use-env-vars-to-get-hwcap-platform.patch upstream

@@ -12,12 +12,11 @@
 #' debian/control
 #CHANGES+=("hook: Add build-dep on xfonts-utils")
 
-# Xserver 1.9
-if [ "$BRANCH" == "server-1.9-branch" ]; then
-echo "2:1.8.99.0" > debian/serverminver
-CHANGES+=("hook: increase serverminver to 2:1.8.99.0")
-echo 11 > debian/inputabiver
-CHANGES+=("hook: increase inputabiver to 11")
-echo 8 > debian/videoabiver
-CHANGES+=("hook: increase videoabiver to 8")
-#fi
+
+#echo 2:1.8.99.0 > debian/serverminver
+#CHANGES+=("hook: increase serverminver to 2:1.8.99.0")
+#echo 10 > debian/inputabiver
+#CHANGES+=("hook: increase inputabiver to 10")
+#echo 8 > debian/videoabiver
+#CHANGES+=("hook: increase videoabiver to 8")
+##fi

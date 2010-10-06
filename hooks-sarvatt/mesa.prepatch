@@ -1,10 +1,9 @@
-# Robert Hooker 2010-06-04
 rm -rf debian
 git clone git://sarvatt.com/mesa.git temp
 cp -a temp/debian ./
 rm -rf temp
 CHANGES+=("hook: Replace packaging with git://sarvatt.com/mesa.git")
-
+CHANGES+=("Notice: r300 gallium is now enabled by default in libgl1-mesa-dri. r600 and other gallium drivers are now installed to /usr/lib/dri/gallium and require manual path adjustment to use. libgl1-mesa-dri-gallium is now deprecated, please use libgl1-mesa-dri-experimental instead. Note that nouveau DRI is now installed in libgl1-mesa-dri-experimental as well.")
 # Tormod Volden 2009-04-28
 # Drop patches for master branch
 

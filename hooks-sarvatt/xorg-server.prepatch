@@ -4,12 +4,34 @@
 #drop 190_cache-xkbcomp_output_for_fast_start_up.patch fails
 #drop 196_xvfb-fbscreeninit-handling.patch fails
 #fi
-if [ "$BRANCH" == "server-1.9-branch" ]; then
-drop 100_rethrow_signals.patch gimme back my signal handler!
+
+#drop 15-nouveau.diff fails
+#drop 16-xaa-fbcomposite-fix-negative-size.diff fails
+#drop 109_fix-swcursor-crash.patch upstream
+#drop 190_cache-xkbcomp_output_for_fast_start_up.patch fails
+#drop 196_xvfb-fbscreeninit-handling.patch fails
+#drop 02_Add-libgcrypt-as-an-option-for-sha1.diff upstream
+#drop 03_fedora_glx_versioning.diff upstream
+#drop 04_fedora_glx14-swrast.diff upstream
+#drop 11-Move-config_init-after-CreateWellKnownSockets-and-In.diff upstream
+#drop 164_trap-aspect-ratios.patch fails
+#
+#p=12-Add-libudev-input-hotplug-backend.diff
+#(cd debian/patches; rm $p; wget http://people.ubuntu.com/~sarvatt/$p)
+#CHANGES+=("hook: Refresh $p")
+#wget -O debian/patches/901_xi_fix.patch http://people.ubuntu.com/~sarvatt/901_xi_fix.patch
+#echo "901_xi_fix.patch" >> debian/patches/series
+#CHANGES+=("hook: Add 901_xi_fix.patch (fd.o #25339)")
+#fi
 
 #drop 196_xvfb-fbscreeninit-handling.patch fails
 #drop 197_xvfb-randr.patch fails
+
 #drop 108_reenable_record_ext.patch upstream
+#drop 02_Add-libgcrypt-and-libnettle-as-options-for-sha1.diff upstream
+#drop 03_fedora_glx_versioning.diff upstream
+#drop 04_fedora_glx14-swrast.diff upstream
+#drop 05_only_call_gamma_set_if_nonnull.diff upstream
 #drop 06_dont_trap_access_to_timer_and_keyboard.diff upstream
 #drop 07-xfree86-fix-build-with-xv-disabled.diff ?
 # udev support patches
@@ -22,7 +44,8 @@ drop 100_rethrow_signals.patch gimme back my signal handler!
 #drop 14-tone-down-nidr-errors.diff unneeded
 #drop 15-keep-udev-x11-driver.diff ?
 
-#drop 109_fix-swcursor-crash.patch upstream
+#drop 100_rethrow_signals.patch fails
+#drop 109_fix-swcursor-crash.patch ?
 #drop 110_findglyphbyhash-fix.patch upstream
 #drop 111_armel-drv-fallbacks.patch unneeded
 #drop 112_xaa-fbcomposite-fix-negative-size.patch ?
@@ -34,7 +57,6 @@ drop 100_rethrow_signals.patch gimme back my signal handler!
 #drop 121_only_switch_vt_when_active.diff ?
 #drop 122_xext_fix_card32_overflow_in_xauth.patch pending
 
-# For a clean build..
 #drop 157_check_null_modes.patch ?
 #drop 162_null_crtc_in_rotation.patch ?
 #drop 164_trap-aspect-ratios.patch ?
@@ -53,3 +75,5 @@ drop 100_rethrow_signals.patch gimme back my signal handler!
 #drop 200_randr-null.patch ?
 #drop 19-exa-handle-pixmap-create-destroy-in-lower-layers.diff upstream
 #drop 123_exa_sys_ptr_nullpointer_check.patch upstream
+
+drop 205_udev-product-ids.patch upstream

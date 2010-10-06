@@ -2,6 +2,7 @@
 
 # Tormod Volden 2009-03-31
 # 
+drop 101_ref-count-dri2-buffers.patch upstream
 CHANGES+=("hook: Apply patch to enable BGNR support.")
 << EOPATCH1 patch -p1
 diff -up xf86-video-ati-6.12.2/src/radeon_kms.c.da xf86-video-ati-6.12.2/src/radeon_kms.c
@@ -18,3 +19,122 @@ diff -up xf86-video-ati-6.12.2/src/radeon_kms.c.da xf86-video-ati-6.12.2/src/rad
      info->MMIO         = NULL;
      info->IsSecondary  = FALSE;
 EOPATCH1
+
+CHANGES+=("Notice: If you used the Gallium xorg.conf option please remove it, r300g is now the default driver in mesa.")
+#CHANGES+=("hook: Apply patch to enable Gallium xorg.conf option.")
+#<< EOPATCH2 patch -p1
+#diff --git a/src/radeon.h b/src/radeon.h
+#index 56bc076..aede629 100644
+#--- a/src/radeon.h
+#+++ b/src/radeon.h
+#@@ -224,6 +224,7 @@ typedef enum {
+#     OPTION_FORCE_LOW_POWER,
+#     OPTION_DYNAMIC_PM,
+#     OPTION_NEW_PLL,
+#+    OPTION_GALLIUM,
+#     OPTION_ZAPHOD_HEADS
+# } RADEONOpts;
+# 
+#@@ -917,6 +918,7 @@ typedef struct {
+# 
+#     /* accel */
+#     Bool              RenderAccel; /* Render */
+#+    Bool              useGallium;
+#     Bool              allowColorTiling;
+#     Bool              tilingEnabled; /* mirror of sarea->tiling_enabled */
+#     struct radeon_accel_state *accel_state;
+#diff --git a/src/radeon_dri2.c b/src/radeon_dri2.c
+#index 7d5205e..5cb5699 100644
+#--- a/src/radeon_dri2.c
+#+++ b/src/radeon_dri2.c
+#@@ -776,7 +776,9 @@ radeon_dri2_screen_init(ScreenPtr pScreen)
+# 
+#     if ( (info->ChipFamily >= CHIP_FAMILY_R600) ) {
+#         dri2_info.driverName = R600_DRIVER_NAME;
+#-    } else if ( (info->ChipFamily >= CHIP_FAMILY_R300) ) {
+#+    } else if ( info->ChipFamily >= CHIP_FAMILY_R300 && info->useGallium ) {
+#+        dri2_info.driverName = R300G_DRIVER_NAME;
+#+    } else if ( info->ChipFamily >= CHIP_FAMILY_R300 ) {
+#         dri2_info.driverName = R300_DRIVER_NAME;
+#     } else if ( info->ChipFamily >= CHIP_FAMILY_R200 ) {
+#         dri2_info.driverName = R200_DRIVER_NAME;
+#diff --git a/src/radeon_driver.c b/src/radeon_driver.c
+#index 7167ea0..563bc88 100644
+#--- a/src/radeon_driver.c
+#+++ b/src/radeon_driver.c
+#@@ -205,6 +206,7 @@ static const OptionInfoRec RADEONOptions[] = {
+#     { OPTION_FORCE_LOW_POWER,	"ForceLowPowerMode", OPTV_BOOLEAN, {0}, FALSE },
+#     { OPTION_DYNAMIC_PM,	"DynamicPM",       OPTV_BOOLEAN, {0}, FALSE },
+#     { OPTION_NEW_PLL,	        "NewPLL",        OPTV_BOOLEAN, {0}, FALSE },
+#+    { OPTION_GALLIUM,          "Gallium",       OPTV_BOOLEAN, {0}, FALSE },
+#     { OPTION_ZAPHOD_HEADS,      "ZaphodHeads",     OPTV_STRING,  {0}, FALSE },
+#     { -1,                    NULL,               OPTV_NONE,    {0}, FALSE }
+# };
+#diff --git a/src/radeon_kms.c b/src/radeon_kms.c
+#index c6a3df7..42b875e 100644
+#--- a/src/radeon_kms.c
+#+++ b/src/radeon_kms.c
+#@@ -69,6 +69,7 @@ const OptionInfoRec RADEONOptions_KMS[] = {
+#     { OPTION_TVSTD,          "TVStandard",       OPTV_STRING,  {0}, FALSE },
+#     { OPTION_EXA_VSYNC,      "EXAVSync",         OPTV_BOOLEAN, {0}, FALSE },
+#     { OPTION_EXA_PIXMAPS,    "EXAPixmaps",	 OPTV_BOOLEAN,   {0}, FALSE },
+#+    { OPTION_GALLIUM,        "Gallium",          OPTV_BOOLEAN, {0}, FALSE },
+#     { OPTION_ZAPHOD_HEADS,   "ZaphodHeads",      OPTV_STRING,  {0}, FALSE },
+#     { -1,                    NULL,               OPTV_NONE,    {0}, FALSE }
+# };
+#@@ -426,6 +427,7 @@ Bool RADEONPreInit_KMS(ScrnInfoPtr pScrn, int flags)
+#     DevUnion* pPriv;
+#     Gamma  zeros = { 0.0, 0.0, 0.0 };
+#     Bool colorTilingDefault;
+#+    Bool galliumAllowed;
+# 
+#     xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, RADEON_LOGLEVEL_DEBUG,
+# 		   "RADEONPreInit_KMS\n");
+#@@ -482,6 +484,18 @@ Bool RADEONPreInit_KMS(ScrnInfoPtr pScrn, int flags)
+#     if (!radeon_alloc_dri(pScrn))
+# 	return FALSE;
+# 
+#+    galliumAllowed = info->ChipFamily >= CHIP_FAMILY_R300 &&
+#+                         info->ChipFamily < CHIP_FAMILY_R600;
+#+
+#+    info->useGallium = xf86ReturnOptValBool(info->Options,
+#+                                        OPTION_GALLIUM, FALSE);
+#+
+#+    if (info->useGallium && !galliumAllowed) {
+#+        xf86DrvMsg(pScrn->scrnIndex, X_WARNING, "Gallium is not supported on this GPU, disabling\n");
+#+        info->useGallium = FALSE;
+#+    } else if (info->useGallium)
+#+        xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Using Gallium for DRI.\n");
+#+
+#     colorTilingDefault = info->ChipFamily >= CHIP_FAMILY_R300 &&
+#                          info->ChipFamily <= CHIP_FAMILY_RS740;
+# 
+#diff --git a/src/radeon_version.h b/src/radeon_version.h
+#index 129046d..d4c4fd5 100644
+#--- a/src/radeon_version.h
+#+++ b/src/radeon_version.h
+#@@ -37,6 +37,7 @@
+# #define RADEON_NAME          "RADEON"
+# #define RADEON_DRIVER_NAME   "radeon"
+# #define R200_DRIVER_NAME     "r200"
+#+#define R300G_DRIVER_NAME    "radeong"
+# #define R300_DRIVER_NAME     "r300"
+# #define R600_DRIVER_NAME     "r600"
+# 
+#--- a/man/radeon.man
+#+++ b/man/radeon.man
+#@@ -370,6 +370,13 @@ R/RV/RS2xx and RS3xx when usig XAA.  The default is to
+# .B enable
+# Render acceleration.
+# .TP
+#+.BI "Option \*qGallium\*q \*q" boolean \*q
+#+Enables or disables the usage of the alternate Gallium DRI driver
+#+(radeong_dri.so). It is supported only on R300-R500 generation cards and
+#+requires KMS/DRI2. This is considered a highly experimental option, don't use
+#+it unless you know what you are doing. The default is 
+#+.B off.
+#+.TP
+# .BI "Option \*qAccelMethod\*q \*q" "string" \*q
+# Chooses between available acceleration architectures.  Valid options are
+# .B XAA
+#EOPATCH2

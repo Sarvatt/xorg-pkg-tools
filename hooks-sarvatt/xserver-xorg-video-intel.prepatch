@@ -1,1 +1,9 @@
+drop 100_b43_pciid_update.patch upstream
 drop 101_copy-fb.patch fails
+drop 102-disable-page-flipping-v2.patch fails
+drop 103-mbp-backlight-support.patch upstream
+drop 104_sandybridge_id_update.patch upstream
+drop 105_sandybridge_dri_disable.patch testing
+drop 106_backport_vblank_on_server_regenerate_fix.patch upstream
+drop 107-submit-batch-buffers-from-flush-callback-chain.patch upstream
+drop 108_sandybridge_disable_Xv.patch upstream
