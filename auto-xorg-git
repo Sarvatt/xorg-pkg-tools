@@ -298,11 +298,12 @@ usage() {
     echo "opts:"
     echo " -a <add-version>   Extra version tag to add ('0ubuntu0me')"
     echo " -b <branch>        Upstream git branch"
-    echo " -d <git repo>      Debian git repository [origin/debian-experimental]"
+    echo " -d <git branch>    Debian git branch [origin/debian-experimental]"
     echo " -D                 Drop existing debian patches before merging"
     echo " -e <epoch>         Add epoch to autodetected package version"
     echo " -f                 Delete old directories instead of updating"
     echo " -g                 No merge, just add debian/ tree"
+    echo " -G <git repo>      Debian git repository [defaults to git.debian.org...]"
     echo " -h                 This help text"
     echo " -H <hooks-dir>     Adds hooks from directory"
     echo " -l <version>       Force ~ separator if new upstream version is higher"
@@ -324,7 +325,7 @@ usage() {
 # main starts here
 
 # Command line options
-while getopts "a:b:d:De:fgH:l:mnop:qr:s:t:u:S:v:w:h\?" opt; do
+while getopts "a:b:d:De:fgG:H:l:mnop:qr:s:t:u:S:v:w:h\?" opt; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"                   ;;
         b ) BRANCH="$OPTARG";
@@ -334,6 +335,7 @@ while getopts "a:b:d:De:fgH:l:mnop:qr:s:t:u:S:v:w:h\?" opt; do
         e ) EPOCH="$OPTARG"                        ;;
         f ) FORCE_OVERWRITE=1                      ;;
         g ) NO_MERGE="yes"                         ;;
+        G ) DEBIANGIT="$OPTARG"                    ;;
         H ) HOOKS="$OPTARG"                        ;;
         l ) LASTVERSION="$OPTARG"                  ;;
         m ) MANUAL_MERGE="yes"                     ;;
@@ -376,7 +378,9 @@ fi
 
 msg "Making package $DEBPKG"
 DEBDIR=$(debgitdir_for_debpkg $DEBPKG)
-DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
+if [ -z "$DEBIANGIT" ]; then
+    DEBIANGIT=git://git.debian.org/git/$DEBDIR/$DEBPKG
+fi
 if [ -z "$UPSTREAMGIT" ]; then
     FDOPKG=$(debpkg_to_fdopkg $DEBPKG)
     FDODIR=$(fdogitdir_for_fdopkg $FDOPKG)
