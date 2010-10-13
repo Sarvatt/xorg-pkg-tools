@@ -4,6 +4,7 @@ drop 03_fedora_glx_versioning.diff upstream
 drop 04_fedora_glx14-swrast.diff upstream
 drop 11-Move-config_init-after-CreateWellKnownSockets-and-In.diff upstream
 drop 164_trap-aspect-ratios.patch fails
+drop 205_udev-product-ids.patch
 
 p=12-Add-libudev-input-hotplug-backend.diff
 (cd debian/patches; rm $p; wget http://people.ubuntu.com/~sarvatt/$p)
