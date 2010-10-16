@@ -1,17 +1,5 @@
 
-drop 03_optional-progs-and-install.patch obsolete
-drop 05_hurd-ftbfs.diff fails
-#drop 103_savage-expose_fbmodes_with_nonzero_alpha.patch
-drop 107_glxgears_is_not_a_benchmark.patch it is for us
-
-# Tormod Volden 2009-12-01
-# Workaround for empty SUBDIR element
-sed -i '/if . -d $$dir /s/$$dir/"$$dir"/' debian/patches/03_optional-progs-and-install.patch
-CHANGES+=("hook: Make 03_optional-progs-and-install.patch handle empty SUBDIRS")
-
-# Tormod Volden 2010-05-07
-# Source file changed location, ugh
-sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/100_no_abi_tag.patch
-sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/101_ubuntu_hidden_glname.patch
-CHANGES+=("hook: Update patches 100,101 for new glapi paths")
+# 2010-10-13 Tormod Volden
+# this patch needs to be refreshed
+drop 103_savage-expose_fbmodes_with_nonzero_alpha.patch fails
 
