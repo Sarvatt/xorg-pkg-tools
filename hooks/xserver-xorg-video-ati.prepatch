@@ -1,5 +1,8 @@
 # This will be sourced as a bash script
 
+# Tormod Volden 2010-10-09
+drop 101_ref-count-dri2-buffers.patch applied upstream
+
 # Tormod Volden 2009-03-31
 # 
 CHANGES+=("hook: Log git commit id in RadeonPreInit()")
