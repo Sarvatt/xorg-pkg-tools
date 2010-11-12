@@ -16,7 +16,7 @@ INPUT="acecad aiptek citron elographics evdev evtouch fpit hyperpen \
 joystick keyboard mouse mutouch penmount synaptics vmmouse void"
 
 APP="compiz grandr twm x11-apps x11-session-utils x11-utils x11-xfs-utils x11-xkb-utils \
-x11-server-utils xauth xbacklight xdm xfs xinit xprint-utils xterm xutils-dev xutils"
+x11-xserver-utils xauth xbacklight xdm xfs xinit xprint-utils xterm xutils-dev xutils"
 
 LIBS="libdmx libdrm libfontenc libfs libice libpciaccess libsm libx11 libxau libxaw \
 libxcomposite libxcursor libxdamage libxdmcp libxext libxfixes libxfont libxi libxinerama \
