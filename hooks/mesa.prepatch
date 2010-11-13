@@ -1,4 +1,9 @@
 
+# 2010-11-12 Tormod Volden
+# This git commit broke our builds and nobody cares :(
+git revert 5a3ac74
+CHANGES+=("hook: Revert 5a3ac74 to fix static linking of libtalloc")
+
 # 2010-10-13 Tormod Volden
 # this patch needs to be refreshed
 drop 103_savage-expose_fbmodes_with_nonzero_alpha.patch fails
