@@ -27,3 +27,11 @@ if [ -n "$PLAINMAVERICK" ]; then
 	sed -i '/^	GALLIUM_DRIVERS .* nouveau/s/ nouveau//' debian/rules
 	CHANGES+=("hook (PLAINMAVERICK) do not build nouveau")
 fi
+
+
+# 2010-01-17 Tormod Volden
+if git show c98ea26e > /dev/null 2>&1; then
+	sed -i '/st_GLESv/d' debian/libgles?-mesa.install
+	sed -i '/egl_/d' debian/libegl1-mesa.install
+	CHANGES+=("hook: do not install egl_dri2.so/egl_glx.so/st_GLES*")
+fi
