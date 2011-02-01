@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# A script for rebuilding all of the X input and video drivers, such as
+# following an xserver update.
+#
+# Copyright 2011 Canonical, Ltd.
+# Authors:  Chris Halse Rogers, Bryce Harrington
+
 # TODO: Make *sure* to wait until all of the xserver builds are done
 #       (Including arm and everything else)
 
@@ -26,6 +32,7 @@ echo "All *.changes ready to be uploaded"
 
 #<vorlon> bryyce: well, armel got hit by the no-change driver rebuilds not having versioned build-dependencies on the new xserver# -dev... :)
 # bryyce: when you're doing such ABI rebuilds, could you please bump the versioned build-dep?
+# TODO:  Above seems hard to do automatically, and would require parsing/rewriting the control file...
 
 # TODO: Pause and let the user doublecheck things
 #for I in *.changes ; do
