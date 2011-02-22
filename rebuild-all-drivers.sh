@@ -21,8 +21,16 @@ if [ $(lsb_release -cs) != "$codename" ] ; then
     exit 1
 fi
 
-apt-get source $(apt-cache show xserver-xorg-video-all | grep Depends: | sed s/Depends://g | sed s/,//g)
-apt-get source $(apt-cache show xserver-xorg-input-all | grep Depends: | sed s/Depends://g | sed s/,//g)
+X_INPUT_ABI=$(cut -d ',' -f 1 /usr/share/xserver-xorg/xinputdep 2> /dev/null)
+X_VIDEO_ABI=$(cut -d ',' -f 1 /usr/share/xserver-xorg/xvideodep 2> /dev/null)
+
+if [ -z "$X_INPUT_ABI" || -z "$X_VIDEO_ABI" ] ; then
+    echo "Current xserver-xorg-dev package must be installed"
+    exit 1
+fi
+
+apt-get source $(grep-aptavail -F Depends -s Source:Package $X_VIDEO_ABI | sed s/Source: //g)
+apt-get source $(grep-aptavail -F Depends -s Source:Package $X_INPUT_ABI | sed s/Source: //g)
 
 for I in * ; do
    [ -d $I ] && (cd $I && dch --rebuild "Rebuild against Xserver 1.10" --distribution ${codename} && dpkg-buildpackage -S)
