@@ -27,7 +27,7 @@ CHANGES+=("hook: s/swrastg/swrast/ debian/libgl1-mesa-dri-experimentall.install.
 
 # Tormod Volden 2009-09-06
 # Bump build-dep for libdrm
-#sed -i '/^ llvm/s/ /' debian/control
+#sed -i '/^ libdrm-dev /s/2.4.3/2.4.13~git/' debian/control
 #CHANGES+=("hook: Build-dep on libdrm 2.4.13")
 
 
