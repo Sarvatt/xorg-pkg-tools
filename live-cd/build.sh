@@ -127,7 +127,7 @@ fi
 
 # fix kernel installation
 sudo cp $NEWROOT/boot/vmlinuz-* $CDTREE/casper/vmlinuz
-sudo cp $NEWROOT/boot/initrd.img-* $CDTREE/casper/initrd.gz
+sudo cp $NEWROOT/boot/initrd.img-* $CDTREE/casper/initrd.lz
 sudo rm -f $NEWROOT/boot/vmlinuz-* $NEWROOT/boot/initrd.img-*
 sudo rm -f $NEWROOT/vmlinuz* $NEWROOT/initrd.img*
 
