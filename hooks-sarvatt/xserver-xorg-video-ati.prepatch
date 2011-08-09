@@ -1,26 +1,45 @@
 # This will be sourced as a bash script
 
+
+drop 101_fix_build_aginst_1.10rc3.diff upstream
+drop 102_disable_pageflipping_for_transformed_displays.patch upstream
+drop 101_llano-support.diff upstream
+drop 102_llano-pciids.diff upstream
+
+
+
+
+
+
+
+## Legacy unused hooks for reference
+
+
 # Tormod Volden 2009-03-31
 # 
-drop 101_ref-count-dri2-buffers.patch upstream
-CHANGES+=("hook: Apply patch to enable BGNR support.")
-<< EOPATCH1 patch -p1
-diff -up xf86-video-ati-6.12.2/src/radeon_kms.c.da xf86-video-ati-6.12.2/src/radeon_kms.c
---- xf86-video-ati-6.12.2/src/radeon_kms.c.da	2009-08-04 15:53:14.000000000 +1000
-+++ xf86-video-ati-6.12.2/src/radeon_kms.c	2009-08-04 15:53:48.000000000 +1000
-@@ -331,6 +331,9 @@ Bool RADEONPreInit_KMS(ScrnInfoPtr pScrn
-     if (pScrn->numEntities != 1) return FALSE;
-     if (!RADEONGetRec(pScrn)) return FALSE;
- 
-+    /* kms bg root enable */
-+    pScrn->canDoBGNoneRoot = 1;
-+
-     info               = RADEONPTR(pScrn);
-     info->MMIO         = NULL;
-     info->IsSecondary  = FALSE;
-EOPATCH1
+#drop 101_ref-count-dri2-buffers.patch upstream
+#drop 101_select_between_classic_and_gallium_dri.patch tenative
+#drop 100_radeon-6.9.0-bgnr-enable.patch fails
+#wget -O debian/patches/101_select_between_classic_and_gallium_dri.patch http://sarvatt.com/downloads/patches/101_select_between_classic_and_gallium_dri.patch
 
-CHANGES+=("Notice: If you used the Gallium xorg.conf option please remove it, r300g is now the default driver in mesa.")
+#CHANGES+=("hook: Apply patch to enable BGNR support.")
+#<< EOPATCH1 patch -p1
+#diff -up xf86-video-ati-6.12.2/src/radeon_kms.c.da xf86-video-ati-6.12.2/src/radeon_kms.c
+#--- xf86-video-ati-6.12.2/src/radeon_kms.c.da	2009-08-04 15:53:14.000000000 +1000
+#+++ xf86-video-ati-6.12.2/src/radeon_kms.c	2009-08-04 15:53:48.000000000 +1000
+#@@ -331,6 +331,9 @@ Bool RADEONPreInit_KMS(ScrnInfoPtr pScrn
+#     if (pScrn->numEntities != 1) return FALSE;
+#     if (!RADEONGetRec(pScrn)) return FALSE;
+# 
+#+    /* kms bg root enable */
+#+    pScrn->canDoBGNoneRoot = 1;
+#+
+#     info               = RADEONPTR(pScrn);
+#     info->MMIO         = NULL;
+#     info->IsSecondary  = FALSE;
+#EOPATCH1
+
+#CHANGES+=("Notice: If you used the Gallium xorg.conf option please remove it, r300g is now the default driver in mesa.")
 #CHANGES+=("hook: Apply patch to enable Gallium xorg.conf option.")
 #<< EOPATCH2 patch -p1
 #diff --git a/src/radeon.h b/src/radeon.h

@@ -17,6 +17,10 @@
 #CHANGES+=("hook: increase serverminver to 2:1.8.99.0")
 #echo 10 > debian/inputabiver
 #CHANGES+=("hook: increase inputabiver to 10")
-#echo 8 > debian/videoabiver
-#CHANGES+=("hook: increase videoabiver to 8")
+#echo 10 > debian/videoabiver
+#CHANGES+=("hook: increase videoabiver to 10")
+#wget -O debian/serverminver http://sarvatt.com/downloads/patches/serverminver
+#CHANGES+=("hook: Bump serverminver")
+
 ##fi
+

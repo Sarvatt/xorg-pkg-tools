@@ -1,9 +1,30 @@
-rm -rf debian
-git clone git://sarvatt.com/mesa.git temp
-cp -a temp/debian ./
-rm -rf temp
-CHANGES+=("hook: Replace packaging with git://sarvatt.com/mesa.git")
-CHANGES+=("Notice: r300 gallium is now enabled by default in libgl1-mesa-dri. r600 and other gallium drivers are now installed to /usr/lib/dri/gallium and require manual path adjustment to use. libgl1-mesa-dri-gallium is now deprecated, please use libgl1-mesa-dri-experimental instead. Note that nouveau DRI is now installed in libgl1-mesa-dri-experimental as well.")
+getp() {
+ (cd debian/patches; rm -f $1
+  wget http://kernel.ubuntu.com/~sarvatt/patches/$1)
+ CHANGES+=("hook: Refresh $1")
+}
+
+getp 13-llvm-config-pick-a-version.diff
+getp 115_llvm_dynamic_linking.diff
+getp 116_use_shared_galliumcore.diff
+drop 117_handle_dri2connect_errors_when_indirect.diff upstream
+drop 118_fix_24bpp_software_renering.diff upstream
+drop 119_r600g_gnome_shell_rendering_fix.diff upstream
+
+
+
+
+
+## Legacy unused hooks for reference
+
+#rm -rf debian
+#git clone git://sarvatt.com/mesa.git temp
+#cp -a temp/debian ./
+#rm -rf temp
+#CHANGES+=("hook: Replace packaging with git://sarvatt.com/mesa.git")
+
+#CHANGES+=("Notice: r300 gallium is now enabled by default in libgl1-mesa-dri. r600 and other gallium drivers are now installed to /usr/lib/dri/gallium and require manual path adjustment to use. libgl1-mesa-dri-gallium is now deprecated, please use libgl1-mesa-dri-experimental instead. Note that nouveau DRI is now installed in libgl1-mesa-dri-experimental as well.")
+
 # Tormod Volden 2009-04-28
 # Drop patches for master branch
 
@@ -28,4 +49,10 @@ CHANGES+=("Notice: r300 gallium is now enabled by default in libgl1-mesa-dri. r6
 #sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/100_no_abi_tag.patch
 #sed -i 's#mesa/x86[-64]*#mapi/glapi#g' debian/patches/101_ubuntu_hidden_glname.patch
 #CHANGES+=("hook: Update patches 100,101 for new glapi paths")
+
+#drop 06_kfreebsd-ftbfs.diff fails
+#drop 05_hurd-ftbfs.diff fails
+
+#echo "dri/usr/lib/${DEB_HOST_MULTIARCH}/gbm/*.so usr/lib/${DEB_HOST_MULTIARCH}/gbm" >> debian/libgbm1.install.in
+#CHANGES+=("hook: Also install pipe drivers in libgbm1 package")
 

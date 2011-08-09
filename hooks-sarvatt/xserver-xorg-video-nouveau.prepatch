@@ -5,3 +5,12 @@
 
 # It patches configure directly instead of configure.in
 drop 01_include_snapshot_date fails
+drop 02_nouveau_bgnr upstream
+drop 03_work-around-exa-hangs.patch testing
+drop 03_use_older_libdrm_headers.diff not_needed
+drop 04_emit_surface_state_after_flush.diff upstream
+
+#CHANGES+=("hook: Also enable acceleration on nvc3/nvc4.")
+#wget -O debian/patches/001-Also-enable-acceleration-on-nvc3-and-nvc4.patch http://sarvatt.com/downloads/patches/001-Also-enable-acceleration-on-nvc3-and-nvc4.patch
+#echo 001-Also-enable-acceleration-on-nvc3-and-nvc4.patch >> debian/patches/series
+drop 05_dri2_buffer_failure_path_crash.diff upstream

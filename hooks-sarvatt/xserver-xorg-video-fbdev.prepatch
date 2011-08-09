@@ -1,0 +1,2 @@
+drop 01_fbdev_man.diff upstream
+drop 02-support-building-without-xv.patch fails

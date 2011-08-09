@@ -1,7 +1,7 @@
 # Tormod Volden 2009-12-08
 # Debian ships a modprobe file for radeon, we don't want that
-sed -i '\:/etc/modprobe.d:s/^/#/' debian/rules
-rm debian/*.in
-rm debian/radeon-kms.conf
-CHANGES+=("hook: Don't install debian's modprobe conf.")
+#sed -i '\:/etc/modprobe.d:s/^/#/' debian/rules
+#rm debian/*.in
+#rm debian/radeon-kms.conf
+#CHANGES+=("hook: Don't install debian's modprobe conf.")
 
