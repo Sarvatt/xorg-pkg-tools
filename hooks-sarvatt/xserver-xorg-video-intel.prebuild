@@ -1,5 +1,10 @@
 # This will be sourced as a bash script
 
+CHANGES+=("Note: SNA is now disabled due to long-standing incompatibilities with unity.")
+
+
+
+
 # Tormod Volden 2009-03-08
 # 
 

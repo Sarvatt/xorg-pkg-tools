@@ -13,7 +13,21 @@ CHANGES+=("hook: Enable floating point texture support")
 sed -i -e '/swrastg_dri.so /s/swrastg/swrast/' debian/libgl1-mesa-dri-experimental.install.in
 CHANGES+=("hook: s/swrastg/swrast/ debian/libgl1-mesa-dri-experimentall.install.in")
 
-
+<< EOPATCH1 patch -p1
+diff --git a/debian/libegl1-mesa.symbols b/debian/libegl1-mesa.symbols
+index 613acf6..0077a39 100644
+--- a/debian/libegl1-mesa.symbols
++++ b/debian/libegl1-mesa.symbols
+@@ -51,6 +51,7 @@ libEGL.so.1 libegl1-mesa #MINVER# | libegl1-x11
+  eglReleaseTexImage@Base 7.8.1
+  eglReleaseThread@Base 7.8.1
+  eglScreenPositionMESA@Base 7.8.1
++ eglSetSwapRectangleANDROID@Base 7.12.0~
+  eglShowScreenSurfaceMESA@Base 7.8.1
+  eglSignalSyncKHR@Base 7.9
+  eglSurfaceAttrib@Base 7.8.1
+EOPATCH1
+CHANGES+=("hook: Refresh libegl1-mesa symbols.")
 
 
 ## Legacy unused hooks for reference
