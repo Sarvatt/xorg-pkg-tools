@@ -8,6 +8,7 @@ getp 13-llvm-config-pick-a-version.diff
 getp 115_llvm_dynamic_linking.diff
 getp 116_use_shared_galliumcore.diff
 drop 11-hurd-ftbfs-again.diff fails
+drop 103_savage-expose_fbmodes_with_nonzero_alpha.patch unneeded
 drop 117_handle_dri2connect_errors_when_indirect.diff upstream
 drop 118_fix_24bpp_software_renering.diff upstream
 drop 119_r600g_gnome_shell_rendering_fix.diff upstream

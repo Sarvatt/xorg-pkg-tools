@@ -36,7 +36,7 @@ sed -i '/DRI_DRIVERS +=.*savage/s/ savage//' debian/rules
 sed -i '/DRI_DRIVERS +=.*unichrome/s/ unichrome//' debian/rules
 sed -i '/DRI_DRIVERS +=.*sis/s/ sis//' debian/rules
 sed -i '/DRI_DRIVERS +=.*tdfx/s/ tdfx//' debian/rules
-CHANGES+=("hooks: Drop i810, mga, r128, savage, unichrome, sis and tdfx drivers."
+CHANGES+=("hooks: Drop i810, mga, r128, savage, unichrome, sis and tdfx drivers.")
 
 #sed -i '/enable-texture-float/a \
 #        --enable-xa \\' debian/rules
