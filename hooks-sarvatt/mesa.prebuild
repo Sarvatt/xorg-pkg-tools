@@ -29,13 +29,14 @@ index 613acf6..0077a39 100644
 EOPATCH1
 CHANGES+=("hook: Refresh libegl1-mesa symbols.")
 
+sed -i '/DRI_DRIVERS +=.*i810/s/ i810//' debian/rules
 sed -i '/DRI_DRIVERS +=.*mga/s/ mga//' debian/rules
 sed -i '/DRI_DRIVERS +=.*r128/s/ r128//' debian/rules
 sed -i '/DRI_DRIVERS +=.*savage/s/ savage//' debian/rules
 sed -i '/DRI_DRIVERS +=.*unichrome/s/ unichrome//' debian/rules
 sed -i '/DRI_DRIVERS +=.*sis/s/ sis//' debian/rules
 sed -i '/DRI_DRIVERS +=.*tdfx/s/ tdfx//' debian/rules
-CHANGES+=("hooks: Drop mga, r128, savage, unichrome, sis and tdfx drivers."
+CHANGES+=("hooks: Drop i810, mga, r128, savage, unichrome, sis and tdfx drivers."
 
 #sed -i '/enable-texture-float/a \
 #        --enable-xa \\' debian/rules
