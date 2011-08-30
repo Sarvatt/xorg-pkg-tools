@@ -5,7 +5,7 @@ sed -i '/^ debhelper /s/8.1.3/8.1.2ubuntu2/' debian/control
 CHANGES+=("hook: Relax debhelper depends to 8.1.2ubuntu2")
 
 # Robert Hooker 2011-07-11
-# Enable floating point texture support and disable st/gbm
+# Enable floating point texture support
 sed -i '/enable-shared-glapi/a \
 	--enable-texture-float \\' debian/rules
 CHANGES+=("hook: Enable floating point texture support")
@@ -29,6 +29,18 @@ index 613acf6..0077a39 100644
 EOPATCH1
 CHANGES+=("hook: Refresh libegl1-mesa symbols.")
 
+sed -i '/DRI_DRIVERS +=.*mga/s/ mga//' debian/rules
+sed -i '/DRI_DRIVERS +=.*r128/s/ r128//' debian/rules
+sed -i '/DRI_DRIVERS +=.*savage/s/ savage//' debian/rules
+sed -i '/DRI_DRIVERS +=.*unichrome/s/ unichrome//' debian/rules
+sed -i '/DRI_DRIVERS +=.*sis/s/ sis//' debian/rules
+sed -i '/DRI_DRIVERS +=.*tdfx/s/ tdfx//' debian/rules
+CHANGES+=("hooks: Drop mga, r128, savage, unichrome, sis and tdfx drivers."
+
+#sed -i '/enable-texture-float/a \
+#        --enable-xa \\' debian/rules
+#echo "usr/lib/*/pkgconfig/xatracker.pc" >> debian/libgl1-mesa-dev.install.in
+#CHANGES+=("hook: Enable XA state tracker")
 
 ## Legacy unused hooks for reference
 
