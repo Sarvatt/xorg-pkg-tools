@@ -146,6 +146,8 @@ fdogitdir_for_fdopkg() {
         echo ""
     elif [ ${fdopkg} = "pixman" ]; then
         echo ""
+    elif [ ${fdopkg} = "wayland" ]; then
+        echo "wayland"
     elif [ ${fdopkg} = "xserver" ]; then
         echo "xorg"
     elif [ ${fdopkg} = "drm" -o ${fdopkg} = "mesa" ]; then
@@ -177,6 +179,8 @@ debgitdir_for_debpkg() {
 
     if [ -z "${debpkg}" ]; then
         echo ""
+    elif [ ${debpkg} = "wayland" ]; then
+        echo "pkg-xorg/wayland"
     elif [ ${debpkg} = "xorg-server" ]; then
         echo "pkg-xorg/xserver"
     elif [ ${debpkg#xserver-xorg-} != ${debpkg} ]; then
