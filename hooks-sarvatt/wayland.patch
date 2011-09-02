@@ -1,0 +1,18 @@
+diff --git a/debian/rules b/debian/rules
+index f3a5acc..0e01df5 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -8,13 +8,6 @@ override_dh_install:
+ 	find debian/tmp -name '*.la' -delete
+ 	dh_install --fail-missing
+ 
+-# Generate hard dependencies:
+-override_dh_makeshlibs: V=$(shell dpkg-parsechangelog|awk '/^Version:/ {print $$2}')
+-override_dh_makeshlibs:
+-	sed 's/@@currentversion@@/(= $(V))/g' \
+-	  debian/$(PACKAGE).symbols.in > debian/$(PACKAGE).symbols
+-	dh_makeshlibs -V '$(PACKAGE) (= $(V))' -- -c4
+-
+ # Debug package:
+ override_dh_strip:
+ 	dh_strip --dbg-package=$(PACKAGE)-dbg
