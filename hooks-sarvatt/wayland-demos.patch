@@ -1,0 +1,29 @@
+diff -u a/debian/wayland-demos.install b/debian/wayland-demos.install
+--- a/debian/wayland-demos.install
++++ b/debian/wayland-demos.install
+@@ -1,6 +1,3 @@
+-# udev rules live elsewhere:
+-etc/udev/rules.d/70-wayland.rules lib/udev/rules.d
+-
+ # compositor:
+ usr/bin/wayland-compositor
+ 
+@@ -19,6 +16,7 @@
+ ../../debian/wayland-run          usr/bin
+ 
+ # actual demo clients, installed manually:
++../../build/clients/desktop-shell usr/lib/wayland/bin
+ ../../build/clients/dnd           usr/lib/wayland/bin
+ ../../build/clients/eventdemo     usr/lib/wayland/bin
+ ../../build/clients/flower        usr/lib/wayland/bin
+@@ -26,7 +24,8 @@
+ ../../build/clients/image         usr/lib/wayland/bin
+ ../../build/clients/resizor       usr/lib/wayland/bin
+ ../../build/clients/screenshot    usr/lib/wayland/bin
+-../../build/clients/simple-client usr/lib/wayland/bin
++../../build/clients/simple-egl    usr/lib/wayland/bin
++../../build/clients/simple-shm    usr/lib/wayland/bin
+ ../../build/clients/smoke         usr/lib/wayland/bin
+ ../../build/clients/terminal      usr/lib/wayland/bin
+ ../../build/clients/view          usr/lib/wayland/bin
+
