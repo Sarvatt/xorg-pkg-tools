@@ -6,5 +6,5 @@ if [ -z "$PACKAGE_VERSION" ]; then
 fi
 CHANGES+=("hook: Bump version to $PACKAGE_VERSION")
 
-patch -p1 < $HOOKS/wayland.demos.patch
+patch -p1 < $HOOKS/wayland-demos.patch
 CHANGES+=("hook: Update installation list.")
