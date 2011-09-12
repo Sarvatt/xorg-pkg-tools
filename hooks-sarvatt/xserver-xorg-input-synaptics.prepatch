@@ -1,3 +1,14 @@
+drop 116_xi2_1.patch fails
+drop 117_gestures.patch fails
+drop 119_active_area_touches.patch fails
+drop 120_active_touches_num_fingers.patch fails
+drop 121_semi-mt_num_fingers.patch fails
+drop 122_revert_pressure_finger_default.patch fails
+drop 123_order_ProcessTouch_for_numFingers.patch fails
+
+# Unused legacy hooks for future reference
+
+
 # Robert Hooker 2009-06-27
 # Import ubuntu patches for xserver-xorg-input-synaptics.
 
@@ -18,5 +29,5 @@
 #drop 02-do-not-use-synaptics-for-keyboards.patch fails
 #drop 114_jumpy_cursor_first_part.patch fails
 
-drop 01-synaptics-dont-grab-if-not-on-current-VT.patch fails
-drop 114_jumpy_cursor_first_part.patch fails
+#drop 01-synaptics-dont-grab-if-not-on-current-VT.patch fails
+#drop 114_jumpy_cursor_first_part.patch fails
