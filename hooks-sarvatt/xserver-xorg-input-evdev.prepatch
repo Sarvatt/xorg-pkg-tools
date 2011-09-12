@@ -1,1 +1,3 @@
-drop 100-fix-touchup-problem-on-touchpads.patch fails
+drop 100-xi2.1.patch fails
+drop 101-gestures.patch fails
+drop 102-fix_valuator_proximity_handling.patch fails
