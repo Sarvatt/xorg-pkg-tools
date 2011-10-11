@@ -4,6 +4,9 @@
 sed -i '/^ debhelper /s/8.1.3/8.1.2ubuntu2/' debian/control
 CHANGES+=("hook: Relax debhelper depends to 8.1.2ubuntu2")
 
+patch -p1 < $HOOKS/mesa-not-installed.patch
+CHANGES+=("hook: Drop obsolete files from debian/not-installed.")
+
 # Robert Hooker 2011-07-11
 # Enable floating point texture support
 sed -i '/enable-shared-glapi/a \
@@ -29,6 +32,20 @@ index 613acf6..0077a39 100644
 EOPATCH1
 CHANGES+=("hook: Refresh libegl1-mesa symbols.")
 
+<< EOPATCH2 patch -p1
+--- a/debian/libgles2-mesa.symbols (libgles2-mesa_7.12.0~git20111007.53f85863-0ubuntu0sarvatt~natty_i386)
++++ b/debian/libgles2-mesa.symbols      2011-10-07 23:05:43.000000000 +0000
+@@ -43,6 +43,7 @@
+  glDisable@Base 7.8.1
+  glDisableVertexAttribArray@Base 7.8.1
+  glDrawArrays@Base 7.8.1
++ glDrawBuffersNV@Base 7.12.0~git20111007.53f85863-0ubuntu0sarvatt~natty
+  glDrawElements@Base 7.8.1
+  glEGLImageTargetRenderbufferStorageOES@Base 7.8.1
+  glEGLImageTargetTexture2DOES@Base 7.8.1
+EOPATCH2
+CHANGES+=("hook: Refresh libgles1-mesa symbols.")
+
 sed -i '/DRI_DRIVERS +=.*i810/s/ i810//' debian/rules
 sed -i '/DRI_DRIVERS +=.*mga/s/ mga//' debian/rules
 sed -i '/DRI_DRIVERS +=.*r128/s/ r128//' debian/rules
@@ -50,7 +67,6 @@ CHANGES+=("hooks: Drop i810, mga, r128, savage, unichrome, sis and tdfx drivers.
 # Add the nouveau driver
 #sed -i '/DRI_DRIVERS += mach64 mga r128/s/mga/mga nouveau/' debian/rules
 #CHANGES+=("hook: Build experimental nouveau mesa classic driver (nv0x-nv2x only)")
-
 
 # Tormod Volden 2009-09-06
 # Bump build-dep for libdrm
