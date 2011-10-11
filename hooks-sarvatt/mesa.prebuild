@@ -44,7 +44,7 @@ CHANGES+=("hook: Refresh libegl1-mesa symbols.")
   glEGLImageTargetRenderbufferStorageOES@Base 7.8.1
   glEGLImageTargetTexture2DOES@Base 7.8.1
 EOPATCH2
-CHANGES+=("hook: Refresh libgles1-mesa symbols.")
+CHANGES+=("hook: Refresh libgles2-mesa symbols.")
 
 sed -i '/DRI_DRIVERS +=.*i810/s/ i810//' debian/rules
 sed -i '/DRI_DRIVERS +=.*mga/s/ mga//' debian/rules
