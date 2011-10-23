@@ -27,3 +27,15 @@ diff -u a/debian/wayland-demos.install b/debian/wayland-demos.install
  ../../build/clients/terminal      usr/lib/wayland/bin
  ../../build/clients/view          usr/lib/wayland/bin
 
+diff -u a/debian/control b/debian/control
+--- a/debian/control
++++ b/debian/control
+@@ -19,6 +19,7 @@
+  libxkbcommon-dev,
+  libudev-dev,
+  libpixman-1-dev,
++ libjpeg-dev,
+  libpng12-dev,
+  librsvg2-bin,
+  libegl1-mesa-dev (>= 7.11~0),
+
