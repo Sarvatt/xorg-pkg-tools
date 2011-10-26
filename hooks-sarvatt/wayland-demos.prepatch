@@ -1,1 +1,6 @@
 drop 100_no_cairo_egl.patch upstream
+
+cp $HOOKS/wayland-demos-no-libjpeg-turbo-symbol.patch debian/patches/
+echo "wayland-demos-no-libjpeg-turbo-symbol.patch" >> debian/patches/series
+CHANGES+=("hook: Fix build without libjpeg-turbo headers, no JCS_EXT_BGRX available.")
+
