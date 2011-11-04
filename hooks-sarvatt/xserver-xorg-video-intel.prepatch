@@ -1,5 +1,6 @@
 drop 101_copy-fb.patch testing
 drop 102_gen6_invalidate_texture_cache.patch upstream
+drop 102_remove_surface_binding_cache.patch upstream
 drop 107_solid_nullptr_check.patch upstream
 drop 108_undo_dmg_trans_before_append.patch upstream
 drop 109_dont_reconstruct_glyph_cache_on_rotate.patch upstream
