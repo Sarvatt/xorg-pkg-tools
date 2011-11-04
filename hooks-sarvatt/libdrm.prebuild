@@ -1,5 +1,24 @@
 # This will be sourced as a bash script
 
+<< EOPATCH1 patch -p1
+--- a/debian/libdrm-intel1.symbols (libdrm-intel1_2.4.27+git20111029.cc9b751e-0ubuntu0sarvatt_amd64)
++++ b/debian/libdrm-intel1.symbols	2011-10-29 19:59:05.221855592 -0400
+@@ -38,6 +38,8 @@
+  drm_intel_bufmgr_gem_enable_reuse@Base 2.4.1
+  drm_intel_bufmgr_gem_init@Base 2.4.1
+  drm_intel_bufmgr_set_debug@Base 2.4.1
++ drm_intel_gem_bo_clear_relocs@Base 2.4.27
++ drm_intel_gem_bo_get_reloc_count@Base 2.4.27
+  drm_intel_gem_bo_map_gtt@Base 2.4.3
+  drm_intel_gem_bo_start_gtt_access@Base 2.4.3
+  drm_intel_gem_bo_unmap_gtt@Base 2.4.9# This will be sourced as a bash script
+EOPATCH1
+CHANGES+=("hook: Refresh libdrm-intel1 symbols.")
+
+
+
+# Legacy hooks for reference, unused
+
 # 2009-04-17 Tormod Volden
 # This package might overwrite some Jaunty header files
 
