@@ -1,0 +1,118 @@
+diff --git a/debian/patches/221_fix_SendEvent_flag_mask.diff b/debian/patches/221_fix_SendEvent_flag_mask.diff
+index 8bbbf36..8d5985d 100644
+--- a/debian/patches/221_fix_SendEvent_flag_mask.diff
++++ b/debian/patches/221_fix_SendEvent_flag_mask.diff
+@@ -15,13 +15,13 @@ before writing it to the client.
+  dix/events.c |   11 +++++++++++
+  1 files changed, 11 insertions(+), 0 deletions(-)
+ 
+-diff --git a/dix/events.c b/dix/events.c
+-index 8a4c6b9..cf24869 100644
+---- a/dix/events.c
+-+++ b/dix/events.c
+-@@ -5241,6 +5241,17 @@ ProcSendEvent(ClientPtr client)
++Index: xorg-server/dix/events.c
++===================================================================
++--- xorg-server.orig/dix/events.c
+++++ xorg-server/dix/events.c
++@@ -5227,6 +5227,17 @@
+  
+-     REQUEST_SIZE_MATCH(xSendEventReq);
++     stuff->event.u.u.type &= ~(SEND_EVENT_BIT);
+  
+ +    /* libXext and other extension libraries may set the bit indicating
+ +     * that this event came from a SendEvent request so remove it
+@@ -37,6 +37,3 @@ index 8a4c6b9..cf24869 100644
+      /* The client's event type must be a core event type or one defined by an
+  	extension. */
+  
+--- 
+-1.7.5.4
+-
+diff --git a/debian/patches/500_xi2.1.patch b/debian/patches/500_xi2.1.patch
+index 57d15a9..efd8e1a 100644
+--- a/debian/patches/500_xi2.1.patch
++++ b/debian/patches/500_xi2.1.patch
+@@ -150,13 +150,13 @@ Index: xorg-server/Xi/exevents.c
+  int
+  UpdateDeviceState(DeviceIntPtr device, DeviceEvent* event)
+  {
+-@@ -854,34 +934,9 @@
++@@ -854,34 +934,9 @@ UpdateDeviceState(DeviceIntPtr device, DeviceEvent* event)
+  
+          if (!button_is_down(device, key, BUTTON_PROCESSED))
+              return DONT_PROCESS;
+ -        if (IsMaster(device)) {
+ -            DeviceIntPtr sd;
+- 
++-
+ -            /*
+ -             * Leave the button down if any slave has the
+ -             * button still down. Note that this depends on the
+@@ -177,6 +177,7 @@ Index: xorg-server/Xi/exevents.c
+ -	if (device->valuator)
+ -	    device->valuator->motionHintWindow = NullWindow;
+ -        if (!b->map[key])
+++
+ +        if (ReleaseButton(device, key) == DONT_PROCESS)
+              return DONT_PROCESS;
+ -        if (b->buttonsDown >= 1 && !--b->buttonsDown)
+@@ -2742,31 +2743,14 @@ Index: xorg-server/dix/events.c
+ -             * must not get the grab, otherwise we may never ungrab the
+ -             * device.
+ -             */
+--
+--            if (grab->grabtype == GRABTYPE_CORE)
+--            {
+--                DeviceIntPtr other;
+--                BOOL interfering = FALSE;
+--
+--                /* A passive grab may have been created for a different device
+--                   than it is assigned to at this point in time.
+--                   Update the grab's device and modifier device to reflect the
+--                   current state.
+--                   Since XGrabDeviceButton requires to specify the
+--                   modifierDevice explicitly, we don't override this choice.
+--                   */
+--                if (tempGrab.type < GenericEvent)
+--                {
+--                    grab->device = device;
+--                    grab->modifierDevice = GetPairedDevice(device);
+--                }
+ +        grabinfo = &device->deviceGrab;
+ +        /* In some cases a passive core grab may exist, but the client
+ +         * already has a core grab on some other device. In this case we
+ +         * must not get the grab, otherwise we may never ungrab the
+ +         * device.
+ +         */
+-+
++ 
++-            if (grab->grabtype == GRABTYPE_CORE)
+ +        if (grab->grabtype == GRABTYPE_CORE)
+ +        {
+ +            DeviceIntPtr other;
+@@ -2780,7 +2764,22 @@ Index: xorg-server/dix/events.c
+ +               modifierDevice explicitly, we don't override this choice.
+ +               */
+ +            if (tempGrab.type < GenericEvent)
+-+            {
++             {
++-                DeviceIntPtr other;
++-                BOOL interfering = FALSE;
++-
++-                /* A passive grab may have been created for a different device
++-                   than it is assigned to at this point in time.
++-                   Update the grab's device and modifier device to reflect the
++-                   current state.
++-                   Since XGrabDeviceButton requires to specify the
++-                   modifierDevice explicitly, we don't override this choice.
++-                   */
++-                if (tempGrab.type < GenericEvent)
++-                {
++-                    grab->device = device;
++-                    grab->modifierDevice = GetPairedDevice(device);
++-                }
+ +                grab->device = device;
+ +                grab->modifierDevice = GetPairedDevice(device);
+ +            }
+

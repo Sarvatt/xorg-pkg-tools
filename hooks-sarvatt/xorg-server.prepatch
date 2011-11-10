@@ -5,13 +5,25 @@ getp() {
 }
 
 
+
 if [ "$BRANCH" == "server-1.10-branch" ]; then
-	drop 215_glx_drawable_refcounting.diff upstream
-	drop 218_randr-check-rotated-virtual-size-limits-correctly.diff upstream
-	drop 20-workaround-36986.diff upstream
+	patch -p1 < $HOOKS/xorg-server-1.10.patch
+
+	drop 210_pixman_null_ptr_check.patch upstream
 	getp 500_xi2.1.patch
-else
-	drop 210_pixman_null_ptr_check.patch fails
+	drop 508_CVE-2011-4028.patch upstream
+	drop 509_CVE-2011-4029.patch upstream
+	
+elif [ "$BRANCH" == "server-1.11-branch" ]; then
+	drop 210_pixman_null_ptr_check.patch upstream
+	drop 220_xi21_always_deliver_raw_events.diff fails
+
+elif [ "$BRANCH" == "master" ]; then
+	patch -p1 < $HOOKS/xorg-server-1.12.patch
+	
+	drop 07-xfree86-fix-build-with-xv-disabled.diff upstream
+	drop 210_pixman_null_ptr_check.patch upstream
+	drop 214_glx_dri_searchdirs.patch fails
 	drop 220_xi21_always_deliver_raw_events.diff fails
 fi
 

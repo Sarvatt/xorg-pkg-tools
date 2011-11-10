@@ -1,0 +1,168 @@
+diff --git a/debian/patches/100_rethrow_signals.patch b/debian/patches/100_rethrow_signals.patch
+index ffbc4b0..aa37be4 100644
+--- a/debian/patches/100_rethrow_signals.patch
++++ b/debian/patches/100_rethrow_signals.patch
+@@ -274,18 +274,18 @@ Index: xorg-server/include/os.h
+  
+ Index: xorg-server/os/log.c
+ ===================================================================
+---- xorg-server.orig/os/log.c	2011-09-10 21:40:27.000000000 -0700
+-+++ xorg-server/os/log.c	2011-09-11 09:51:21.555668560 -0700
+-@@ -89,6 +89,8 @@
++--- xorg-server.orig/os/log.c
+++++ xorg-server/os/log.c
++@@ -88,6 +88,8 @@
++ #include <stdarg.h>
+  #include <stdlib.h>	/* for malloc() */
+- #include <errno.h>
+  
+ +#include <signal.h>	/* for raise() */
+ +
+  #include "input.h"
+  #include "site.h"
+  #include "opaque.h"
+-@@ -403,9 +405,11 @@
++@@ -467,9 +469,11 @@
+  
+  void
+  AbortServer(void) _X_NORETURN;
+diff --git a/debian/patches/15-nouveau.diff b/debian/patches/15-nouveau.diff
+index 98fec87..b240906 100644
+--- a/debian/patches/15-nouveau.diff
++++ b/debian/patches/15-nouveau.diff
+@@ -19,11 +19,19 @@ Signed-off-by: Cyril Brulebois <kibi@debian.org>
+ 
+ --- a/hw/xfree86/common/xf86pciBus.c
+ +++ b/hw/xfree86/common/xf86pciBus.c
+-@@ -1123,7 +1123,24 @@ videoPtrToDriverList(struct pci_device *
++@@ -1123,15 +1123,24 @@ videoPtrToDriverList(struct pci_device *
+  	    break;
+  	case 0x102b:		    driverList[0] = "mga";	break;
+  	case 0x10c8:		    driverList[0] = "neomagic"; break;
+--	case 0x10de: case 0x12d2:   driverList[0] = "nv";	break;
++-	case 0x10de: case 0x12d2:
++-	{
++-	    int idx = 0;
++-#ifdef __linux__
++-	    driverList[idx++] = "nouveau";
++-#endif
++-	    driverList[idx++] = "nv";
++-	    break;
++-	}
+ +	case 0x10de: case 0x12d2:
+ +	    switch (dev->device_id) {
+ +	    /* NV1 */
+diff --git a/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch b/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch
+index ca4a57c..93a92de 100644
+--- a/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch
++++ b/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch
+@@ -255,7 +255,7 @@ Index: xorg-server/xkb/ddxLoad.c
+  #ifndef WIN32
+      out= Popen(buf,"w");
+  #else
+-@@ -247,30 +351,42 @@
++@@ -247,33 +351,42 @@
+  #endif
+      
+      if (out!=NULL) {
+@@ -287,6 +287,9 @@ Index: xorg-server/xkb/ddxLoad.c
+ -		nameRtrn[nameRtrnLen-1]= '\0';
+ -	    }
+ -            free(buf);
++-#ifdef WIN32
++-	    unlink(tmpname);
++-#endif
+ -	    return TRUE;
+ +		 DebugF("[xkb] xkb executes: %s\n",buf);
+ +
+diff --git a/debian/patches/198_nohwaccess.patch b/debian/patches/198_nohwaccess.patch
+index 0bc9169..136dc17 100644
+--- a/debian/patches/198_nohwaccess.patch
++++ b/debian/patches/198_nohwaccess.patch
+@@ -3,47 +3,48 @@ contains just the remainder, which implements a -nohwaccess option.
+ 
+ Index: xorg-server/hw/xfree86/os-support/linux/lnx_init.c
+ ===================================================================
+---- xorg-server.orig/hw/xfree86/os-support/linux/lnx_init.c	2011-08-24 12:52:44.815647133 +0300
+-+++ xorg-server/hw/xfree86/os-support/linux/lnx_init.c	2011-08-24 12:56:49.725650622 +0300
+-@@ -41,6 +41,7 @@
++--- xorg-server.orig/hw/xfree86/os-support/linux/lnx_init.c
+++++ xorg-server/hw/xfree86/os-support/linux/lnx_init.c
++@@ -39,6 +39,7 @@
++ #include <sys/stat.h>
++ 
+  static Bool KeepTty = FALSE;
+- static Bool VTSwitch = TRUE;
+- static Bool ShareVTs = FALSE;
+ +Bool NoHwAccess = FALSE;
+  static int activeVT = -1;
+  
+  static char vtname[11];
+-@@ -321,6 +322,11 @@
+-                 ShareVTs = TRUE;
+-                 return 1;
+-         }
++@@ -308,6 +309,12 @@
++ 		return 1;
++ 	}
++ 
+ +	if (!strcmp(argv[i], "-nohwaccess"))
+ +	{
+ +		NoHwAccess = TRUE;
+ +		return(1);
+ +	}
+++
+  	if ((argv[i][0] == 'v') && (argv[i][1] == 't'))
+  	{
+  		if (sscanf(argv[i], "vt%2d", &xf86Info.vtno) == 0)
+-@@ -342,4 +348,5 @@
++@@ -327,4 +334,5 @@
++ 	ErrorF("vtXX                   use the specified VT number\n");
++ 	ErrorF("-keeptty               ");
+  	ErrorF("don't detach controlling tty (for debugging only)\n");
+- 	ErrorF("-novtswitch            don't immediately switch to new VT\n");
+- 	ErrorF("-sharevts              share VTs with another X server\n");
+ +	ErrorF("-nohwaccess            don't access hardware ports directly\n");
+  }
+ Index: xorg-server/hw/xfree86/os-support/linux/lnx_video.c
+ ===================================================================
+---- xorg-server.orig/hw/xfree86/os-support/linux/lnx_video.c	2011-08-24 12:52:44.825647135 +0300
+-+++ xorg-server/hw/xfree86/os-support/linux/lnx_video.c	2011-08-24 12:56:49.725650622 +0300
+-@@ -50,6 +50,7 @@
+- #define MAP_FAILED ((void *)-1)
++--- xorg-server.orig/hw/xfree86/os-support/linux/lnx_video.c
+++++ xorg-server/hw/xfree86/os-support/linux/lnx_video.c
++@@ -46,6 +46,7 @@
++ #include <asm/mtrr.h>
+  #endif
+  
+ +extern Bool NoHwAccess;
+  static Bool ExtendedEnabled = FALSE;
+  
+  #ifdef __ia64__
+-@@ -497,6 +498,9 @@
++@@ -493,6 +494,9 @@
+  	int fd;
+  	unsigned int ioBase_phys;
+  #endif
+diff --git a/debian/patches/208_switch_on_release.diff b/debian/patches/208_switch_on_release.diff
+index 6210156..c462694 100644
+--- a/debian/patches/208_switch_on_release.diff
++++ b/debian/patches/208_switch_on_release.diff
+@@ -87,12 +87,12 @@ Index: xorg-server/xkb/xkbActions.c
+  	filter->keycode = keycode;
+  	filter->active = 1;
+  	filter->filterOthers = 0;
+- 	filter->priv = 0;
++ 	filter->priv = xkbi->state.locked_mods&pAction->mods.mask;
+ -	filter->filter = _XkbFilterLockState;
+ +	filter->filter = _XkbFilterLockMods;
+  	filter->upAction = *pAction;
+- 	xkbi->state.locked_mods^= pAction->mods.mask;
+- 	xkbi->setMods = pAction->mods.mask;
++ 	if (!(filter->upAction.mods.flags&XkbSA_LockNoLock))
++ 	    xkbi->state.locked_mods|= pAction->mods.mask;
+ @@ -1115,9 +1174,12 @@
+  		    sendEvent=_XkbFilterLatchState(xkbi,filter,key,&act);
+  		    break;
+
