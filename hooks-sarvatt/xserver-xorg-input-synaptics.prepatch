@@ -1,3 +1,6 @@
+patch -p1 < $HOOKS/xserver-xorg-input-synaptics.patch
+	
+drop 03-man-no-hal.patch upstream
 drop 116_xi2_1.patch fails
 drop 117_gestures.patch fails
 drop 119_active_area_touches.patch fails
