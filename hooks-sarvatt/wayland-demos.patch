@@ -39,3 +39,72 @@ diff -u a/debian/control b/debian/control
   librsvg2-bin,
   libegl1-mesa-dev (>= 7.11~0),
 
+
+--- a/debian/README.Debian	2011-11-16 09:16:24.000000000 +0100
++++ b/debian/README.Debian	2011-11-16 09:16:24.000000000 +0100
+@@ -12,9 +12,9 @@
+   * When clients are run, the wayland socket is found using the same
+     mechanism (XDG_RUNTIME_DIR, with current directory as fallback).
+   * Since clients have very generic names, they are shipped in the
+-    /usr/lib/wayland/bin directory. A wrapper (wayland-run) makes it
++    /usr/lib/wayland-demos directory. A wrapper (wayland-run) makes it
+     possible to run the demo clients without having to enter the full
+-    path: “wayland-run demo” runs “/usr/lib/wayland/bin/demo”; if there's
++    path: “wayland-run demo” runs “/usr/lib/wayland-demos/demo”; if there's
+     no argument, or if the specified demo doesn't exist, a random demo
+     client is started instead.
+   * wayland-run comes with basic bash completion support, making it easy
+--- a/debian/wayland-demos.bash-completion	2011-11-16 09:16:24.000000000 +0100
++++ b/debian/wayland-demos.bash-completion	2011-11-16 09:16:24.000000000 +0100
+@@ -8,7 +8,7 @@
+   _get_comp_words_by_ref cur
+   case $COMP_CWORD in
+     1)
+-       demos=$(ls /usr/lib/wayland/bin)
++       demos=$(ls /usr/lib/wayland-demos)
+        COMPREPLY=( $( compgen -W "$demos" -- "$cur" ) )
+        ;;
+     *) _filedir
+--- a/debian/wayland-demos.install	2011-11-16 09:16:24.000000000 +0100
++++ b/debian/wayland-demos.install	2011-11-16 09:16:24.000000000 +0100
+@@ -16,16 +16,16 @@
+ ../../debian/wayland-run          usr/bin
+ 
+ # actual demo clients, installed manually:
+-../../build/clients/desktop-shell usr/lib/wayland/bin
+-../../build/clients/dnd           usr/lib/wayland/bin
+-../../build/clients/eventdemo     usr/lib/wayland/bin
+-../../build/clients/flower        usr/lib/wayland/bin
+-../../build/clients/gears         usr/lib/wayland/bin
+-../../build/clients/image         usr/lib/wayland/bin
+-../../build/clients/resizor       usr/lib/wayland/bin
+-../../build/clients/screenshot    usr/lib/wayland/bin
+-../../build/clients/simple-egl    usr/lib/wayland/bin
+-../../build/clients/simple-shm    usr/lib/wayland/bin
+-../../build/clients/smoke         usr/lib/wayland/bin
+-../../build/clients/terminal      usr/lib/wayland/bin
+-../../build/clients/view          usr/lib/wayland/bin
++usr/lib/wayland-demos/wayland-desktop-shell
++../../build/clients/dnd           usr/lib/wayland-demos
++../../build/clients/eventdemo     usr/lib/wayland-demos
++../../build/clients/flower        usr/lib/wayland-demos
++../../build/clients/gears         usr/lib/wayland-demos
++../../build/clients/image         usr/lib/wayland-demos
++../../build/clients/resizor       usr/lib/wayland-demos
++../../build/clients/screenshot    usr/lib/wayland-demos
++../../build/clients/simple-egl    usr/lib/wayland-demos
++../../build/clients/simple-shm    usr/lib/wayland-demos
++../../build/clients/smoke         usr/lib/wayland-demos
++../../build/clients/terminal      usr/lib/wayland-demos
++../../build/clients/view          usr/lib/wayland-demos
+--- a/debian/wayland-run	2011-11-16 09:16:24.000000000 +0100
++++ b/debian/wayland-run	2011-11-16 09:16:24.000000000 +0100
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # Shell wrapper to run demo clients under $LIBPATH
+ 
+-LIBPATH=/usr/lib/wayland/bin
++LIBPATH=/usr/lib/wayland-demos
+ 
+ demo=$1
+ 
