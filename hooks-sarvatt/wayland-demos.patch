@@ -108,3 +108,17 @@ diff -u a/debian/control b/debian/control
  
  demo=$1
  
+
+diff --git a/debian/control b/debian/control
+index f6667dc..5be2458 100644
+--- a/debian/control
++++ b/debian/control
+@@ -25,6 +25,7 @@ Build-Depends:
+  libegl1-mesa-dev (>= 7.11~0),
+  libegl1-mesa-drivers (>= 7.11~0),
+  libgbm-dev,
++ libglu1-mesa-dev,
+ # clients:
+   libpoppler-glib-dev,
+   libglib2.0-dev,
+
