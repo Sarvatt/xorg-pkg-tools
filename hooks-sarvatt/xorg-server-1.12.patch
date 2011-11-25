@@ -52,6 +52,25 @@ index 98fec87..b240906 100644
  +	case 0x10de: case 0x12d2:
  +	    switch (dev->device_id) {
  +	    /* NV1 */
+diff --git a/debian/patches/157_check_null_modes.patch b/debian/patches/157_check_null_modes.patch
+index a0d6370..29ac2e1 100644
+--- a/debian/patches/157_check_null_modes.patch
++++ b/debian/patches/157_check_null_modes.patch
+@@ -1,10 +1,10 @@
+ Index: xorg-server/hw/xfree86/common/xf86VidMode.c
+ ===================================================================
+---- xorg-server.orig/hw/xfree86/common/xf86VidMode.c	2011-08-24 12:52:45.565647144 +0300
+-+++ xorg-server/hw/xfree86/common/xf86VidMode.c	2011-08-24 12:56:49.605650623 +0300
+-@@ -222,6 +222,9 @@
++--- xorg-server.orig/hw/xfree86/common/xf86VidMode.c
+++++ xorg-server/hw/xfree86/common/xf86VidMode.c
++@@ -225,6 +225,9 @@
++ 	    return FALSE;
+  
+-     pScrn = xf86Screens[scrnIndex];
+      pVidMode = VMPTR(pScrn->pScreen);
+ +    if (pScrn->modes == NULL)
+ +        return FALSE;
 diff --git a/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch b/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch
 index ca4a57c..93a92de 100644
 --- a/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch
@@ -61,12 +80,17 @@ index ca4a57c..93a92de 100644
       out= Popen(buf,"w");
   #else
 -@@ -247,30 +351,42 @@
-+@@ -247,33 +351,42 @@
++@@ -247,32 +351,42 @@
   #endif
       
       if (out!=NULL) {
-@@ -287,6 +287,9 @@ Index: xorg-server/xkb/ddxLoad.c
- -		nameRtrn[nameRtrnLen-1]= '\0';
+@@ -283,10 +283,12 @@ Index: xorg-server/xkb/ddxLoad.c
+              if (xkbDebugFlags)
+ -                DebugF("[xkb] xkb executes: %s\n",buf);
+ -	    if (nameRtrn) {
+--		strncpy(nameRtrn,keymap,nameRtrnLen);
+--		nameRtrn[nameRtrnLen-1]= '\0';
++-		strlcpy(nameRtrn,keymap,nameRtrnLen);
  -	    }
  -            free(buf);
 +-#ifdef WIN32
