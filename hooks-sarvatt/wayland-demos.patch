@@ -67,7 +67,7 @@ diff -u a/debian/control b/debian/control
      *) _filedir
 --- a/debian/wayland-demos.install	2011-11-16 09:16:24.000000000 +0100
 +++ b/debian/wayland-demos.install	2011-11-16 09:16:24.000000000 +0100
-@@ -16,16 +16,16 @@
+@@ -16,16 +16,17 @@
  ../../debian/wayland-run          usr/bin
  
  # actual demo clients, installed manually:
@@ -85,6 +85,7 @@ diff -u a/debian/control b/debian/control
 -../../build/clients/terminal      usr/lib/wayland/bin
 -../../build/clients/view          usr/lib/wayland/bin
 +usr/lib/wayland-demos/wayland-desktop-shell
++usr/lib/wayland-demos/wayland-tablet-shell
 +../../build/clients/dnd           usr/lib/wayland-demos
 +../../build/clients/eventdemo     usr/lib/wayland-demos
 +../../build/clients/flower        usr/lib/wayland-demos
