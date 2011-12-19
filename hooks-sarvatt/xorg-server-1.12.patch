@@ -169,24 +169,4 @@ index 0bc9169..136dc17 100644
   	int fd;
   	unsigned int ioBase_phys;
   #endif
-diff --git a/debian/patches/208_switch_on_release.diff b/debian/patches/208_switch_on_release.diff
-index 6210156..c462694 100644
---- a/debian/patches/208_switch_on_release.diff
-+++ b/debian/patches/208_switch_on_release.diff
-@@ -87,12 +87,12 @@ Index: xorg-server/xkb/xkbActions.c
-  	filter->keycode = keycode;
-  	filter->active = 1;
-  	filter->filterOthers = 0;
-- 	filter->priv = 0;
-+ 	filter->priv = xkbi->state.locked_mods&pAction->mods.mask;
- -	filter->filter = _XkbFilterLockState;
- +	filter->filter = _XkbFilterLockMods;
-  	filter->upAction = *pAction;
-- 	xkbi->state.locked_mods^= pAction->mods.mask;
-- 	xkbi->setMods = pAction->mods.mask;
-+ 	if (!(filter->upAction.mods.flags&XkbSA_LockNoLock))
-+ 	    xkbi->state.locked_mods|= pAction->mods.mask;
- @@ -1115,9 +1174,12 @@
-  		    sendEvent=_XkbFilterLatchState(xkbi,filter,key,&act);
-  		    break;
 
