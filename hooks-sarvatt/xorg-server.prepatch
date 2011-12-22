@@ -22,9 +22,6 @@ elif [ "$BRANCH" == "master" ]; then
 	patch -p1 < $HOOKS/xorg-server-1.12.patch
 	
 	drop 07-xfree86-fix-build-with-xv-disabled.diff upstream
-	drop 210_pixman_null_ptr_check.patch upstream
-	drop 214_glx_dri_searchdirs.patch fails
-	drop 220_xi21_always_deliver_raw_events.diff fails
 fi
 
 ## Legacy unused hooks for reference

@@ -33,6 +33,6 @@
 if [ "$BRANCH" == "master" ]; then
 	echo 2:1.11.99 > debian/serverminver
 	echo ABI_VIDEODRV_VERSION:12.0 >> debian/serverminver
-	echo ABI_XINPUT_VERSION:15.0 >> debian/serverminver
+	echo ABI_XINPUT_VERSION:16.0 >> debian/serverminver
 fi
 

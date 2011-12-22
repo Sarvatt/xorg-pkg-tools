@@ -170,3 +170,59 @@ index 0bc9169..136dc17 100644
   	unsigned int ioBase_phys;
   #endif
 
+
+diff --git a/debian/patches/214_glx_dri_searchdirs.patch b/debian/patches/214_glx_dri_searchdirs.patch
+index 3baa38f..f02c534 100644
+--- a/debian/patches/214_glx_dri_searchdirs.patch
++++ b/debian/patches/214_glx_dri_searchdirs.patch
+@@ -16,9 +16,9 @@ Index: xorg-server/glx/glxdriswrast.c
+ --- xorg-server.orig/glx/glxdriswrast.c	2011-09-11 18:41:08.000000000 -0500
+ +++ xorg-server/glx/glxdriswrast.c	2011-09-11 18:41:43.381346390 -0500
+ @@ -427,6 +427,7 @@
++ {
+      const char *driverName = "swrast";
+      __GLXDRIscreen *screen;
+-     const __DRIconfig **driConfigs;
+ +    void *cookie = NULL;
+  
+      screen = calloc(1, sizeof *screen);
+@@ -167,9 +167,9 @@ Index: xorg-server/glx/glxdri.c
+ --- xorg-server.orig/glx/glxdri.c	2011-09-11 18:41:08.000000000 -0500
+ +++ xorg-server/glx/glxdri.c	2011-09-11 18:41:43.381346390 -0500
+ @@ -968,6 +968,7 @@
++     Bool isCapable;
+      size_t buffer_size;
+      ScrnInfoPtr pScrn = xf86Screens[pScreen->myNum];
+-     const __DRIconfig **driConfigs;
+ +    void *cookie = NULL;
+  
+      if (!xf86LoaderCheckSymbol("DRIQueryDirectRenderingCapable") ||
+@@ -188,9 +188,9 @@ Index: xorg-server/glx/glxdri2.c
+ --- xorg-server.orig/glx/glxdri2.c	2011-09-11 18:41:08.000000000 -0500
+ +++ xorg-server/glx/glxdri2.c	2011-09-11 18:41:43.381346390 -0500
+ @@ -689,6 +689,7 @@
++     __GLXDRIscreen *screen;
+      size_t buffer_size;
+      ScrnInfoPtr pScrn = xf86Screens[pScreen->myNum];
+-     const __DRIconfig **driConfigs;
+ +    void *cookie = NULL;
+  
+      screen = calloc(1, sizeof *screen);
+@@ -209,7 +209,7 @@ Index: xorg-server/glx/glxdri2.c
+ -	(*screen->dri2->createNewScreen)(pScreen->myNum,
+ -					 screen->fd,
+ -					 loader_extensions,
+--					 &driConfigs,
++-					 &screen->driConfigs,
+ -					 screen);
+ -
+ -    if (screen->driScreen == NULL) {
+@@ -228,7 +228,7 @@ Index: xorg-server/glx/glxdri2.c
+ +	    (*screen->dri2->createNewScreen)(pScreen->myNum,
+ +					     screen->fd,
+ +					     loader_extensions,
+-+					     &driConfigs,
+++					     &screen->driConfigs,
+ +					     screen);
+ +	if (screen->driScreen == NULL) {
+ +	    LogMessage(X_INFO,
