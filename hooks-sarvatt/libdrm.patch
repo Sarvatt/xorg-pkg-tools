@@ -1,0 +1,50 @@
+--- a/debian/libdrm2.symbols (libdrm2_2.4.29+git20111215.0ab2251b-0ubuntu0sarvatt~natty_amd64)
++++ b/debian/libdrm2.symbols	2011-12-15 13:18:04.929698083 -0500
+@@ -76,6 +76,7 @@
+  drmMap@Base 2.3.1
+  drmMapBufs@Base 2.3.1
+  drmMarkBufs@Base 2.3.1
++ drmModeAddFB2@Base 2.4.29+git
+  drmModeAddFB@Base 2.4.3
+  drmModeAttachMode@Base 2.4.3
+  drmModeConnectorSetProperty@Base 2.4.3
+@@ -88,6 +89,7 @@
+  drmModeFreeEncoder@Base 2.4.3
+  drmModeFreeFB@Base 2.4.3
+  drmModeFreeModeInfo@Base 2.4.3
++ drmModeFreePlane@Base 2.4.29+git
+  drmModeFreeProperty@Base 2.4.3
+  drmModeFreePropertyBlob@Base 2.4.3
+  drmModeFreeResources@Base 2.4.3
+@@ -95,6 +97,8 @@
+  drmModeGetCrtc@Base 2.4.3
+  drmModeGetEncoder@Base 2.4.3
+  drmModeGetFB@Base 2.4.3
++ drmModeGetPlane@Base 2.4.29+git
++ drmModeGetPlaneResources@Base 2.4.29+git
+  drmModeGetProperty@Base 2.4.3
+  drmModeGetPropertyBlob@Base 2.4.3
+  drmModeGetResources@Base 2.4.3
+@@ -103,6 +107,7 @@
+  drmModeRmFB@Base 2.4.3
+  drmModeSetCrtc@Base 2.4.3
+  drmModeSetCursor@Base 2.4.3
++ drmModeSetPlane@Base 2.4.29+git
+  drmMsg@Base 2.4.1
+  drmOpen@Base 2.3.1
+  drmOpenControl@Base 2.4.3
+--- a/debian/libdrm-intel1.symbols (libdrm-intel1_2.4.29+git20120103.a9dd34a7-0ubuntu0sarvatt_amd64)
++++ b/debian/libdrm-intel1.symbols	2012-01-03 10:55:33.417560287 -0500
+@@ -39,6 +39,12 @@
+  drm_intel_bufmgr_gem_init@Base 2.4.1
+  drm_intel_bufmgr_gem_set_vma_cache_size@Base 2.4.29
+  drm_intel_bufmgr_set_debug@Base 2.4.1
++ drm_intel_decode@Base 2.4.29+git
++ drm_intel_decode_context_alloc@Base 2.4.29+git
++ drm_intel_decode_context_free@Base 2.4.29+git
++ drm_intel_decode_set_batch_pointer@Base 2.4.29+git
++ drm_intel_decode_set_dump_past_end@Base 2.4.29+git
++ drm_intel_decode_set_head_tail@Base 2.4.29+git
+  drm_intel_gem_bo_clear_relocs@Base 2.4.27
+  drm_intel_gem_bo_get_reloc_count@Base 2.4.27
+  drm_intel_gem_bo_map_gtt@Base 2.4.3
