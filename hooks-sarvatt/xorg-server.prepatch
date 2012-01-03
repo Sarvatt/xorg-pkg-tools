@@ -22,6 +22,7 @@ elif [ "$BRANCH" == "master" ]; then
 	patch -p1 < $HOOKS/xorg-server-1.12.patch
 	
 	drop 07-xfree86-fix-build-with-xv-disabled.diff upstream
+	drop 220_test-loop.patch upstream
 fi
 
 ## Legacy unused hooks for reference
