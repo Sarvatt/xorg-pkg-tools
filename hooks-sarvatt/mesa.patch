@@ -1,0 +1,10 @@
+--- a/debian/libegl1-mesa.symbols (libegl1-mesa_7.12.0~git20111222.7fd8dc3a-0ubuntu0sarvatt_amd64)
++++ b/debian/libegl1-mesa.symbols	2011-12-22 19:26:46.000000000 +0000
+@@ -37,6 +37,7 @@
+  eglGetSyncAttribKHR@Base 7.9
+  eglInitialize@Base 7.8.1
+  eglMakeCurrent@Base 7.8.1
++ eglPostSubBufferNV@Base 7.12.0~
+  eglQueryAPI@Base 7.8.1
+  eglQueryContext@Base 7.8.1
+  eglQueryModeStringMESA@Base 7.8.1
