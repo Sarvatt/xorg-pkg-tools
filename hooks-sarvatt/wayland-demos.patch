@@ -111,15 +111,71 @@ diff -u a/debian/control b/debian/control
  
 
 diff --git a/debian/control b/debian/control
-index f6667dc..5be2458 100644
+index 5be2458..84cd2cc 100644
 --- a/debian/control
 +++ b/debian/control
-@@ -25,6 +25,7 @@ Build-Depends:
+@@ -26,6 +26,8 @@ Build-Depends:
   libegl1-mesa-dev (>= 7.11~0),
   libegl1-mesa-drivers (>= 7.11~0),
   libgbm-dev,
 + libglu1-mesa-dev,
++ libxcb-xfixes0-dev,
  # clients:
    libpoppler-glib-dev,
    libglib2.0-dev,
-
+diff --git a/debian/wayland-demos.install b/debian/wayland-demos.install
+index 9df25ed..f9133dc 100644
+--- a/debian/wayland-demos.install
++++ b/debian/wayland-demos.install
+@@ -1,13 +1,13 @@
+ # compositor:
+-usr/bin/wayland-compositor
++usr/bin/weston
+ 
+ # plugins:
+-usr/lib/wayland/*.so
++usr/lib/weston/*.so
+ 
+ # images:
+-usr/share/wayland/*.png
+-usr/share/wayland/*.svg
+-../../debian/background.png       usr/share/wayland
++usr/share/weston/*.png
++usr/share/weston/*.svg
++../../debian/background.png       usr/share/weston
+ 
+ # wayland startup script
+ ../../debian/wstart               usr/bin
+@@ -16,8 +16,8 @@ usr/share/wayland/*.svg
+ ../../debian/wayland-run          usr/bin
+ 
+ # actual demo clients, installed manually:
+-usr/lib/wayland-demos/wayland-desktop-shell
+-usr/lib/wayland-demos/wayland-tablet-shell
++usr/lib/wayland-demos/weston-desktop-shell
++usr/lib/wayland-demos/weston-tablet-shell
+ ../../build/clients/dnd           usr/lib/wayland-demos
+ ../../build/clients/eventdemo     usr/lib/wayland-demos
+ ../../build/clients/flower        usr/lib/wayland-demos
+@@ -27,6 +27,8 @@ usr/lib/wayland-demos/wayland-tablet-shell
+ ../../build/clients/screenshot    usr/lib/wayland-demos
+ ../../build/clients/simple-egl    usr/lib/wayland-demos
+ ../../build/clients/simple-shm    usr/lib/wayland-demos
++../../build/clients/simple-touch  usr/lib/wayland-demos
+ ../../build/clients/smoke         usr/lib/wayland-demos
+ ../../build/clients/terminal      usr/lib/wayland-demos
+ ../../build/clients/view          usr/lib/wayland-demos
++../../build/clients/wscreensaver  usr/lib/wayland-demos
+diff --git a/debian/wstart b/debian/wstart
+index df387a8..fa2c7f5 100644
+--- a/debian/wstart
++++ b/debian/wstart
+@@ -4,7 +4,7 @@
+ export MESA_DEBUG=1
+ export EGL_LOG_LEVEL=debug eglinfo
+ 
+-wayland-compositor -b /usr/share/wayland/background.png &
++weston -b /usr/share/weston/background.png &
+ 
+ sleep 2
+ 
