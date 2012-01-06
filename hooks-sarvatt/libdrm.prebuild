@@ -1,10 +1,10 @@
 # This will be sourced as a bash script
 
-# Drop when 2.4.30 is released.
-patch -p1 < $HOOKS/libdrm.patch
-CHANGES+=("hook: Refresh symbols.")
-
 # Legacy hooks for reference, unused
+
+# Drop when 2.4.30 is released.
+#patch -p1 < $HOOKS/libdrm.patch
+#CHANGES+=("hook: Refresh symbols.")
 
 # 2009-04-17 Tormod Volden
 # This package might overwrite some Jaunty header files
