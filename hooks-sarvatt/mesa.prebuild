@@ -1,6 +1,9 @@
 patch -p1 < $HOOKS/mesa.patch
 CHANGES+=("hook: Refresh libegl1-mesa symbols.")
 
+patch -p1 < $HOOKS/mesa-build-deps.patch
+CHANGES+=("hook: Add libxcb-glx0-dev dependencies.")
+
 # Robert Hooker 2011-07-08
 # Natty had debhelper 8.1.2ubuntu2 with multiarch backported
 # debian did not get multiarch until 8.1.3.

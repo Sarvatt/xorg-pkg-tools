@@ -1,0 +1,20 @@
+diff --git a/debian/control b/debian/control
+index a0b4ef6..978f277 100644
+--- a/debian/control
++++ b/debian/control
+@@ -26,6 +26,7 @@ Build-Depends:
+  x11proto-dri2-dev (>= 2.1),
+  linux-libc-dev (>= 2.6.31) [linux-any],
+  libx11-xcb-dev,
++ libxcb-glx0-dev,
+  libxcb-dri2-0-dev,
+  libxcb-xfixes0-dev,
+  python-libxml2,
+@@ -235,6 +236,7 @@ Depends:
+  libdrm-dev (>= 2.4.19) [!hurd-i386],
+  x11proto-dri2-dev (>= 2.1),
+  x11proto-gl-dev (>= 1.4.11),
++ libxcb-glx0-dev,
+  libx11-dev,
+  libxext-dev,
+  libxxf86vm-dev,
