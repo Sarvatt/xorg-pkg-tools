@@ -1,3 +1,4 @@
 # This will be sourced as a bash script
 
+drop 20-faumachine-maxpitch.diff fails
 drop 200_fix_gd5446_maxpitch.patch fails
