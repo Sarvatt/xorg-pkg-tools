@@ -8,3 +8,15 @@
   eglQueryAPI@Base 7.8.1
   eglQueryContext@Base 7.8.1
   eglQueryModeStringMESA@Base 7.8.1
+  
+diff -u mesa-8.0.0~git20120120.7a1e941e/debian/control mesa-8.0.0~git20120120.7a1e941e/debian/control
+--- mesa-8.0.0~git20120120.7a1e941e/debian/control
++++ mesa-8.0.0~git20120120.7a1e941e/debian/control
+@@ -23,6 +23,7 @@
+  libxext-dev,
+  autoconf,
+  automake,
++ libtool,
+  x11proto-dri2-dev (>= 2.1),
+  linux-libc-dev (>= 2.6.31) [linux-any],
+  libx11-xcb-dev,
