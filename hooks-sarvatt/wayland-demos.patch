@@ -179,3 +179,15 @@ index df387a8..fa2c7f5 100644
  
  sleep 2
  
+diff --git a/debian/rules b/debian/rules
+index 14acfa1..af8e70b 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -11,6 +11,7 @@ override_dh_auto_configure:
+ 		--enable-x11-compositor \
+ 		--disable-openwfd-compositor \
+ 		--enable-clients \
++		--disable-setuid-install \
+ 		--disable-meego-tablet-shell
+ 	uudecode debian/background.png.uuencode
+ 
