@@ -1,0 +1,12 @@
+diff --git a/debian/libgl1-mesa-dri.install.linux.in b/debian/libgl1-mesa-dri.install.linux.in
+index 03cb91a..3bf56d7 100644
+--- a/debian/libgl1-mesa-dri.install.linux.in
++++ b/debian/libgl1-mesa-dri.install.linux.in
+@@ -4,7 +4,6 @@ build/dri/${DEB_HOST_MULTIARCH}/libglsl.so usr/lib/${DEB_HOST_MULTIARCH}/dri
+ build/dri/${DEB_HOST_MULTIARCH}/libdricore.so usr/lib/${DEB_HOST_MULTIARCH}/dri
+ 
+ # This part is Linux-specific:
+-build/dri/${DEB_HOST_MULTIARCH}/libgallium.so usr/lib/${DEB_HOST_MULTIARCH}/dri
+ build/dri/${DEB_HOST_MULTIARCH}/gallium/r600_dri.so usr/lib/${DEB_HOST_MULTIARCH}/dri
+ build/dri/${DEB_HOST_MULTIARCH}/gallium/nouveau_dri.so usr/lib/${DEB_HOST_MULTIARCH}/dri
+ build/dri/${DEB_HOST_MULTIARCH}/gallium/nouveau_vieux_dri.so usr/lib/${DEB_HOST_MULTIARCH}/dri

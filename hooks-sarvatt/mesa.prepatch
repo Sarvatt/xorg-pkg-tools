@@ -4,7 +4,9 @@ getp() {
  CHANGES+=("hook: Refresh $1")
 }
 
-
+drop 116_use_shared_galliumcore.diff
+patch -p1 < $HOOKS/mesa-drop-libgallium.patch
+CHANGES+=("hooks: Stop installing libgallium.so")
 
 
 ## Legacy unused hooks for reference
