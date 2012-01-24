@@ -1,53 +1,14 @@
-patch -p1 < $HOOKS/mesa.patch
-CHANGES+=("hook: Refresh libegl1-mesa symbols.")
-
-patch -p1 < $HOOKS/mesa-build-deps.patch
-CHANGES+=("hook: Add libxcb-glx0-dev dependencies.")
-
 # Robert Hooker 2011-07-08
 # Natty had debhelper 8.1.2ubuntu2 with multiarch backported
 # debian did not get multiarch until 8.1.3.
 sed -i '/^ debhelper /s/8.1.3/8.1.2ubuntu2/' debian/control
 CHANGES+=("hook: Relax debhelper depends to 8.1.2ubuntu2")
 
-patch -p1 < $HOOKS/mesa-no-r300-r600.patch
-CHANGES+=("hook: drop classic r300/r600 from libgl1-mesa-dri-experimental, no longer shipped upstream.")
-patch -p1 < $HOOKS/mesa-not-installed.patch
-CHANGES+=("hook: Drop obsolete files from debian/not-installed.")
-
 # Robert Hooker 2011-07-11
 # Enable floating point texture support
 sed -i '/enable-shared-glapi/a \
 	--enable-texture-float \\' debian/rules
 CHANGES+=("hook: Enable floating point texture support")
-
-sed -i -e '/swrastg_dri.so /s/swrastg/swrast/' debian/libgl1-mesa-dri-experimental.install.in
-CHANGES+=("hook: s/swrastg/swrast/ debian/libgl1-mesa-dri-experimentall.install.in")
-
-<< EOPATCH2 patch -p1
---- a/debian/libgles2-mesa.symbols (libgles2-mesa_7.12.0~git20111007.53f85863-0ubuntu0sarvatt~natty_i386)
-+++ b/debian/libgles2-mesa.symbols      2011-10-07 23:05:43.000000000 +0000
-@@ -43,6 +43,7 @@
-  glDisable@Base 7.8.1
-  glDisableVertexAttribArray@Base 7.8.1
-  glDrawArrays@Base 7.8.1
-+ glDrawBuffersNV@Base 7.12.0~git20111007.53f85863-0ubuntu0sarvatt~natty
-  glDrawElements@Base 7.8.1
-  glEGLImageTargetRenderbufferStorageOES@Base 7.8.1
-  glEGLImageTargetTexture2DOES@Base 7.8.1
-EOPATCH2
-CHANGES+=("hook: Refresh libgles2-mesa symbols.")
-
-sed -i '/DRI_DRIVERS +=.*i810/s/ i810//' debian/rules
-sed -i '/DRI_DRIVERS +=.*r300/s/ r300//' debian/rules
-sed -i '/DRI_DRIVERS +=.*r600/s/ r600//' debian/rules
-sed -i '/DRI_DRIVERS +=.*mga/s/ mga//' debian/rules
-sed -i '/DRI_DRIVERS +=.*r128/s/ r128//' debian/rules
-sed -i '/DRI_DRIVERS +=.*savage/s/ savage//' debian/rules
-sed -i '/DRI_DRIVERS +=.*unichrome/s/ unichrome//' debian/rules
-sed -i '/DRI_DRIVERS +=.*sis/s/ sis//' debian/rules
-sed -i '/DRI_DRIVERS +=.*tdfx/s/ tdfx//' debian/rules
-CHANGES+=("hooks: Drop i810, mga, r128, savage, unichrome, r300, r600 sis and tdfx classic drivers.")
 
 #sed -i '/enable-texture-float/a \
 #        --enable-xa \\' debian/rules
