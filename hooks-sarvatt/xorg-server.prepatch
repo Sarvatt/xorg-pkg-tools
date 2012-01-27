@@ -26,6 +26,7 @@ elif [ "$BRANCH" == "master" ]; then
 	drop 221_pointer_motion_update_fix.patch upstream
 	drop 223_indirect_touch_x_y_valuators.patch upstream
 	drop 224_return_BadWindow_not_BadMatch.diff upstream
+	getp 500_pointer_barrier_thresholds.diff
 fi
 
 ## Legacy unused hooks for reference
