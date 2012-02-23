@@ -1,7 +1,7 @@
 if [ -z "$PACKAGE_VERSION" ]; then
     eval `grep PACKAGE_VERSION= configure`
-    if [ "$BRANCH" = master ] && [ "$PACKAGE_VERSION" = 0.1 ]; then
-       PACKAGE_VERSION=0.1.0
+    if [ "$BRANCH" = master ] && [ "$PACKAGE_VERSION" = master ]; then
+       PACKAGE_VERSION=0.85.0
     fi
 fi
 CHANGES+=("hook: Bump version to $PACKAGE_VERSION")
