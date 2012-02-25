@@ -39,6 +39,10 @@ elif [ "$BRANCH" == "master" ]; then
 	drop 607-Implement-touch-early-accept.patch upstream
 	drop 608-dix-fix-an-out-of-memory-crash.patch upstream
 	drop 609-Xi-handle-new-XIAllowEvents-request-in-inputproto-2..patch upstream
+	drop 610-Fix-scrolling.patch upstream
+	drop 611-Fix-touch-punt-crash.patch upstream
+	drop 612-Fix-vcp-touches-corruption.patch upstream
+	drop 613-Keep-vcp-touch-class.patch upstream
 fi
 
 ## Legacy unused hooks for reference
