@@ -8,6 +8,8 @@ drop 120_active_touches_num_fingers.patch fails
 drop 121_semi-mt_num_fingers.patch fails
 drop 122_revert_pressure_finger_default.patch fails
 drop 123_order_ProcessTouch_for_numFingers.patch fails
+drop 125_option_rec_revert.patch upstream
+drop 126_ubuntu_xi22.patch upstream
 
 # Unused legacy hooks for future reference
 

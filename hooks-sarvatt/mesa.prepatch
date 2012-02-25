@@ -4,10 +4,10 @@ getp() {
  CHANGES+=("hook: Refresh $1")
 }
 
-getp 111_export_searchdirs_in_dripc.diff
-drop 116_use_shared_galliumcore.diff fails
-patch -p1 < $HOOKS/mesa-drop-libgallium.patch
-CHANGES+=("hooks: Stop installing libgallium.so")
+#getp 111_export_searchdirs_in_dripc.diff
+#drop 116_use_shared_galliumcore.diff fails
+#patch -p1 < $HOOKS/mesa-drop-libgallium.patch
+#CHANGES+=("hooks: Stop installing libgallium.so")
 
 
 ## Legacy unused hooks for reference
