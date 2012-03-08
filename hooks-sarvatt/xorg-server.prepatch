@@ -18,7 +18,7 @@ elif [ "$BRANCH" == "server-1.11-branch" ]; then
 	drop 210_pixman_null_ptr_check.patch upstream
 	drop 220_xi21_always_deliver_raw_events.diff fails
 
-elif [ "$BRANCH" == "master" ]; then
+elif [ "$BRANCH" == "server-1.12-branch" ]; then
 	patch -p1 < $HOOKS/xorg-server-1.12.patch
 	
 	drop 07-xfree86-fix-build-with-xv-disabled.diff upstream
@@ -28,21 +28,6 @@ elif [ "$BRANCH" == "master" ]; then
 	drop 224_return_BadWindow_not_BadMatch.diff upstream
 	drop 225_non-root_config_paths.patch upstream
 	getp 500_pointer_barrier_thresholds.diff
-	
-	drop 600-Revert-dix-deduplicate-callers-of-DeliverDeviceEvent.patch upstream
-	drop 601-Store-window-pointer-in-touch-listener-record.patch upstream
-	drop 602-Factor-out-TouchEnd-generation-and-delivery.patch upstream
-	drop 603-Export-TouchEventRejected-as-TouchRejected.patch upstream
-	drop 604-Move-AllowTouch-to-dix-touch.c-and-rename-to-TouchAc.patch upstream
-	drop 605-Check-for-proper-window-ID-when-processing-touch-all.patch upstream
-	drop 606-Implement-early-touch-reject.patch upstream
-	drop 607-Implement-touch-early-accept.patch upstream
-	drop 608-dix-fix-an-out-of-memory-crash.patch upstream
-	drop 609-Xi-handle-new-XIAllowEvents-request-in-inputproto-2..patch upstream
-	drop 610-Fix-scrolling.patch upstream
-	drop 611-Fix-touch-punt-crash.patch upstream
-	drop 612-Fix-vcp-touches-corruption.patch upstream
-	drop 613-Keep-vcp-touch-class.patch upstream
 fi
 
 ## Legacy unused hooks for reference
