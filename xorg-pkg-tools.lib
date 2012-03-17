@@ -94,6 +94,7 @@ debpkg_to_fdopkg() {
          "$pkg" = "libfontenc" -o \
          "$pkg" = "liblbxutil" -o \
          "$pkg" = "libpciaccess" -o \
+         "$pkg" = "libxkbcommon" -o \
          "$pkg" = "libxkbui" -o \
          "$pkg" = "libxkbfile" -o \
          "$pkg" = "libxtrans" ]; then
