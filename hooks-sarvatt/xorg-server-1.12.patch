@@ -1,62 +1,501 @@
+diff --git a/debian/patches/02_Add-libnettle-as-option-for-sha1.diff b/debian/patches/02_Add-libnettle-as-option-for-sha1.diff
+index bb0c338..b2571aa 100644
+--- a/debian/patches/02_Add-libnettle-as-option-for-sha1.diff
++++ b/debian/patches/02_Add-libnettle-as-option-for-sha1.diff
+@@ -85,6 +85,6 @@ Index: xorg-server/os/xsha1.c
+ +    return 1;
+ +}
+ +
+- #else /* Use OpenSSL's libcrypto */
++ #elif defined(HAVE_SHA1_IN_COMMONCRYPTO)        /* Use CommonCrypto for SHA1 */
+  
+- # include <stddef.h>  /* buggy openssl/sha.h wants size_t */
++ #include <CommonCrypto/CommonDigest.h>
+
+diff --git a/debian/patches/15-nouveau.diff b/debian/patches/15-nouveau.diff
+index 98fec87..634b9a4 100644
+--- a/debian/patches/15-nouveau.diff
++++ b/debian/patches/15-nouveau.diff
+@@ -19,12 +19,19 @@ Signed-off-by: Cyril Brulebois <kibi@debian.org>
+ 
+ --- a/hw/xfree86/common/xf86pciBus.c
+ +++ b/hw/xfree86/common/xf86pciBus.c
+-@@ -1123,7 +1123,24 @@ videoPtrToDriverList(struct pci_device *
+- 	    break;
+- 	case 0x102b:		    driverList[0] = "mga";	break;
+- 	case 0x10c8:		    driverList[0] = "neomagic"; break;
+--	case 0x10de: case 0x12d2:   driverList[0] = "nv";	break;
+-+	case 0x10de: case 0x12d2:
++@@ -1123,15 +1123,23 @@ videoPtrToDriverList(struct pci_device *
++         break;
++     case 0x10de:
++     case 0x12d2:
++-    {
++-        int idx = 0;
++-
++-#ifdef __linux__
++-        driverList[idx++] = "nouveau";
++-#endif
++-        driverList[idx++] = "nv";
++-        break;
++-    }
+ +	    switch (dev->device_id) {
+ +	    /* NV1 */
+ +	    case 0x0008:
+@@ -42,9 +49,9 @@ Signed-off-by: Cyril Brulebois <kibi@debian.org>
+ +		break;
+ +	    }
+ +	    break;
+- 	case 0x1106:		    driverList[0] = "openchrome"; break;
+-         case 0x1b36:		    driverList[0] = "qxl"; break;
+- 	case 0x1163:		    driverList[0] = "rendition"; break;
++     case 0x1106:
++         driverList[0] = "openchrome";
++         break;
+ --- a/glx/glxdricommon.c
+ +++ b/glx/glxdricommon.c
+ @@ -217,6 +217,7 @@ glxProbeDriver(const char *driverName,
+@@ -59,10 +66,10 @@ Signed-off-by: Cyril Brulebois <kibi@debian.org>
+      }
+  
+      if (*coreExt == NULL || *renderExt == NULL) {
+--	LogMessage(X_ERROR,
++-        LogMessage(X_ERROR,
+ +	if (!strcmp(driverName, "nouveau"))
+ +	    from = X_INFO;
+ +	LogMessage(from,
+- 		   "AIGLX error: %s does not export required DRI extension\n",
+- 		   driverName);
+- 	goto cleanup_failure;
++                    "AIGLX error: %s does not export required DRI extension\n",
++                    driverName);
++         goto cleanup_failure;
+
 diff --git a/debian/patches/100_rethrow_signals.patch b/debian/patches/100_rethrow_signals.patch
-index ffbc4b0..aa37be4 100644
+index ffbc4b0..03a7677 100644
 --- a/debian/patches/100_rethrow_signals.patch
 +++ b/debian/patches/100_rethrow_signals.patch
-@@ -274,18 +274,18 @@ Index: xorg-server/include/os.h
+@@ -2,11 +2,12 @@ Index: xorg-server/hw/dmx/dmxinit.c
+ ===================================================================
+ --- xorg-server.orig/hw/dmx/dmxinit.c	2011-09-10 21:40:27.000000000 -0700
+ +++ xorg-server/hw/dmx/dmxinit.c	2011-09-10 21:45:50.066123727 -0700
+-@@ -821,7 +821,7 @@
++@@ -821,8 +821,7 @@
+  /** This function is called in Xserver/os/utils.c from \a AbortServer().
+   * We must ensure that backend and console state is restored in the
+   * event the server shutdown wasn't clean. */
+--void AbortDDX(enum ExitCode error)
++-void
++-AbortDDX(enum ExitCode error)
+ +void SigAbortDDX(int signo, enum ExitCode error)
+  {
+      int i;
+@@ -34,8 +35,8 @@ Index: xorg-server/hw/kdrive/src/kdrive.c
+ -AbortDDX(enum ExitCode error)
+ +SigAbortDDX(int signo, enum ExitCode error)
+  {
+-     KdDisableScreens ();
+-     if (kdOsFuncs)
++     KdDisableScreens();
++     if (kdOsFuncs) {
+ @@ -248,6 +248,11 @@
+          OsAbort();
+  }
+@@ -46,7 +47,7 @@ Index: xorg-server/hw/kdrive/src/kdrive.c
+ +}
+ +
+  void
+- ddxGiveUp (enum ExitCode error)
++ ddxGiveUp(enum ExitCode error)
+  {
+ Index: xorg-server/hw/vfb/InitOutput.c
+ ===================================================================
+@@ -82,9 +83,9 @@ Index: xorg-server/hw/xfree86/common/xf86Events.c
+  {
+ +  static Bool beenhere = FALSE;
+ +
+-   if ((signo == SIGILL) && xf86SigIllHandler) {
+-     (*xf86SigIllHandler)();
+-     return 0; /* continue */
++     if ((signo == SIGILL) && xf86SigIllHandler) {
++         (*xf86SigIllHandler) ();
++         return 0;               /* continue */
+ Index: xorg-server/hw/xfree86/common/xf86Init.c
+ ===================================================================
+ --- xorg-server.orig/hw/xfree86/common/xf86Init.c	2011-09-10 21:40:27.000000000 -0700
+@@ -109,9 +110,9 @@ Index: xorg-server/hw/xfree86/common/xf86Init.c
+  {
+      int i;
   
+-@@ -929,24 +932,46 @@
++@@ -929,22 +932,45 @@
+      if (xorgHWOpenConsole)
+- 	xf86CloseConsole();
++         xf86CloseConsole();
+  
+ +    ErrorF (" ddxSigGiveUp: Closing log\n");
+ +
+@@ -119,7 +120,7 @@ Index: xorg-server/hw/xfree86/common/xf86Init.c
+  
+      /* If an unexpected signal was caught, dump a core for debugging */
+ -    if (xf86Info.caughtSignal)
+--	OsAbort();
++-        OsAbort();
+ +    if (xf86Info.caughtSignal) {
+ +        if (signo != 0) {
+ +            raise(signo);
+@@ -141,8 +142,7 @@ Index: xorg-server/hw/xfree86/common/xf86Init.c
+ +{
+ +    ddxSigGiveUp(0, error);
+ +}
+- 
+- 
+++
+  /*
+ - * AbortDDX --
+ + * SigAbortDDX --
+@@ -158,13 +158,13 @@ Index: xorg-server/hw/xfree86/common/xf86Init.c
+ -AbortDDX(enum ExitCode error)
+ +SigAbortDDX(int signo, enum ExitCode error)
+  {
+-   int i;
++     int i;
+  
+ @@ -979,7 +1004,20 @@
+-    * This is needed for an abnormal server exit, since the normal exit stuff
+-    * MUST also be performed (i.e. the vt must be left in a defined state)
+-    */
+--  ddxGiveUp(error);
++      * This is needed for an abnormal server exit, since the normal exit stuff
++      * MUST also be performed (i.e. the vt must be left in a defined state)
++      */
++-    ddxGiveUp(error);
+ +  ddxSigGiveUp(signo, error);
+ +}
+ +
+@@ -186,15 +186,16 @@ Index: xorg-server/hw/xnest/Init.c
+ ===================================================================
+ --- xorg-server.orig/hw/xnest/Init.c	2011-09-10 21:40:27.000000000 -0700
+ +++ xorg-server/hw/xnest/Init.c	2011-09-10 21:45:50.076124422 -0700
+-@@ -114,12 +114,17 @@
++@@ -114,13 +114,17 @@
+  /*
+   * DDX - specific abort routine.  Called by AbortServer().
+   */
+--void AbortDDX(enum ExitCode error)
++-void
++-AbortDDX(enum ExitCode error)
+ +void SigAbortDDX(int signo, enum ExitCode error)
+  {
+-   xnestDoFullGeneration = True;
+-   xnestCloseDisplay();
++     xnestDoFullGeneration = True;
++     xnestCloseDisplay();
+  }
+  
+ +void AbortDDX(enum ExitCode error)
+@@ -203,14 +204,13 @@ Index: xorg-server/hw/xnest/Init.c
+ +}
+ +
+  /* Called by GiveUp(). */
+- void ddxGiveUp(enum ExitCode error)
+- {
++ void
++ ddxGiveUp(enum ExitCode error)
+ Index: xorg-server/hw/xquartz/darwin.c
+ ===================================================================
+ --- xorg-server.orig/hw/xquartz/darwin.c	2011-09-10 21:40:27.000000000 -0700
+ +++ xorg-server/hw/xquartz/darwin.c	2011-09-10 22:01:07.976518255 -0700
+-@@ -773,14 +773,20 @@
+- 
++@@ -773,14 +773,19 @@
+  
+  /*
+ - * AbortDDX --
+@@ -220,13 +220,15 @@ Index: xorg-server/hw/xquartz/darwin.c
+   *      are closed.
+   */
+  _X_NORETURN
+--void AbortDDX( enum ExitCode error ) {
++-void
++-AbortDDX(enum ExitCode error)
++-{
+ +void SigAbortDDX( int signo, enum ExitCode error )
+ +{
+-     ErrorF( "   AbortDDX\n" );
++     ErrorF("   AbortDDX\n");
+      OsAbort();
+  }
+- 
+++
+ +_X_NORETURN
+ +void AbortDDX( enum ExitCode error )
+ +{
+@@ -240,13 +242,13 @@ Index: xorg-server/hw/xwin/InitOutput.c
+  
+  /* See Porting Layer Definition - p. 57 */
+  void
+--AbortDDX (enum ExitCode error)
++-AbortDDX(enum ExitCode error)
+ +SigAbortDDX (int signo, enum ExitCode error)
+  {
+  #if CYGDEBUG
+-   winDebug ("AbortDDX\n");
++     winDebug("AbortDDX\n");
+ @@ -266,6 +266,12 @@
+-   ddxGiveUp (error);
++     ddxGiveUp(error);
+  }
+  
+ +void
+@@ -257,38 +259,39 @@ Index: xorg-server/hw/xwin/InitOutput.c
+ +
+  #ifdef __CYGWIN__
+  /* hasmntopt is currently not implemented for cygwin */
+- static const char *winCheckMntOpt(const struct mntent *mnt, const char *opt)
++ static const char *
+ Index: xorg-server/include/os.h
+ ===================================================================
+ --- xorg-server.orig/include/os.h	2011-09-10 21:40:27.000000000 -0700
+ +++ xorg-server/include/os.h	2011-09-11 09:51:52.766866712 -0700
+-@@ -466,7 +466,9 @@
+-     EXIT_ERR_DRIVERS	= 3,
++@@ -466,8 +466,10 @@
++     EXIT_ERR_DRIVERS = 3,
+  };
+  
+ +extern _X_EXPORT void SigAbortDDX(int signo, enum ExitCode error);
+- extern _X_EXPORT void AbortDDX(enum ExitCode error);
++ extern _X_EXPORT void
++ AbortDDX(enum ExitCode error);
+ +extern _X_EXPORT void ddxSigGiveUp(int signo, enum ExitCode error);
+- extern _X_EXPORT void ddxGiveUp(enum ExitCode error);
+- extern _X_EXPORT int TimeSinceLastInputEvent(void);
+- 
++ extern _X_EXPORT void
++ ddxGiveUp(enum ExitCode error);
++ extern _X_EXPORT int
  Index: xorg-server/os/log.c
  ===================================================================
 ---- xorg-server.orig/os/log.c	2011-09-10 21:40:27.000000000 -0700
 -+++ xorg-server/os/log.c	2011-09-11 09:51:21.555668560 -0700
 -@@ -89,6 +89,8 @@
+- #include <stdlib.h>	/* for malloc() */
+- #include <errno.h>
 +--- xorg-server.orig/os/log.c
 ++++ xorg-server/os/log.c
 +@@ -88,6 +88,8 @@
 + #include <stdarg.h>
-  #include <stdlib.h>	/* for malloc() */
-- #include <errno.h>
++ #include <stdlib.h>             /* for malloc() */
   
- +#include <signal.h>	/* for raise() */
+-+#include <signal.h>	/* for raise() */
+++#include <signal.h>             /* for raise() */
  +
   #include "input.h"
   #include "site.h"
   #include "opaque.h"
 -@@ -403,9 +405,11 @@
+- 
 +@@ -467,9 +469,11 @@
+  void
+- AbortServer(void) _X_NORETURN;
++ AbortServer(void)
++     _X_NORETURN;
+ +void
+ +SigAbortServer(int signo) _X_NORETURN;
+  
+@@ -306,8 +309,8 @@ Index: xorg-server/os/log.c
+ +    SigAbortDDX(signo, EXIT_ERR_ABORT);
+      fflush(stderr);
+ -    if (CoreDump)
+--	OsAbort();
+--    exit (1);
++-        OsAbort();
++-    exit(1);
+ +    if (CoreDump) {
+ +	if (signo != 0)
+ +	    raise(signo);
+@@ -358,18 +361,18 @@ Index: xorg-server/os/osinit.c
+ --- xorg-server.orig/os/osinit.c	2011-09-10 21:40:27.000000000 -0700
+ +++ xorg-server/os/osinit.c	2011-09-10 21:45:50.076124422 -0700
+ @@ -138,13 +138,13 @@
+-           case SIGBUS:
+-           case SIGILL:
+-           case SIGFPE:
+-+	      signal(signo,SIG_DFL);
+- 	      ErrorF("%s at address %p\n", strsignal(signo), sip->si_addr);
+-       }
+-   }
++         case SIGBUS:
++         case SIGILL:
++         case SIGFPE:
+++            signal(signo,SIG_DFL);
++             ErrorF("%s at address %p\n", strsignal(signo), sip->si_addr);
++         }
++     }
+  #endif
+  
+--  FatalError("Caught signal %d (%s). Server aborting\n",
+--	     signo, strsignal(signo));
+-+  FatalSignal(signo);
++-    FatalError("Caught signal %d (%s). Server aborting\n",
++-               signo, strsignal(signo));
+++    FatalSignal(signo);
+  }
   
   void
-  AbortServer(void) _X_NORETURN;
-diff --git a/debian/patches/15-nouveau.diff b/debian/patches/15-nouveau.diff
-index 98fec87..b240906 100644
---- a/debian/patches/15-nouveau.diff
-+++ b/debian/patches/15-nouveau.diff
-@@ -19,11 +19,19 @@ Signed-off-by: Cyril Brulebois <kibi@debian.org>
- 
- --- a/hw/xfree86/common/xf86pciBus.c
- +++ b/hw/xfree86/common/xf86pciBus.c
--@@ -1123,7 +1123,24 @@ videoPtrToDriverList(struct pci_device *
-+@@ -1123,15 +1123,24 @@ videoPtrToDriverList(struct pci_device *
-  	    break;
-  	case 0x102b:		    driverList[0] = "mga";	break;
-  	case 0x10c8:		    driverList[0] = "neomagic"; break;
---	case 0x10de: case 0x12d2:   driverList[0] = "nv";	break;
-+-	case 0x10de: case 0x12d2:
-+-	{
-+-	    int idx = 0;
-+-#ifdef __linux__
-+-	    driverList[idx++] = "nouveau";
-+-#endif
-+-	    driverList[idx++] = "nv";
-+-	    break;
-+-	}
- +	case 0x10de: case 0x12d2:
- +	    switch (dev->device_id) {
- +	    /* NV1 */
+
+diff --git a/debian/patches/105_nvidia_fglrx_autodetect.patch b/debian/patches/105_nvidia_fglrx_autodetect.patch
+index 5668e71..a1bf278 100644
+--- a/debian/patches/105_nvidia_fglrx_autodetect.patch
++++ b/debian/patches/105_nvidia_fglrx_autodetect.patch
+@@ -29,36 +29,38 @@ Index: xorg-server/hw/xfree86/common/xf86AutoConfig.c
+  	"\tIdentifier\t\"Builtin Default Layout\"\n"
+ @@ -153,7 +160,10 @@
+      for (p = deviceList; *p; p++) {
+- 	snprintf(buf, sizeof(buf), BUILTIN_DEVICE_SECTION, *p, 0, *p);
+- 	AppendToConfig(buf);
+--	snprintf(buf, sizeof(buf), BUILTIN_SCREEN_SECTION, *p, 0, *p, 0);
++         snprintf(buf, sizeof(buf), BUILTIN_DEVICE_SECTION, *p, 0, *p);
++         AppendToConfig(buf);
++-        snprintf(buf, sizeof(buf), BUILTIN_SCREEN_SECTION, *p, 0, *p, 0);
+ +	if( strcmp(*p, "fglrx") == 0 || strcmp(*p, "nvidia") == 0)
+ +		snprintf(buf, sizeof(buf), BUILTIN_SCREEN_SECTION_PROPRIETARY, *p, 0, *p, 0);
+ +	else
+ +		snprintf(buf, sizeof(buf), BUILTIN_SCREEN_SECTION, *p, 0, *p, 0);
+- 	AppendToConfig(buf);
++         AppendToConfig(buf);
+      }
+  
+ Index: xorg-server/hw/xfree86/common/xf86pciBus.c
+ ===================================================================
+ --- xorg-server.orig/hw/xfree86/common/xf86pciBus.c	2011-08-24 12:56:49.535650619 +0300
+ +++ xorg-server/hw/xfree86/common/xf86pciBus.c	2011-08-24 12:57:52.775651523 +0300
+-@@ -1107,7 +1107,10 @@
+- 	case 0x1142:		    driverList[0] = "apm"; break;
+- 	case 0xedd8:		    driverList[0] = "ark"; break;
+- 	case 0x1a03:		    driverList[0] = "ast"; break;
+--	case 0x1002:		    driverList[0] = "ati"; break;
+-+	case 0x1002:
+-+	    driverList[0] = "fglrx";
+-+	    driverList[1] = "ati";
+-+	    break;
+- 	case 0x102c:		    driverList[0] = "chips"; break;
+- 	case 0x1013:		    driverList[0] = "cirrus"; break;
+- 	case 0x3d3d:		    driverList[0] = "glint"; break;
++@@ -1107,9 +1107,10 @@
++     case 0x1a03:
++         driverList[0] = "ast";
++         break;
++-    case 0x1002:
++-        driverList[0] = "ati";
+++    case 0x1002:
+++        driverList[0] = "fglrx";
+++        driverList[1] = "ati";
+++        break;
++-        break;
++     case 0x102c:
++         driverList[0] = "chips";
++         break;
+ @@ -1124,20 +1127,21 @@
+- 	case 0x102b:		    driverList[0] = "mga";	break;
+- 	case 0x10c8:		    driverList[0] = "neomagic"; break;
+- 	case 0x10de: case 0x12d2:
++         break;
++     case 0x10de:
++     case 0x12d2:
+ +	    driverList[0] = "nvidia";
+  	    switch (dev->device_id) {
+  	    /* NV1 */
+
+diff --git a/debian/patches/111_armel-drv-fallbacks.patch b/debian/patches/111_armel-drv-fallbacks.patch
+index 5014278..942d80a 100644
+--- a/debian/patches/111_armel-drv-fallbacks.patch
++++ b/debian/patches/111_armel-drv-fallbacks.patch
+@@ -3,7 +3,7 @@ Index: xorg-server-1.11.4/hw/xfree86/common/xf86AutoConfig.c
+ --- xorg-server-1.11.4.orig/hw/xfree86/common/xf86AutoConfig.c	2012-03-20 02:08:02.154998574 -0300
+ +++ xorg-server-1.11.4/hw/xfree86/common/xf86AutoConfig.c	2012-03-20 02:08:46.819220051 -0300
+ @@ -44,6 +44,12 @@
+- # include "xf86sbusBus.h"
++ #include "xf86sbusBus.h"
+  #endif
+  
+ +#if defined(__arm__) && defined(__linux__)
+@@ -13,8 +13,8 @@ Index: xorg-server-1.11.4/hw/xfree86/common/xf86AutoConfig.c
+ +#endif
+ +
+  #ifdef sun
+- # include <sys/visual_io.h>
+- # include <ctype.h>
++ #include <sys/visual_io.h>
++ #include <ctype.h>
+ @@ -198,6 +204,26 @@
+      return ret == CONFIG_OK;
+  }
+@@ -44,7 +44,7 @@ Index: xorg-server-1.11.4/hw/xfree86/common/xf86AutoConfig.c
+  {
+ @@ -282,6 +308,16 @@
+  #if !defined(__linux__) && defined(__sparc__)
+- 	matches[i++] = xnfstrdup("wsfb");
++         matches[i++] = xnfstrdup("wsfb");
+  #else
+ +#if defined(__linux__) && defined(__arm__)
+ +        if (test_sysfs_device("mxc_gpu", "imx"))
+@@ -56,6 +56,6 @@ Index: xorg-server-1.11.4/hw/xfree86/common/xf86AutoConfig.c
+ +        else if (test_sysfs_device("omapfb", "omapfb"))
+ +           matches[i++] = xnfstrdup("omapfb");
+ +#endif /* defined(__linux__) && defined(__arm__) */
+- 	matches[i++] = xnfstrdup("fbdev");
++         matches[i++] = xnfstrdup("fbdev");
+  #endif
+      }
+
+diff --git a/debian/patches/122_xext_fix_card32_overflow_in_xauth.patch b/debian/patches/122_xext_fix_card32_overflow_in_xauth.patch
+index 69b7300..5720204 100644
+--- a/debian/patches/122_xext_fix_card32_overflow_in_xauth.patch
++++ b/debian/patches/122_xext_fix_card32_overflow_in_xauth.patch
+@@ -14,25 +14,24 @@ Index: xorg-server/Xext/security.c
+ ===================================================================
+ --- xorg-server.orig/Xext/security.c	2011-08-24 12:52:45.635647146 +0300
+ +++ xorg-server/Xext/security.c	2011-08-24 12:56:49.595650621 +0300
+-@@ -271,10 +271,10 @@
++@@ -271,9 +271,9 @@
+      /* maxSecs is the number of full seconds that can be expressed in
+       * 32 bits worth of milliseconds
+       */
+--    CARD32 maxSecs = (CARD32)(~0) / (CARD32)MILLI_PER_SECOND;
++-    CARD32 maxSecs = (CARD32) (~0) / (CARD32) MILLI_PER_SECOND;
+ +    CARD32 maxSecs = (CARD32)(MAXINT) / (CARD32)MILLI_PER_SECOND;
+  
+-     if (seconds > maxSecs)
+--    { /* only come here if we want to wait more than 49 days */
+-+    { /* only come here if we want to wait more than 24 days */
+- 	pAuth->secondsRemaining = seconds - maxSecs;
+- 	return maxSecs * MILLI_PER_SECOND;
++-    if (seconds > maxSecs) {    /* only come here if we want to wait more than 49 days */
+++    if (seconds > maxSecs) {    /* only come here if we want to wait more than 24 days */
++         pAuth->secondsRemaining = seconds - maxSecs;
++         return maxSecs * MILLI_PER_SECOND;
+      }
+ @@ -312,8 +312,6 @@
+  {
+-     SecurityAuthorizationPtr pAuth = (SecurityAuthorizationPtr)pval;
++     SecurityAuthorizationPtr pAuth = (SecurityAuthorizationPtr) pval;
+  
+ -    assert(pAuth->timer == timer);
+ -
+-     if (pAuth->secondsRemaining)
+-     {
+- 	return SecurityComputeAuthorizationTimeout(pAuth,
++     if (pAuth->secondsRemaining) {
++         return SecurityComputeAuthorizationTimeout(pAuth,
++                                                    pAuth->secondsRemaining);
+
 diff --git a/debian/patches/157_check_null_modes.patch b/debian/patches/157_check_null_modes.patch
-index a0d6370..29ac2e1 100644
+index a0d6370..4eb9344 100644
 --- a/debian/patches/157_check_null_modes.patch
 +++ b/debian/patches/157_check_null_modes.patch
-@@ -1,10 +1,10 @@
+@@ -1,14 +1,14 @@
  Index: xorg-server/hw/xfree86/common/xf86VidMode.c
  ===================================================================
 ---- xorg-server.orig/hw/xfree86/common/xf86VidMode.c	2011-08-24 12:52:45.565647144 +0300
@@ -65,12 +504,161 @@ index a0d6370..29ac2e1 100644
 +--- xorg-server.orig/hw/xfree86/common/xf86VidMode.c
 ++++ xorg-server/hw/xfree86/common/xf86VidMode.c
 +@@ -225,6 +225,9 @@
-+ 	    return FALSE;
++         return FALSE;
   
 -     pScrn = xf86Screens[scrnIndex];
       pVidMode = VMPTR(pScrn->pScreen);
  +    if (pScrn->modes == NULL)
  +        return FALSE;
+ +
+      pVidMode->First = pScrn->modes;
+-     pVidMode->Next =  pVidMode->First->next;
++     pVidMode->Next = pVidMode->First->next;
+  
+
+diff --git a/debian/patches/162_null_crtc_in_rotation.patch b/debian/patches/162_null_crtc_in_rotation.patch
+index 0f01921..95bbd66 100644
+--- a/debian/patches/162_null_crtc_in_rotation.patch
++++ b/debian/patches/162_null_crtc_in_rotation.patch
+@@ -4,9 +4,9 @@ Index: xorg-server/hw/xfree86/modes/xf86RandR12.c
+ +++ xorg-server/hw/xfree86/modes/xf86RandR12.c	2011-08-24 12:56:49.615650622 +0300
+ @@ -930,7 +930,8 @@
+      for (c = 0; c < config->num_crtc; c++) {
+- 	xf86CrtcPtr    crtc = config->crtc[c];
++         xf86CrtcPtr crtc = config->crtc[c];
+  
+--	RRCrtcSetRotations (crtc->randr_crtc, rotations);
++-        RRCrtcSetRotations(crtc->randr_crtc, rotations);
+ +        if (crtc != NULL)
+ +            RRCrtcSetRotations (crtc->randr_crtc, rotations);
+      }
+
+diff --git a/debian/patches/166_nullptr_xinerama_keyrepeat.patch b/debian/patches/166_nullptr_xinerama_keyrepeat.patch
+index cbff596..f152d1a 100644
+--- a/debian/patches/166_nullptr_xinerama_keyrepeat.patch
++++ b/debian/patches/166_nullptr_xinerama_keyrepeat.patch
+@@ -15,13 +15,13 @@ Index: xorg-server/mi/mipointer.c
+ --- xorg-server.orig/mi/mipointer.c	2011-08-24 12:52:45.385647143 +0300
+ +++ xorg-server/mi/mipointer.c	2011-08-24 12:57:30.295651201 +0300
+ @@ -300,6 +300,10 @@
+-     SetupScreen (pScreen);
++     SetupScreen(pScreen);
+      pPointer = MIPOINTER(pDev);
+  
+ +    /* Null pointer causes crash on keyrepeat with Xinerama LP: (#324465) */
+ +    if (pPointer == NULL)
+ +        return;
+ +
+-     if (pPointer->pScreen != pScreen)
+-     {
+- 	(*pScreenPriv->screenFuncs->NewEventScreen) (pDev, pScreen, TRUE);
++     if (pPointer->pScreen != pScreen) {
++         (*pScreenPriv->screenFuncs->NewEventScreen) (pDev, pScreen, TRUE);
++         changedScreen = TRUE;
+
+diff --git a/debian/patches/167_nullptr_xisbread.patch b/debian/patches/167_nullptr_xisbread.patch
+index 0fa56bd..1d21cae 100644
+--- a/debian/patches/167_nullptr_xisbread.patch
++++ b/debian/patches/167_nullptr_xisbread.patch
+@@ -4,11 +4,11 @@ Index: xorg-server/hw/xfree86/common/xisb.c
+ +++ xorg-server/hw/xfree86/common/xisb.c	2011-08-24 12:56:49.655650624 +0300
+ @@ -98,6 +98,9 @@
+  {
+- 	int ret;
++     int ret;
+  
+ +        if (b == NULL)
+ +            return -2;
+ +
+- 	if (b->current >= b->end)
+- 	{
+- 		if (b->block_duration >= 0)
++     if (b->current >= b->end) {
++         if (b->block_duration >= 0) {
++             if (xf86WaitForInput(b->fd, b->block_duration) < 1)
+
+diff --git a/debian/patches/168_glibc_trace_to_stderr.patch b/debian/patches/168_glibc_trace_to_stderr.patch
+index 5503a1c..52d0730 100644
+--- a/debian/patches/168_glibc_trace_to_stderr.patch
++++ b/debian/patches/168_glibc_trace_to_stderr.patch
+@@ -7,11 +7,11 @@ Index: xorg-server/hw/xfree86/common/xf86Init.c
+ +++ xorg-server/hw/xfree86/common/xf86Init.c	2011-08-24 12:56:49.665650623 +0300
+ @@ -866,6 +866,9 @@
+  
+-   if (!beenHere) {
+-     umask(022);
++     if (!beenHere) {
++         umask(022);
+ +    /* have glibc report internal abort traces to stderr instead of
+ +       the controlling terminal */
+ +    setenv("LIBC_FATAL_STDERR_","1",0);
+-     xf86LogInit();
+-   }
++         xf86LogInit();
++     }
+  
+
+diff --git a/debian/patches/172_cwgetbackingpicture_nullptr_check.patch b/debian/patches/172_cwgetbackingpicture_nullptr_check.patch
+index 8d5bd4b..c63f9f7 100644
+--- a/debian/patches/172_cwgetbackingpicture_nullptr_check.patch
++++ b/debian/patches/172_cwgetbackingpicture_nullptr_check.patch
+@@ -15,21 +15,21 @@ Index: xorg-server/miext/cw/cw_render.c
+ --- xorg-server.orig/miext/cw/cw_render.c	2011-08-24 12:52:45.195647139 +0300
+ +++ xorg-server/miext/cw/cw_render.c	2011-08-24 12:56:49.675650621 +0300
+ @@ -123,10 +123,15 @@
+- 	WindowPtr   pWindow = (WindowPtr) pDrawable;
+- 	PixmapPtr   pPixmap = getCwPixmap (pWindow);
++         WindowPtr pWindow = (WindowPtr) pDrawable;
++         PixmapPtr pPixmap = getCwPixmap(pWindow);
+  
+--	*x_off = pDrawable->x - pPixmap->screen_x;
+--	*y_off = pDrawable->y - pPixmap->screen_y;
++-        *x_off = pDrawable->x - pPixmap->screen_x;
++-        *y_off = pDrawable->y - pPixmap->screen_y;
+ +        if (pDrawable && pPixmap) {
+ +            *x_off = pDrawable->x - pPixmap->screen_x;
+ +            *y_off = pDrawable->y - pPixmap->screen_y;
+  
+--	return pPicturePrivate->pBackingPicture;
++-        return pPicturePrivate->pBackingPicture;
+ +            return pPicturePrivate->pBackingPicture;
+ +        } else {
+ +            *x_off = *y_off = 0;
+ +            return pPicture;
+ +        }
+      }
+-     else
+-     {
++     else {
++         *x_off = *y_off = 0;
+
+diff --git a/debian/patches/188_default_primary_to_first_busid.patch b/debian/patches/188_default_primary_to_first_busid.patch
+index 2115a52..a9acaa0 100644
+--- a/debian/patches/188_default_primary_to_first_busid.patch
++++ b/debian/patches/188_default_primary_to_first_busid.patch
+@@ -8,13 +8,13 @@ Index: xorg-server/hw/xfree86/common/xf86pciBus.c
+ --- xorg-server.orig/hw/xfree86/common/xf86pciBus.c	2011-08-24 12:56:49.565650621 +0300
+ +++ xorg-server/hw/xfree86/common/xf86pciBus.c	2011-08-24 12:56:49.685650622 +0300
+ @@ -147,8 +147,8 @@
+- 		    primaryBus.id.pci = info;
+- 		} else {
+- 		    xf86Msg(X_NOTICE,
+--			    "More than one possible primary device found\n");
+--		    primaryBus.type ^= (BusType)(-1);
++                 }
++                 else {
++                     xf86Msg(X_NOTICE,
++-                            "More than one possible primary device found\n");
++-                    primaryBus.type ^= (BusType) (-1);
+ +			    "More than one possible primary device found.  Using first one seen.\n");
+ +                    break;
+- 		}
+- 	    }
+- 	}
++                 }
++             }
++         }
+
 diff --git a/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch b/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch
 index ca4a57c..93a92de 100644
 --- a/debian/patches/190_cache-xkbcomp_output_for_fast_start_up.patch
@@ -99,11 +687,71 @@ index ca4a57c..93a92de 100644
  -	    return TRUE;
  +		 DebugF("[xkb] xkb executes: %s\n",buf);
  +
+
+diff --git a/debian/patches/191-Xorg-add-an-extra-module-path.patch b/debian/patches/191-Xorg-add-an-extra-module-path.patch
+index 59ae2c1..1902ba7 100644
+--- a/debian/patches/191-Xorg-add-an-extra-module-path.patch
++++ b/debian/patches/191-Xorg-add-an-extra-module-path.patch
+@@ -36,16 +36,16 @@ Index: xorg-server/hw/xfree86/common/xf86Config.c
+ --- xorg-server.orig/hw/xfree86/common/xf86Config.c	2011-08-24 12:52:44.925647137 +0300
+ +++ xorg-server/hw/xfree86/common/xf86Config.c	2011-08-24 12:56:49.715650621 +0300
+ @@ -628,11 +628,21 @@
+-   
+-   /* ModulePath */
+  
+--  if (fileconf) {
+--    if (xf86ModPathFrom != X_CMDLINE && fileconf->file_modulepath) {
++     /* ModulePath */
++ 
++-    if (fileconf) {
++-        if (xf86ModPathFrom != X_CMDLINE && fileconf->file_modulepath) {
+ +  if (xf86ModPathFrom != X_CMDLINE) {
+ +    if (fileconf && fileconf->file_modulepath) {
+-       xf86ModulePath = fileconf->file_modulepath;
+-       xf86ModPathFrom = X_CONFIG;
+-     }
++             xf86ModulePath = fileconf->file_modulepath;
++             xf86ModPathFrom = X_CONFIG;
++         }
+ +    else if (strcmp(xf86ExtraModulePath, "") != 0) {
+ +      char *newpath = malloc(strlen(xf86ExtraModulePath)
+ +			     + strlen(xf86ModulePath)
+@@ -56,9 +56,9 @@ Index: xorg-server/hw/xfree86/common/xf86Config.c
+ +
+ +      xf86ModulePath = newpath;
+ +    }
+-   }
++     }
+  
+-   xf86Msg(xf86ModPathFrom, "ModulePath set to \"%s\"\n", xf86ModulePath);
++     xf86Msg(xf86ModPathFrom, "ModulePath set to \"%s\"\n", xf86ModulePath);
+ Index: xorg-server/hw/xfree86/common/xf86Globals.c
+ ===================================================================
+ --- xorg-server.orig/hw/xfree86/common/xf86Globals.c	2011-08-24 12:52:44.935647136 +0300
+@@ -77,12 +77,12 @@ Index: xorg-server/hw/xfree86/common/xf86Priv.h
+ +++ xorg-server/hw/xfree86/common/xf86Priv.h	2011-08-24 12:56:49.715650621 +0300
+ @@ -75,6 +75,7 @@
+  
+- extern _X_EXPORT  xf86InfoRec xf86Info;
+- extern _X_EXPORT  const char *xf86ModulePath;
++ extern _X_EXPORT xf86InfoRec xf86Info;
++ extern _X_EXPORT const char *xf86ModulePath;
+ +extern _X_EXPORT  const char *xf86ExtraModulePath;
+- extern _X_EXPORT  MessageType xf86ModPathFrom;
+- extern _X_EXPORT  const char *xf86LogFile;
+- extern _X_EXPORT  MessageType xf86LogFileFrom;
++ extern _X_EXPORT MessageType xf86ModPathFrom;
++ extern _X_EXPORT const char *xf86LogFile;
++ extern _X_EXPORT MessageType xf86LogFileFrom;
+ Index: xorg-server/include/xorg-config.h.in
+ ===================================================================
+ --- xorg-server.orig/include/xorg-config.h.in	2011-08-24 12:52:44.965647137 +0300
+
 diff --git a/debian/patches/198_nohwaccess.patch b/debian/patches/198_nohwaccess.patch
-index 0bc9169..136dc17 100644
+index 0bc9169..2a6c1d8 100644
 --- a/debian/patches/198_nohwaccess.patch
 +++ b/debian/patches/198_nohwaccess.patch
-@@ -3,47 +3,48 @@ contains just the remainder, which implements a -nohwaccess option.
+@@ -3,53 +3,54 @@ contains just the remainder, which implements a -nohwaccess option.
  
  Index: xorg-server/hw/xfree86/os-support/linux/lnx_init.c
  ===================================================================
@@ -127,25 +775,29 @@ index 0bc9169..136dc17 100644
 -                 return 1;
 -         }
 +@@ -308,6 +309,12 @@
-+ 		return 1;
-+ 	}
++         return 1;
++     }
 + 
  +	if (!strcmp(argv[i], "-nohwaccess"))
  +	{
  +		NoHwAccess = TRUE;
  +		return(1);
  +	}
-++
-  	if ((argv[i][0] == 'v') && (argv[i][1] == 't'))
-  	{
-  		if (sscanf(argv[i], "vt%2d", &xf86Info.vtno) == 0)
+- 	if ((argv[i][0] == 'v') && (argv[i][1] == 't'))
+- 	{
+- 		if (sscanf(argv[i], "vt%2d", &xf86Info.vtno) == 0)
 -@@ -342,4 +348,5 @@
-+@@ -327,4 +334,5 @@
-+ 	ErrorF("vtXX                   use the specified VT number\n");
-+ 	ErrorF("-keeptty               ");
-  	ErrorF("don't detach controlling tty (for debugging only)\n");
+- 	ErrorF("don't detach controlling tty (for debugging only)\n");
 - 	ErrorF("-novtswitch            don't immediately switch to new VT\n");
 - 	ErrorF("-sharevts              share VTs with another X server\n");
+++
++     if ((argv[i][0] == 'v') && (argv[i][1] == 't')) {
++         if (sscanf(argv[i], "vt%2d", &xf86Info.vtno) == 0) {
++             UseMsg();
++@@ -327,4 +334,5 @@
++     ErrorF("vtXX                   use the specified VT number\n");
++     ErrorF("-keeptty               ");
++     ErrorF("don't detach controlling tty (for debugging only)\n");
  +	ErrorF("-nohwaccess            don't access hardware ports directly\n");
   }
  Index: xorg-server/hw/xfree86/os-support/linux/lnx_video.c
@@ -165,11 +817,122 @@ index 0bc9169..136dc17 100644
   
   #ifdef __ia64__
 -@@ -497,6 +498,9 @@
+- 	int fd;
+- 	unsigned int ioBase_phys;
 +@@ -493,6 +494,9 @@
-  	int fd;
-  	unsigned int ioBase_phys;
++     int fd;
++     unsigned int ioBase_phys;
   #endif
+ +	/* Fake it... */
+ +	if (NoHwAccess)
+ +		return TRUE;
+  
+- 	if (ExtendedEnabled)
+- 		return TRUE;
++     if (ExtendedEnabled)
++         return TRUE;
 
+diff --git a/debian/patches/208_switch_on_release.diff b/debian/patches/208_switch_on_release.diff
+index 3eefde7..8005313 100644
+--- a/debian/patches/208_switch_on_release.diff
++++ b/debian/patches/208_switch_on_release.diff
+@@ -2,7 +2,7 @@ Index: xorg-server/xkb/xkbActions.c
+ ===================================================================
+ --- xorg-server.orig/xkb/xkbActions.c	2011-12-14 15:15:20.000000000 -0800
+ +++ xorg-server/xkb/xkbActions.c	2011-12-14 15:26:43.372680253 -0800
+-@@ -328,24 +328,83 @@ _XkbFilterLatchState(	XkbSrvInfoPtr	xkbi
++@@ -328,23 +328,81 @@ _XkbFilterLatchState(	XkbSrvInfoPtr	xkbi
+      return 1;
+  }
+  
+@@ -23,17 +23,16 @@ Index: xorg-server/xkb/xkbActions.c
+ +static XkbFilterPtr _XkbNextFreeFilter(XkbSrvInfoPtr xkbi);
+ +
+  static int
+--_XkbFilterLockState(	XkbSrvInfoPtr	xkbi,
++-_XkbFilterLockState(XkbSrvInfoPtr xkbi,
+ +_XkbFilterLockGroup(	XkbSrvInfoPtr	xkbi,
+- 			XkbFilterPtr	filter,
+- 			unsigned	keycode,
+- 			XkbAction *	pAction)
++                     XkbFilterPtr filter, unsigned keycode, XkbAction *pAction)
+  {
+--    if (pAction&&(pAction->type==XkbSA_LockGroup)) {
+--	if (pAction->group.flags&XkbSA_GroupAbsolute)
+--	     xkbi->state.locked_group= XkbSAGroup(&pAction->group);
+--	else xkbi->state.locked_group+= XkbSAGroup(&pAction->group);
+--	return 1;
++-    if (pAction && (pAction->type == XkbSA_LockGroup)) {
++-        if (pAction->group.flags & XkbSA_GroupAbsolute)
++-            xkbi->state.locked_group = XkbSAGroup(&pAction->group);
++-        else
++-            xkbi->state.locked_group += XkbSAGroup(&pAction->group);
++-        return 1;
+ +    int sendEvent = 1;
+ +
+ +    if (!xkbSwitchGroupOnRelease()) {
+@@ -83,27 +82,27 @@ Index: xorg-server/xkb/xkbActions.c
+ +			unsigned	keycode,
+ +			XkbAction *	pAction)
+ +{
+-     if (filter->keycode==0) {		/* initial press */
+- 	filter->keycode = keycode;
+- 	filter->active = 1;
+- 	filter->filterOthers = 0;
+- 	filter->priv = xkbi->state.locked_mods&pAction->mods.mask;
+--	filter->filter = _XkbFilterLockState;
+-+	filter->filter = _XkbFilterLockMods;
+- 	filter->upAction = *pAction;
+- 	if (!(filter->upAction.mods.flags&XkbSA_LockNoLock))
+- 	    xkbi->state.locked_mods|= pAction->mods.mask;
++     if (filter->keycode == 0) { /* initial press */
++         filter->keycode = keycode;
++         filter->active = 1;
++         filter->filterOthers = 0;
++         filter->priv = xkbi->state.locked_mods & pAction->mods.mask;
++-        filter->filter = _XkbFilterLockState;
+++        filter->filter = _XkbFilterLockMods;
++         filter->upAction = *pAction;
++         if (!(filter->upAction.mods.flags & XkbSA_LockNoLock))
++             xkbi->state.locked_mods |= pAction->mods.mask;
+ @@ -1118,9 +1177,12 @@ xkbDeviceInfoPtr xkbPrivPtr = XKBDEVICEI
+- 		    sendEvent=_XkbFilterLatchState(xkbi,filter,key,&act);
+- 		    break;
+- 		case XkbSA_LockMods:
++                 sendEvent = _XkbFilterLatchState(xkbi, filter, key, &act);
++                 break;
++             case XkbSA_LockMods:
+ +		    filter = _XkbNextFreeFilter(xkbi);
+ +		    sendEvent=_XkbFilterLockMods(xkbi,filter,key,&act);
+ +		    break;
+- 		case XkbSA_LockGroup:
+- 		    filter = _XkbNextFreeFilter(xkbi);
+--		    sendEvent=_XkbFilterLockState(xkbi,filter,key,&act);
++             case XkbSA_LockGroup:
++                 filter = _XkbNextFreeFilter(xkbi);
++-                sendEvent = _XkbFilterLockState(xkbi, filter, key, &act);
+ +		    sendEvent=_XkbFilterLockGroup(xkbi,filter,key,&act);
+- 		    break;
+- 		case XkbSA_ISOLock:
+- 		    filter = _XkbNextFreeFilter(xkbi);
++                 break;
++             case XkbSA_ISOLock:
++                 filter = _XkbNextFreeFilter(xkbi);
+
+diff --git a/debian/patches/209_add_legacy_bgnone_option.patch b/debian/patches/209_add_legacy_bgnone_option.patch
+index e53d24d..ef4faf3 100644
+--- a/debian/patches/209_add_legacy_bgnone_option.patch
++++ b/debian/patches/209_add_legacy_bgnone_option.patch
+@@ -16,6 +16,6 @@ Index: xorg-server/os/utils.c
+          }
+ +	else if ( strcmp( argv[i], "-nr") == 0)
+ +	    bgNoneRoot = TRUE;
+-         else if ( strcmp( argv[i], "-maxbigreqsize") == 0) {
+-              if(++i < argc) {
+-                  long reqSizeArg = atol(argv[i]);
++         else if (strcmp(argv[i], "-maxbigreqsize") == 0) {
++             if (++i < argc) {
++                 long reqSizeArg = atol(argv[i]);
 
 diff --git a/debian/patches/214_glx_dri_searchdirs.patch b/debian/patches/214_glx_dri_searchdirs.patch
 index 3baa38f..f02c534 100644
@@ -226,3 +989,282 @@ index 3baa38f..f02c534 100644
  +					     screen);
  +	if (screen->driScreen == NULL) {
  +	    LogMessage(X_INFO,
+
+diff --git a/debian/patches/226_fall_back_to_autoconfiguration.patch b/debian/patches/226_fall_back_to_autoconfiguration.patch
+index 4a513fb..b1c9e2b 100644
+--- a/debian/patches/226_fall_back_to_autoconfiguration.patch
++++ b/debian/patches/226_fall_back_to_autoconfiguration.patch
+@@ -27,22 +27,22 @@ index 16d5557..a1a06ad 100644
+ +Bool xf86AttemptedFallback = FALSE;
+  
+  const char *xf86VisualNames[] = {
+- 	"StaticGray",
++     "StaticGray",
+ diff --git a/hw/xfree86/common/xf86Init.c b/hw/xfree86/common/xf86Init.c
+ index 0a47140..a0c7f51 100644
+ --- a/hw/xfree86/common/xf86Init.c
+ +++ b/hw/xfree86/common/xf86Init.c
+ @@ -411,20 +411,34 @@ InitOutput(ScreenInfo *pScreenInfo, int argc, char **argv)
+-       free(optionlist);
+-     }
++             free(optionlist);
++         }
+  
+ +Fallback:
+-     /* Load all driver modules specified in the config file */
+-     /* If there aren't any specified in the config file, autoconfig them */
+-     /* FIXME: Does not handle multiple active screen sections, but I'm not
+-      * sure if we really want to handle that case*/
+-     configured_device = xf86ConfigLayout.screens->screen->device;
+--    if ((!configured_device) || (!configured_device->driver)) {
++         /* Load all driver modules specified in the config file */
++         /* If there aren't any specified in the config file, autoconfig them */
++         /* FIXME: Does not handle multiple active screen sections, but I'm not
++          * sure if we really want to handle that case*/
++         configured_device = xf86ConfigLayout.screens->screen->device;
++-        if ((!configured_device) || (!configured_device->driver)) {
+ +    if (xf86AttemptedFallback) {
+ +        configured_device->driver = NULL;
+ +        if (!autoConfigDevice(configured_device)) {
+@@ -51,14 +51,14 @@ index 0a47140..a0c7f51 100644
+ +        }
+ +    }
+ +    else if ((!configured_device) || (!configured_device->driver)) {
+-         if (!autoConfigDevice(configured_device)) {
+-             xf86Msg(X_ERROR, "Automatic driver configuration failed\n");
+-             return ;
++             if (!autoConfigDevice(configured_device)) {
++                 xf86Msg(X_ERROR, "Automatic driver configuration failed\n");
++                 return;
++             }
+          }
+-     }
+-     if ((modulelist = xf86DriverlistFromConfig())) {
+--      xf86LoadModules(modulelist, NULL);
+--      free(modulelist);
++         if ((modulelist = xf86DriverlistFromConfig())) {
++-            xf86LoadModules(modulelist, NULL);
++-            free(modulelist);
+ +      if (!xf86LoadModules(modulelist, NULL) && !xf86AttemptedFallback) {
+ +          free(modulelist);
+ +          xf86AttemptedFallback = TRUE;
+@@ -67,15 +67,15 @@ index 0a47140..a0c7f51 100644
+ +      else {
+ +          free(modulelist);
+ +      }
+-     }
++         }
+  
+-     /* Load all input driver modules specified in the config file. */
++         /* Load all input driver modules specified in the config file. */
+ @@ -483,8 +497,15 @@ InitOutput(ScreenInfo *pScreenInfo, int argc, char **argv)
+-     else
+- 	xf86Info.dontVTSwitch = TRUE;
++         else
++             xf86Info.dontVTSwitch = TRUE;
+  
+--    if (xf86BusConfig() == FALSE)
+--        return;
++-        if (xf86BusConfig() == FALSE)
++-            return;
+ +    if (xf86BusConfig() == FALSE) {
+ +        if (!xf86AttemptedFallback) {
+ +            xf86AttemptedFallback = TRUE;
+@@ -86,20 +86,20 @@ index 0a47140..a0c7f51 100644
+ +        }
+ +    }
+  
+-     xf86PostProbe();
++         xf86PostProbe();
+  
+ diff --git a/hw/xfree86/common/xf86Priv.h b/hw/xfree86/common/xf86Priv.h
+ index 1fe3d7e..c342424 100644
+ --- a/hw/xfree86/common/xf86Priv.h
+ +++ b/hw/xfree86/common/xf86Priv.h
+ @@ -86,6 +86,7 @@ extern _X_EXPORT  int xf86NumDrivers;
+- extern _X_EXPORT  Bool xf86Resetting;
+- extern _X_EXPORT  Bool xf86Initialising;
+- extern _X_EXPORT  int xf86NumScreens;
+-+extern _X_EXPORT  Bool xf86AttemptedFallback;
+- extern _X_EXPORT  const char *xf86VisualNames[];
+- extern _X_EXPORT  int xf86Verbose;                 /* verbosity level */
+- extern _X_EXPORT  int xf86LogVerbose;		/* log file verbosity level */
++ extern _X_EXPORT Bool xf86Resetting;
++ extern _X_EXPORT Bool xf86Initialising;
++ extern _X_EXPORT int xf86NumScreens;
+++extern _X_EXPORT Bool xf86AttemptedFallback;
++ extern _X_EXPORT const char *xf86VisualNames[];
++ extern _X_EXPORT int xf86Verbose;       /* verbosity level */
++ extern _X_EXPORT int xf86LogVerbose;    /* log file verbosity level */
+ -- 
+ 1.7.5.4
+ 
+diff --git a/debian/patches/506_touchscreen_pointer_emulation_checks.patch b/debian/patches/506_touchscreen_pointer_emulation_checks.patch
+index 11a9ea2..f02e682 100644
+--- a/debian/patches/506_touchscreen_pointer_emulation_checks.patch
++++ b/debian/patches/506_touchscreen_pointer_emulation_checks.patch
+@@ -1,49 +1,3 @@
+-From c149cf06d1966d134073d4b33f2ec028fbf7bbd1 Mon Sep 17 00:00:00 2001
+-From: Chase Douglas <chase.douglas@canonical.com>
+-Date: Wed, 4 Apr 2012 12:41:59 -0700
+-Subject: [PATCH 1/3] Don't attempt to add non-master core touch pointer
+- emulation listeners
+-
+-Core events aren't generated for slave devices, so this is just wrong.
+-On top of that, the mask being checked in the removed hunk is wrong as
+-well. It is dereferencing a pointer of type OtherClients as though it
+-were a pointer to type InputClients.
+-
+-Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+-
+-Conflicts:
+-
+-	dix/touch.c
+----
+- dix/touch.c |   12 ------------
+- 1 files changed, 0 insertions(+), 12 deletions(-)
+-
+-diff --git a/dix/touch.c b/dix/touch.c
+-index d04801c..87b0f15 100644
+---- a/dix/touch.c
+-+++ b/dix/touch.c
+-@@ -853,18 +853,6 @@ TouchAddRegularListener(DeviceIntPtr dev, TouchPointInfoPtr ti,
+-                              win);
+-             return TRUE;
+-         }
+--
+--        /* all others */
+--        nt_list_for_each_entry(iclients, (InputClients*)wOtherClients(win), next)
+--        {
+--            if (!(iclients->mask[XIAllDevices] & core_filter))
+--                continue;
+--
+--            TouchEventHistoryAllocate(ti);
+--            TouchAddListener(ti, iclients->resource, CORE,
+--                             type, LISTENER_AWAITING_BEGIN, win);
+--            return TRUE;
+--        }
+-     }
+- 
+-     return FALSE;
+--- 
+-1.7.9.1
+-
+ From 01091806f762f6f8fc83dc1051b5f3cfb38e88b1 Mon Sep 17 00:00:00 2001
+ From: Chase Douglas <chase.douglas@canonical.com>
+ Date: Wed, 4 Apr 2012 12:57:40 -0700
+@@ -54,47 +8,47 @@ The current code checks the core event mask as though it were an XI2
+ mask. This change fixes the checks so the proper client and event masks
+ are used.
+ 
+-Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+-
+-Conflicts:
+-
+-	Xi/exevents.c
++Signed-off-by: Chase Douglas <chase.douglas at canonical.com>
+ ---
+- Xi/exevents.c |   13 +++++++++----
+- 1 files changed, 9 insertions(+), 4 deletions(-)
++ Xi/exevents.c |   18 ++++++++++++------
++ 1 files changed, 12 insertions(+), 6 deletions(-)
+ 
+ diff --git a/Xi/exevents.c b/Xi/exevents.c
+-index f390f67..72e6d91 100644
++index ff22240..05cd677 100644
+ --- a/Xi/exevents.c
+ +++ b/Xi/exevents.c
+-@@ -1342,6 +1342,8 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
++@@ -1305,6 +1305,8 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
+              BUG_WARN(!iclients);
+              if (!iclients)
+                  return FALSE;
+ +
+ +            *client = rClient(iclients);
+-         } else if (listener->level == XI)
+-         {
++         }
++         else if (listener->level == XI) {
+              int xi_type = GetXIType(TouchGetPointerEventType(ev));
+-@@ -1352,19 +1354,22 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
++@@ -1317,20 +1319,24 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
+              BUG_WARN(!iclients);
+              if (!iclients)
+                  return FALSE;
+ +
+ +            *client = rClient(iclients);
+-         } else
+-         {
++         }
++         else {
+              int coretype = GetCoreType(TouchGetPointerEventType(ev));
+              Mask core_filter = event_get_filter_from_type(dev, coretype);
+ +            OtherClients *oclients;
+  
+              /* all others */
+--            nt_list_for_each_entry(iclients, (InputClients*)wOtherClients(*win), next)
++-            nt_list_for_each_entry(iclients,
++-                                   (InputClients *) wOtherClients(*win), next)
+ -                if (iclients->mask[XIAllDevices] & core_filter)
+-+            nt_list_for_each_entry(oclients, (InputClients*)wOtherClients(*win), next)
+-+                if (oclients->mask & core_filter)
+-                     break;
++-                break;
+ -            /* if owner selected, iclients is NULL */
+++            nt_list_for_each_entry(oclients,
+++                                   (OtherClients *) wOtherClients(*win), next)
+++                if (oclients->mask & core_filter)
+++                    break;
+++
+ +            /* if owner selected, oclients is NULL */
+ +            *client = oclients ? rClient(oclients) : wClient(*win);
+          }
+@@ -115,36 +69,32 @@ The current code returns a reference to memory that may not actually be
+ an XI2 mask. Instead, only return a value when an XI2 client has
+ selected for events.
+ 
+-Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+-
+-Conflicts:
+-
+-	Xi/exevents.c
++Signed-off-by: Chase Douglas <chase.douglas at canonical.com>
+ ---
+  Xi/exevents.c |    3 ++-
+  1 files changed, 2 insertions(+), 1 deletions(-)
+ 
+ diff --git a/Xi/exevents.c b/Xi/exevents.c
+-index 72e6d91..fe06efa 100644
++index 05cd677..2ecdeff 100644
+ --- a/Xi/exevents.c
+ +++ b/Xi/exevents.c
+-@@ -1293,6 +1293,7 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
++@@ -1255,6 +1255,7 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
+  {
+-      int rc;
+-      InputClients *iclients = NULL;
+-+     *mask = NULL;
++     int rc;
++     InputClients *iclients = NULL;
+++    *mask = NULL;
+  
+      if (listener->type == LISTENER_GRAB ||
+-         listener->type == LISTENER_POINTER_GRAB)
+-@@ -1343,6 +1344,7 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
++         listener->type == LISTENER_POINTER_GRAB) {
++@@ -1306,6 +1307,7 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
+              if (!iclients)
+                  return FALSE;
+  
+ +            *mask = iclients->xi2mask;
+              *client = rClient(iclients);
+-         } else if (listener->level == XI)
+-         {
+-@@ -1370,7 +1372,6 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
++         }
++         else if (listener->level == XI) {
++@@ -1337,7 +1339,6 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
+              *client = oclients ? rClient(oclients) : wClient(*win);
+          }
+  
+
