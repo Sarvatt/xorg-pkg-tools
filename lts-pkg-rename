@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+# Script to do renames, replaces, breaks for LTS point updates
+
+########################################################################
+# The new stacks will be introduced alongside the stock 12.04 stack and
+# will co-exist with them. All of the packages will be renamed to not
+# conflict with the packages in the stock 12.04 stack. We will utilize
+# mesa's alternatives system to install the updated GL libraries and
+# enable them.
+#
+# Only the server-side components of the X stack will be upgraded, not
+# libX11 or any other client-side code.
+#
+# For package naming, kernel names source packages by appending
+# -lts-backports-$VERSION. They don't appear to need to rename binary
+# packages since they already include the kernel version; instead I'm
+# assuming we would rename binary packages like sources - append
+# -lts-backports-$VERSION.
+#
+# The X.org packages will be renamed following the kernel convention
+# ('linux-lts-backport-natty' c.f. bug #806586), to enable them to
+# co-exist in the same archive. Thus, the X package names will have
+# 'lts-backport-VERSION' appended to them:
+#
+#   mesa-lts-backport-quixotic
+#   xserver-xorg-video-intel-lts-backport-quixotic
+#   xserver-xorg-video-intel-dbg-lts-backport-quixotic
+#   xorg-server-lts-backport-quixotic
+#   xserver-xorg-core-dbg-lts-backport-quixotic
+#   xserver-common-lts-backport-quixotic
+#
+########################################################################
+
+# TODO: import bash functions
+
+# TODO: Update this once the official name is announced
+# TODO: (Or just query it from launchpad?)
+lts_codename=quixotic
+suffix=lts-backport-${lts_codename}
+#codename=$(current-ubuntu-development-codename)
+
+# TODO: Usage
+
+# TODO: optparse
+
+base_version() {
+    buf=${1#*:}          # Strip epoch
+    echo ${buf%-*}       # Strip debian version
+}
+
+# Determine package name from the changelog
+changelog=debian/changelog
+if [ ! -e ${changelog} ]; then
+    echo $PWD
+    echo "ERROR: Could not locate debian/changelog from the current dir"
+    exit 1
+fi
+
+rules=debian/rules
+if [ ! -e ${rules} ]; then
+    echo $PWD
+    echo "ERROR: Could not locate debian/rules from the current dir"
+    exit 2
+fi
+
+old_package=$(head -n 1 ${changelog} | cut -d' ' -f1)
+old_package_version=$(head -n 1 ${changelog} | cut -d' ' -f2)
+old_package_version=${old_package_version//[\(\)/}  # Strip parens
+new_package=${old_package}-${suffix}
+base_version=$(base_version ${old_package_version})
+
+if [[ "${old_package}" =~ ${suffix}$ ]]; then
+    echo ${old_package}
+    echo "ERROR: Already renamed"
+    exit 3
+fi
+
+echo "Renaming the orig.tar.gz..."
+old_orig=${old_package}_${base_version}.orig.tar.gz
+new_orig=${new_package}_${base_version}.orig.tar.gz
+if [ -e ../${new_orig} ]; then
+    echo "Warning: ../${new_orig} already exists so not renaming"
+else
+    cp -via ../${old_orig} ../${new_orig}
+fi
+echo
+
+echo "Updating the maintainer..."
+update-maintainer -q
+echo
+
+echo "Adding a changelog entry..."
+dch --increment \
+    --package ${new_package} \
+    --distribution ${lts_codename}-proposed \
+    --force-distribution \
+    "Rename package for the LTS point update, and add replaces/breaks"
+echo
+
+echo "Processing the control file..."
+# TODO: dpkg-control is imaginary - needs written
+dpkg-control \
+    --source-name-append ${suffix} \
+    --binary-names-append ${suffix} \
+    --other-names-mappings ${rename_mapping_file} \
+    --add-replaces ${old_package} \
+    --add-breaks "${old_package}=${old_package_version}"
+echo
+
+echo "Checking rules..."
+grep ${old_package} ${rules}
+if [ $? != 0 ]; then
+    echo "${rules} mentions ${old_package}"
+    echo "Warning: Manual update of ${rules} required"
+fi
+echo
+
+# TODO: Actually this needs to iterate over the binary package names too...
+echo "Renaming any <package>.* files..."
+for old_file in debian/${old_package}.*; do
+    new_file=$(basename $old_file)
+    new_file=debian/${new_file/${old_package}/${new_package}}
+    echo "mv $old_file $new_file"
+    mv $old_file $new_file
+    # TODO: Maybe using 'rename' would be better?
+done
+echo
+
+echo "Generating changes file..."
+debuild -S
+echo
+
+echo "${old_package} now renamed to ${new_package}"
