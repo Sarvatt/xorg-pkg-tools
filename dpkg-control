@@ -1,0 +1,219 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+def parse_options():
+    '''Option handling'''
+    import optparse
+    parser = optparse.OptionParser(version="%prog %ver")
+    parser.add_option(
+        "-s", "--source-suffix", dest="source_suffix",
+        help="Appends given suffix to the control file's source package name",
+        action="store", default=None)
+    parser.add_option(
+        "-b", "--binary-suffix", dest="binary_suffix",
+        help="Appends given suffix to all binary files present in the control file",
+        action="store", default=None)
+    parser.add_option(
+        "-m", "--mapping-file", dest="mapping_file",
+        help="Use given 'key value' file for mapping other referenced file names",
+        action="store", default=None)
+    parser.add_option(
+        "-R", "--add-replaces", dest="add_replaces",
+        help="Add or append a Replaces section to the control file for the old source package name",
+        action="store_true", default=False)
+    parser.add_option(
+        "-B", "--add-breaks", dest="add_breaks",
+        help="Add or append a Breaks section to the control file for the old source package name",
+        action="store_true", default=False)
+    parser.add_option(
+        "-t", "--test", dest="test",
+        help="Run the test suite instead of normal operation",
+        action="store_true", default=False)
+    parser.add_option(
+        "-d", "--debug", dest="debug",
+        help="Show extra debugging output",
+        action="store_true", default=False)
+    return parser.parse_args()
+
+def find_debiandir():
+    '''Locate debian/control, looking in a few places'''
+    for d in ['./debian', '../debian', '../../debian']:
+        if os.path.exists(d):
+            return d
+
+def load_file(filename):
+    assert(filename)
+    absfile = os.path.expanduser(filename)
+    if not os.path.exists(absfile):
+        return []
+    file = open(absfile, 'r')
+    # TODO: yeild?
+    lines = file.readlines()
+    file.close()
+    return lines
+
+def load_mappings(filename):
+    '''Loads a file consisting of pairs of space delimited item translations'''
+    mappings = {}
+    if filename:
+        for line in load_file(filename):
+            line = line.split('#')[0]   # Ignore everything after a comment
+            items = line.split()        # Split on whitespace
+            if len(items) < 2:
+                continue
+            mappings[items[0]] = items[1]
+    return mappings
+
+def ERR(*msg):
+    msg = ' '.join(map(str, msg))
+    sys.stderr.write("ERROR: %s\n" %(msg))
+    sys.stderr.flush()
+
+def die(msg, code=1):
+    ERR(msg)
+    sys.exit(code)
+
+########################################################################
+## Tests
+import unittest
+from tempfile import mkdtemp
+from shutil import rmtree
+
+class TestDpkgControl(unittest.TestCase):
+    tempdir = None
+
+    def setUp(self):
+        self.tempdir = mkdtemp()
+
+    def tearDown(self):
+        rmtree(self.tempdir)
+        self.tempdir = None
+
+    def test_find_debiandir(self):
+        debdir = os.path.join(self.tempdir, "debian")
+        os.mkdir(debdir)
+        patchesdir = os.path.join(debdir, "patches")
+        os.mkdir(patchesdir)
+
+        os.chdir(self.tempdir)
+        self.assertEqual('./debian', find_debiandir())
+
+        os.chdir(debdir)
+        self.assertEqual('../debian', find_debiandir())
+
+        os.chdir(patchesdir)
+        self.assertEqual('../../debian', find_debiandir())
+
+# TODO: With no parameters specified, the debian/control going in
+#       must be equivalent to the debian/control going out.
+#       Also allow testing against a collection of sample controls.
+#
+
+
+########################################################################
+## Main
+if __name__ == "__main__":
+    import re
+    options, args = parse_options()
+
+    if options.test:
+        unittest.main()
+        sys.exit(0)
+
+    debdir = find_debiandir()     or die("No debian directory found")
+    control_file = os.path.join(debdir, "control")
+    os.path.exists(control_file)  or die("No control file in debian directory")
+
+    re_prop = re.compile(r'^([-\w]+):\s*(.*)$')
+
+    mappings = load_mappings(options.mapping_file)
+
+    section = None
+    prop = None
+    breaks = None
+    replaces = None
+    for orig_line in load_file("debian/control"):
+        orig_line = orig_line.rstrip("\n")
+        # Sections are separated by blank links
+        if len(orig_line) == 0:
+            # Add replaces and breaks if we haven't added them already
+            if replaces:
+                print "Replaces: %s" %(replaces)
+                replaces = None
+            if breaks:
+                print "Breaks: %s" %(breaks)
+                breaks = None
+
+            # Re-init
+            print
+            section = None
+            prop = None
+            breaks = None
+            replaces = None
+            value = None
+
+        line = orig_line.split('#')[0].strip() # Ignore comments
+
+        # Properties look like 'Word: ...'
+        m = re_prop.match(line)
+        if m:
+            new_prop = m.group(1)
+            prop = new_prop
+            value = m.group(2)
+        elif orig_line and orig_line[0].isspace():
+            new_prop = None
+            value = line
+        if not prop:
+            continue
+
+        if 'Source' == prop:
+            if options.source_suffix:
+                print "%s-%s" %(line, options.source_suffix)
+            else:
+                print orig_line
+
+        elif 'Package' == prop:
+            if options.add_replaces and value:
+                replaces = value
+            if options.add_breaks and value:
+                breaks = value
+            if options.binary_suffix:
+                print "%s-%s" %(line, options.binary_suffix)
+            else:
+                print orig_line
+
+        elif 'Description' == prop:
+            print orig_line
+
+        elif 'Replaces' == prop and replaces:
+            if new_prop:
+                print "%s:" %(prop)
+                print " %s," %(replaces)
+                replaces = None
+            else:
+                print orig_line
+
+        elif 'Breaks' == prop and breaks:
+            if new_prop:
+                print "%s:" %(prop)
+                print " %s," %(breaks)
+                breaks = None
+            else:
+                print orig_line
+
+        else:
+            # For other packages referred to in Depends, Recommends, etc.
+            # if mappings are defined, use them to modify the package names
+            text = orig_line
+            # Perhaps this should split the elements and look them up?
+            if options.mapping_file:
+                for pkg in mappings.keys():
+                    if pkg in line:
+                        text = re.sub(r"\b(%s)(?=[^-\w])" %(pkg),
+                                      mappings[pkg],
+                                      text)
+
+            print text
+
