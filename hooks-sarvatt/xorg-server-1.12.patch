@@ -1100,43 +1100,46 @@ index 4a513fb..b1c9e2b 100644
  1.7.5.4
  
 diff --git a/debian/patches/506_touchscreen_pointer_emulation_checks.patch b/debian/patches/506_touchscreen_pointer_emulation_checks.patch
-index 11a9ea2..ad25001 100644
+index c6fcac8..476fd39 100644
 --- a/debian/patches/506_touchscreen_pointer_emulation_checks.patch
 +++ b/debian/patches/506_touchscreen_pointer_emulation_checks.patch
-@@ -9,27 +9,23 @@ On top of that, the mask being checked in the removed hunk is wrong as
- well. It is dereferencing a pointer of type OtherClients as though it
- were a pointer to type InputClients.
+@@ -9,13 +9,12 @@ mask. This change fixes the checks so the proper client and event masks
+ are used.
  
--Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
--
--Conflicts:
--
--	dix/touch.c
-+Signed-off-by: Chase Douglas <chase.douglas at canonical.com>
+ Signed-off-by: Chase Douglas <chase.douglas@canonical.com>
+-Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
  ---
-  dix/touch.c |   12 ------------
-  1 files changed, 0 insertions(+), 12 deletions(-)
+- dix/touch.c |    8 ++++----
+- 1 files changed, 4 insertions(+), 4 deletions(-)
++ dix/touch.c |    7 ++++---
++ 1 files changed, 4 insertions(+), 3 deletions(-)
  
  diff --git a/dix/touch.c b/dix/touch.c
--index d04801c..87b0f15 100644
-+index 0829b65..fcec916 100644
+-index 572bdfb..f8f26c8 100644
++index 572bdfb..ecb2283 100644
  --- a/dix/touch.c
  +++ b/dix/touch.c
--@@ -853,18 +853,6 @@ TouchAddRegularListener(DeviceIntPtr dev, TouchPointInfoPtr ti,
-+@@ -830,18 +830,6 @@ TouchAddRegularListener(DeviceIntPtr dev, TouchPointInfoPtr ti,
-                               win);
-              return TRUE;
+ @@ -811,6 +811,7 @@ TouchAddRegularListener(DeviceIntPtr dev, TouchPointInfoPtr ti,
+@@ -26,14 +25,14 @@ index 572bdfb..f8f26c8 100644
+  
+          /* window owner */
+          if (IsMaster(dev) && (win->eventMask & core_filter)) {
+-@@ -822,13 +823,12 @@ TouchAddRegularListener(DeviceIntPtr dev, TouchPointInfoPtr ti,
++@@ -822,13 +823,13 @@ TouchAddRegularListener(DeviceIntPtr dev, TouchPointInfoPtr ti,
           }
- -
- -        /* all others */
+  
+          /* all others */
 --        nt_list_for_each_entry(iclients, (InputClients*)wOtherClients(win), next)
 --        {
 +-        nt_list_for_each_entry(iclients, (InputClients *) wOtherClients(win),
-+-                               next) {
+++        nt_list_for_each_entry(oclients, (OtherClients *) wOtherClients(win),
++                                next) {
  -            if (!(iclients->mask[XIAllDevices] & core_filter))
- -                continue;
- -
-@@ -54,47 +50,47 @@ The current code checks the core event mask as though it were an XI2
+-+        nt_list_for_each_entry(oclients, wOtherClients(win), next) {
+ +            if (!(oclients->mask & core_filter))
+                  continue;
+  
+@@ -56,47 +55,47 @@ The current code checks the core event mask as though it were an XI2
  mask. This change fixes the checks so the proper client and event masks
  are used.
  
@@ -1202,7 +1205,7 @@ index 11a9ea2..ad25001 100644
  +            /* if owner selected, oclients is NULL */
  +            *client = oclients ? rClient(oclients) : wClient(*win);
           }
-@@ -115,36 +111,32 @@ The current code returns a reference to memory that may not actually be
+@@ -117,36 +116,32 @@ The current code returns a reference to memory that may not actually be
  an XI2 mask. Instead, only return a value when an XI2 client has
  selected for events.
  
@@ -1249,4 +1252,4 @@ index 11a9ea2..ad25001 100644
 +@@ -1337,7 +1339,6 @@ RetrieveTouchDeliveryData(DeviceIntPtr dev, TouchPointInfoPtr ti,
               *client = oclients ? rClient(oclients) : wClient(*win);
           }
-  
+

@@ -26,13 +26,10 @@ elif [ "$BRANCH" == "server-1.12-branch" ]; then
 	drop 07-xfree86-fix-build-with-xv-disabled.diff upstream
 	drop 224_return_BadWindow_not_BadMatch.diff upstream
 	drop 225_non-root_config_paths.patch upstream
-	
+
+	#drop 507_touchscreen_fixes.patch needs-refresh
+		
 	getp 500_pointer_barrier_thresholds.diff
-	
-	drop 501_touch_accept_end.patch upstream
-	drop 502_indirect_touch_window_set.patch upstream
-	drop 503_fix_mouse_warp.patch upstream
-	drop 504_implement_passive_touch_ungrab.patch upstream
 fi
 
 ## Legacy unused hooks for reference
