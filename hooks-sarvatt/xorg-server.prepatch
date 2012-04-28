@@ -27,7 +27,9 @@ elif [ "$BRANCH" == "server-1.12-branch" ]; then
 	drop 224_return_BadWindow_not_BadMatch.diff upstream
 	drop 225_non-root_config_paths.patch upstream
 
-	#drop 507_touchscreen_fixes.patch needs-refresh
+	drop 505_query_pointer_touchscreen.patch upstream
+	drop 506_touchscreen_pointer_emulation_checks.patch upstream
+	drop 507_touchscreen_fixes.patch fails
 		
 	getp 500_pointer_barrier_thresholds.diff
 fi
