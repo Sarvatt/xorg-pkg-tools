@@ -10,6 +10,15 @@ getp() {
 #CHANGES+=("hooks: Stop installing libgallium.so")
 
 
+#mesa master (8.1)
+drop 05_kfreebsd-egl-x11.diff fails
+drop 115_llvm_dynamic_linking.diff upstream
+
+getp mesa-wayland-dri2.patch
+echo mesa-wayland-dri2.patch >> debian/patches/series
+
+drop 117_intel_fix_hiz_null_dereference.patch upstream
+
 ## Legacy unused hooks for reference
 
 #rm -rf debian

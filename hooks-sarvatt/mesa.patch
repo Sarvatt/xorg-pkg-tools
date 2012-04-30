@@ -1,0 +1,154 @@
+diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/libegl1-mesa-drivers.install.linux.in debian/libegl1-mesa-drivers.install.linux.in
+--- a/debian/libegl1-mesa-drivers.install.linux.in	2012-04-30 20:35:54.000000000 +0000
++++ b/debian/libegl1-mesa-drivers.install.linux.in	2012-04-30 20:15:45.706101191 +0000
+@@ -3,4 +3,4 @@
+ 
+ # Wayland support, only on Linux:
+ dri/usr/lib/${DEB_HOST_MULTIARCH}/libwayland-egl.so.1 usr/lib/${DEB_HOST_MULTIARCH}/mesa-egl
+-dri/usr/lib/${DEB_HOST_MULTIARCH}/libwayland-egl.so.1.0 usr/lib/${DEB_HOST_MULTIARCH}/mesa-egl
++dri/usr/lib/${DEB_HOST_MULTIARCH}/libwayland-egl.so.1.0.0 usr/lib/${DEB_HOST_MULTIARCH}/mesa-egl
+diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/libegl1-mesa.symbols debian/libegl1-mesa.symbols
+--- a/debian/libegl1-mesa.symbols	2012-04-30 20:35:54.000000000 +0000
++++ b/debian/libegl1-mesa.symbols	2012-04-30 20:28:04.370087144 +0000
+@@ -3,6 +3,19 @@
+ # drivers.  Handle the dependency explicitly in the driver
+ # package.
+  (regex)"^_egl.*@Base$" 7.8.1
++ dri2_add_config@Base 8.1~
++ dri2_create_image_khr@Base 8.1~
++ dri2_create_screen@Base 8.1~
++ dri2_get_device_name_for_fd@Base 8.1~
++ dri2_get_driver_for_fd@Base 8.1~
++ dri2_initialize_drm@Base 8.1~
++ dri2_initialize_wayland@Base 8.1~
++ dri2_initialize_x11@Base 8.1~
++ dri2_load_driver@Base 8.1~
++ dri2_load_driver_swrast@Base 8.1~
++ dri2_lookup_egl_image@Base 8.1~
++ dri2_setup_screen@Base 8.1~
++ dri2_to_egl_attribute_map@Base 8.1~
+  eglBindAPI@Base 7.8.1
+  eglBindTexImage@Base 7.8.1
+  eglBindWaylandDisplayWL@Base 7.11~0
+@@ -63,4 +76,11 @@
+  eglWaitClient@Base 7.8.1
+  eglWaitGL@Base 7.8.1
+  eglWaitNative@Base 7.8.1
++ image_lookup_extension@Base 8.1~
++ use_invalidate@Base 8.1~
++ wayland_buffer_is_drm@Base 8.1~
++ wayland_drm_buffer_get_buffer@Base 8.1~
++ wayland_drm_buffer_get_format@Base 8.1~
++ wayland_drm_init@Base 8.1~
++ wayland_drm_uninit@Base 8.1~
+  (arch=linux-any)wl_drm_interface@Base 8.0-2~
+diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/libgbm1.symbols debian/libgbm1.symbols
+--- a/debian/libgbm1.symbols	2012-04-30 20:35:54.000000000 +0000
++++ b/debian/libgbm1.symbols	2012-04-30 20:30:36.362084256 +0000
+@@ -1,16 +1,31 @@
+ libgbm.so.1 libgbm1 #MINVER#
++ _gbm_create_device@Base 8.1~
+  _gbm_fd_get_device_name@Base 7.11~1
+  _gbm_log@Base 7.11~1
+  _gbm_mesa_get_device@Base 7.11~1
+  _gbm_udev_device_new_from_fd@Base 7.11~1
++ devices@Base 8.1~
++ dri2_loader_extension@Base 8.1~
++ dri_fd_get_driver_name@Base 8.1~
+  gbm_bo_create@Base 7.11~1
+  gbm_bo_create_from_egl_image@Base 7.11~1
+  gbm_bo_destroy@Base 7.11~1
++ gbm_bo_get_device@Base 8.1~
++ gbm_bo_get_format@Base 8.1~
+  gbm_bo_get_handle@Base 7.11~1
+  gbm_bo_get_height@Base 7.11~1
+  gbm_bo_get_pitch@Base 7.11~1
++ gbm_bo_get_user_data@Base 8.1~
+  gbm_bo_get_width@Base 7.11~1
++ gbm_bo_set_user_data@Base 8.1~
+  gbm_create_device@Base 7.11~1
+  gbm_device_destroy@Base 7.11~1
+  gbm_device_get_backend_name@Base 7.11~1
+  gbm_device_get_fd@Base 7.11~1
++ gbm_device_is_format_supported@Base 8.1~
++ gbm_dri_backend@Base 8.1~
++ gbm_surface_create@Base 8.1~
++ gbm_surface_destroy@Base 8.1~
++ gbm_surface_has_free_buffers@Base 8.1~
++ gbm_surface_lock_front_buffer@Base 8.1~
++ gbm_surface_release_buffer@Base 8.1~
+diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/libgl1-mesa-dev.install.in debian/libgl1-mesa-dev.install.in
+--- a/debian/libgl1-mesa-dev.install.in	2012-04-30 20:35:54.000000000 +0000
++++ b/debian/libgl1-mesa-dev.install.in	2012-04-30 19:50:07.902130425 +0000
+@@ -1,2 +1,2 @@
+-usr/lib/${DEB_HOST_MULTIARCH}/libGL.so usr/lib/${DEB_HOST_MULTIARCH}/mesa
++build/dri/${DEB_HOST_MULTIARCH}/libGL.so usr/lib/${DEB_HOST_MULTIARCH}/mesa
+ usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig/gl.pc
+diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/libgl1-mesa-dri.install.in debian/libgl1-mesa-dri.install.in
+--- a/debian/libgl1-mesa-dri.install.in	2012-04-30 20:35:54.000000000 +0000
++++ b/debian/libgl1-mesa-dri.install.in	2012-04-30 20:20:15.054096069 +0000
+@@ -2,3 +2,4 @@
+ build/dri/${DEB_HOST_MULTIARCH}/*_dri.so  usr/lib/${DEB_HOST_MULTIARCH}/dri
+ build/dri/${DEB_HOST_MULTIARCH}/libglsl.so usr/lib/${DEB_HOST_MULTIARCH}/dri
+ build/dri/${DEB_HOST_MULTIARCH}/libdricore.so usr/lib/${DEB_HOST_MULTIARCH}/dri
++dri/etc/drirc etc
+diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/libgl1-mesa-dri.install.linux.in debian/libgl1-mesa-dri.install.linux.in
+--- a/debian/libgl1-mesa-dri.install.linux.in	2012-04-30 20:35:54.000000000 +0000
++++ b/debian/libgl1-mesa-dri.install.linux.in	2012-04-30 20:20:07.070096226 +0000
+@@ -2,6 +2,7 @@
+ build/dri/${DEB_HOST_MULTIARCH}/*_dri.so  usr/lib/${DEB_HOST_MULTIARCH}/dri
+ build/dri/${DEB_HOST_MULTIARCH}/libglsl.so usr/lib/${DEB_HOST_MULTIARCH}/dri
+ build/dri/${DEB_HOST_MULTIARCH}/libdricore.so usr/lib/${DEB_HOST_MULTIARCH}/dri
++dri/etc/drirc etc
+ 
+ # This part is Linux-specific:
+ build/dri/${DEB_HOST_MULTIARCH}/libgallium.so usr/lib/${DEB_HOST_MULTIARCH}/dri
+diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/libgl1-mesa-swx11-dev.install.in debian/libgl1-mesa-swx11-dev.install.in
+--- a/debian/libgl1-mesa-swx11-dev.install.in	2012-04-30 20:35:54.000000000 +0000
++++ b/debian/libgl1-mesa-swx11-dev.install.in	2012-04-30 19:47:13.590133910 +0000
+@@ -1,2 +1,2 @@
+-usr/lib/${DEB_HOST_MULTIARCH}/libGL.a  usr/lib/${DEB_HOST_MULTIARCH}/mesa/
+-usr/lib/${DEB_HOST_MULTIARCH}/libGL.so usr/lib/${DEB_HOST_MULTIARCH}/mesa/
++#usr/lib/${DEB_HOST_MULTIARCH}/libGL.a  usr/lib/${DEB_HOST_MULTIARCH}/mesa/
++build/dri/${DEB_HOST_MULTIARCH}/libGL.so usr/lib/${DEB_HOST_MULTIARCH}/mesa/
+diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/libgl1-mesa-swx11.install.in debian/libgl1-mesa-swx11.install.in
+--- a/debian/libgl1-mesa-swx11.install.in	2012-04-30 20:35:54.000000000 +0000
++++ b/debian/libgl1-mesa-swx11.install.in	2012-04-30 19:46:55.710134081 +0000
+@@ -1 +1 @@
+-usr/lib/${DEB_HOST_MULTIARCH}/libGL.so.* usr/lib/${DEB_HOST_MULTIARCH}/mesa/
++build/dri/${DEB_HOST_MULTIARCH}/libGL.so.* usr/lib/${DEB_HOST_MULTIARCH}/mesa/
+diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/rules debian/rules
+--- a/debian/rules	2012-04-30 20:35:54.000000000 +0000
++++ b/debian/rules	2012-04-30 20:40:26.306073044 +0000
+@@ -97,7 +97,7 @@
+ 
+   # LLVM is required for r300g and recommended for swrastg on x86:
+   ifneq (,$(filter $(DEB_HOST_ARCH),amd64 i386 kfreebsd-amd64 kfreebsd-i386))
+-	confflags_GALLIUM += --enable-gallium-llvm
++	confflags_GALLIUM += --enable-gallium-llvm --with-llvm-shared-libs
+   endif
+ 
+ 	confflags_DIRECT_RENDERING = --enable-driglx-direct
+@@ -192,12 +192,11 @@
+ 	CFLAGS="$(CFLAGS) -march=i686" \
+ 	CXXFLAGS="$(CXXFLAGS) -march=i686"
+ 
+-autotools_files = bin/config.guess bin/config.sub
++#autotools_files = bin/config.guess bin/config.sub
+ 
+ configure: $(QUILT_STAMPFN) configure.ac
+ 	for file in $(autotools_files); do cp $$file $$file.pristine; done
+ 	autoreconf -vfi
+-
+ # list the configurations that will built
+ configs:
+ 	@echo Building the following configurations: $(CONFIGS)
+@@ -308,6 +307,8 @@
+ 	set -e; for file in $(NOT_INSTALLED_EITHER); do rm -f debian/tmp/$$file; done
+ 	# No need for this .so, libglapi is just a convenience library:
+ 	rm debian/tmp/dri/usr/lib/${DEB_HOST_MULTIARCH}/libglapi.so
++	# automake-ification in 8.1 now adds numerious .la files
++	find debian/tmp -name '*.la' -delete
+ 
+ 	dh_install -s --fail-missing
+ 

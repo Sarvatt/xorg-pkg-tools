@@ -7,19 +7,19 @@ CHANGES+=("hook: Relax debhelper depends to 8.1.2ubuntu2")
 #sed -i -e "/^Build-Depends: /s/$/, libtool/" debian/control
 #CHANGES+=("hook: Add libtool to build depends.")
 
+patch -p1 < $HOOKS/mesa.patch
+CHANGES+=("hook: Update build system for mesa master.")
+
+patch -p1 < $HOOKS/mesa-wayland-dri2.patch
+CHANGES+=("hook: Patch wayland support for out of tree builds.")
+
+## Legacy unused hooks for reference
+
 # Robert Hooker 2011-07-11
 # Enable floating point texture support
 #sed -i '/enable-shared-glapi/a \
 #	--enable-texture-float \\' debian/rules
 #CHANGES+=("hook: Enable floating point texture support")
-
-#sed -i '/enable-texture-float/a \
-#        --enable-xa \\' debian/rules
-#echo "usr/lib/*/pkgconfig/xatracker.pc" >> debian/libgl1-mesa-dev.install.in
-#CHANGES+=("hook: Enable XA state tracker")
-
-## Legacy unused hooks for reference
-
 
 # Robert Hooker 2010-02-06
 # Add the nouveau driver
