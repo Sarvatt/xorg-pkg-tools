@@ -10,9 +10,6 @@ CHANGES+=("hook: Relax debhelper depends to 8.1.2ubuntu2")
 patch -p1 < $HOOKS/mesa.patch
 CHANGES+=("hook: Update build system for mesa master.")
 
-patch -p1 < $HOOKS/mesa-wayland-dri2.patch
-CHANGES+=("hook: Patch wayland support for out of tree builds.")
-
 ## Legacy unused hooks for reference
 
 # Robert Hooker 2011-07-11
