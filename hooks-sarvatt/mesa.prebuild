@@ -1,9 +1,3 @@
-# Robert Hooker 2011-07-08
-# Natty had debhelper 8.1.2ubuntu2 with multiarch backported
-# debian did not get multiarch until 8.1.3.
-sed -i '/^ debhelper /s/8.1.3/8.1.2ubuntu2/' debian/control
-CHANGES+=("hook: Relax debhelper depends to 8.1.2ubuntu2")
-
 sed -i -e "/^Build-Depends: /s/$/, libtool/" debian/control
 CHANGES+=("hook: Add libtool to build depends.")
 
@@ -11,6 +5,12 @@ patch -p1 < $HOOKS/mesa.patch
 CHANGES+=("hook: Update build system for mesa master.")
 
 ## Legacy unused hooks for reference
+
+# Robert Hooker 2011-07-08
+# Natty had debhelper 8.1.2ubuntu2 with multiarch backported
+# debian did not get multiarch until 8.1.3.
+sed -i '/^ debhelper /s/8.1.3/8.1.2ubuntu2/' debian/control
+CHANGES+=("hook: Relax debhelper depends to 8.1.2ubuntu2")
 
 # Robert Hooker 2011-07-11
 # Enable floating point texture support
