@@ -1,0 +1,48 @@
+diff --git a/debian/control b/debian/control
+index 81322d3..5a974c8 100644
+--- a/debian/control
++++ b/debian/control
+@@ -16,6 +16,7 @@ Build-Depends:
+  libegl1-mesa-dev (>= 8.0-2),
+  libegl1-mesa-drivers (>= 8.0-2),
+  libgles2-mesa-dev (>= 8.0-2),
++ libmtdev-dev,
+  libwayland-dev (>= 0.85),
+  libxcb1-dev,
+  libxcb-xfixes0-dev,
+diff --git a/debian/rules b/debian/rules
+index 42a3fef..4d1ff05 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -12,6 +12,10 @@ override_dh_install:
+ override_dh_makeshlibs:
+ 	# No-op: libraries are private, not shared.
+ 
++override_dh_auto_test:
++	# the test suite does not 100% pass in headless mode
++	dh_auto_test || true
++
+ %:
+ 	dh $@ --with quilt,autoreconf
+ 
+ diff --git a/debian/weston.install b/debian/weston.install
+index fd01e4b..017ce96 100644
+--- a/debian/weston.install
++++ b/debian/weston.install
+@@ -1,13 +1,16 @@
+ usr/bin/weston
++usr/bin/weston-launch
+ usr/bin/weston-terminal
+ 
+ usr/lib/weston/weston-tablet-shell
+ usr/lib/weston/weston-desktop-shell
++usr/lib/weston/weston-screenshooter
+ 
+ usr/lib/weston/desktop-shell.so
+ usr/lib/weston/drm-backend.so
+ usr/lib/weston/tablet-shell.so
+ usr/lib/weston/wayland-backend.so
+ usr/lib/weston/x11-backend.so
++usr/lib/weston/xserver-launcher.so
+ 
+ usr/share/weston
