@@ -1,0 +1,212 @@
+diff --git a/debian/control b/debian/control
+index 71d057b..4ec2258 100644
+--- a/debian/control
++++ b/debian/control
+@@ -23,7 +24,7 @@ Depends:
+  libdrm2 (= ${binary:Version}),
+  libdrm-intel1 (= ${binary:Version}) [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
+  libdrm-radeon1 (= ${binary:Version}) [linux-any],
+- libdrm-nouveau1a (= ${binary:Version}) [linux-any],
++ libdrm-nouveau2 (= ${binary:Version}) [linux-any],
+  libkms1 (= ${binary:Version}) [linux-any],
+  ${misc:Depends},
+ Replaces:
+@@ -101,12 +102,11 @@ Description: Userspace interface to intel-specific kernel DRM services -- debugg
+  .
+  This package provides the debugging symbols for the libdrm-intel1 package.
+ 
+-Package: libdrm-nouveau1a
++Package: libdrm-nouveau2
+ Section: libs
+ Architecture: linux-any
+ Depends: ${shlibs:Depends},
+  ${misc:Depends},
+-Conflicts: libdrm-nouveau1
+ Pre-Depends: ${misc:Pre-Depends}
+ Multi-Arch: same
+ Description: Userspace interface to nouveau-specific kernel DRM services -- runtime
+@@ -115,13 +115,12 @@ Description: Userspace interface to nouveau-specific kernel DRM services -- runt
+  kernelspace portion of the "Direct Rendering Infrastructure" (DRI). The DRI is
+  currently used on Linux to provide hardware-accelerated OpenGL drivers.
+ 
+-Package: libdrm-nouveau1a-dbg
++Package: libdrm-nouveau2-dbg
+ Section: debug
+ Priority: extra
+ Architecture: linux-any
+-Depends: libdrm-nouveau1a (= ${binary:Version}),
++Depends: libdrm-nouveau2 (= ${binary:Version}),
+  ${misc:Depends},
+-Conflicts: libdrm-nouveau1-dbg
+ Multi-Arch: same
+ Description: Userspace interface to nouveau-specific kernel DRM -- debugging symbols
+  This library implements the userspace interface to the kernel DRM services.
+@@ -129,7 +128,7 @@ Description: Userspace interface to nouveau-specific kernel DRM -- debugging sym
+  of the "Direct Rendering Infrastructure" (DRI). The DRI is currently used on
+  Linux to provide hardware-accelerated OpenGL drivers.
+  .
+- This package provides the debugging symbols for the libdrm-nouveau1a package.
++ This package provides the debugging symbols for the libdrm-nouveau2 package.
+ 
+ Package: libdrm-radeon1
+ Section: libs
+diff --git a/debian/libdrm-nouveau1a.install b/debian/libdrm-nouveau1a.install
+deleted file mode 100644
+index 6c55080..0000000
+--- a/debian/libdrm-nouveau1a.install
++++ /dev/null
+@@ -1 +0,0 @@
+-usr/lib/*/libdrm_nouveau.so.1*
+diff --git a/debian/libdrm-nouveau1a.lintian-overrides b/debian/libdrm-nouveau1a.lintian-overrides
+deleted file mode 100644
+index 76c525b..0000000
+--- a/debian/libdrm-nouveau1a.lintian-overrides
++++ /dev/null
+@@ -1 +0,0 @@
+-libdrm-nouveau1a: package-name-doesnt-match-sonames libdrm-nouveau1
+diff --git a/debian/libdrm-nouveau1a.symbols b/debian/libdrm-nouveau1a.symbols
+deleted file mode 100644
+index a2ba922..0000000
+--- a/debian/libdrm-nouveau1a.symbols
++++ /dev/null
+@@ -1,46 +0,0 @@
+-libdrm_nouveau.so.1 libdrm-nouveau1a #MINVER#
+- nouveau_bo_busy@Base 2.4.23
+- nouveau_bo_emit_buffer@Base 2.4.23
+- nouveau_bo_handle_get@Base 2.4.23
+- nouveau_bo_handle_ref@Base 2.4.23
+- nouveau_bo_init@Base 2.4.23
+- nouveau_bo_map@Base 2.4.23
+- nouveau_bo_map_flush@Base 2.4.23
+- nouveau_bo_map_range@Base 2.4.23
+- nouveau_bo_new@Base 2.4.23
+- nouveau_bo_new_tile@Base 2.4.23
+- nouveau_bo_pending@Base 2.4.23
+- nouveau_bo_ref@Base 2.4.23
+- nouveau_bo_takedown@Base 2.4.23
+- nouveau_bo_unmap@Base 2.4.23
+- nouveau_bo_user@Base 2.4.23
+- nouveau_bo_wrap@Base 2.4.23
+- nouveau_channel_alloc@Base 2.4.23
+- nouveau_channel_free@Base 2.4.23
+- nouveau_device_close@Base 2.4.23
+- nouveau_device_get_param@Base 2.4.23
+- nouveau_device_open@Base 2.4.23
+- nouveau_device_open_existing@Base 2.4.23
+- nouveau_device_set_param@Base 2.4.23
+- nouveau_grobj_alloc@Base 2.4.23
+- nouveau_grobj_autobind@Base 2.4.23
+- nouveau_grobj_free@Base 2.4.23
+- nouveau_grobj_ref@Base 2.4.23
+- nouveau_notifier_alloc@Base 2.4.23
+- nouveau_notifier_free@Base 2.4.23
+- nouveau_notifier_reset@Base 2.4.23
+- nouveau_notifier_return_val@Base 2.4.23
+- nouveau_notifier_status@Base 2.4.23
+- nouveau_notifier_wait_status@Base 2.4.23
+- nouveau_pushbuf_emit_reloc@Base 2.4.23
+- nouveau_pushbuf_fini@Base 2.4.23
+- nouveau_pushbuf_flush@Base 2.4.23
+- nouveau_pushbuf_init@Base 2.4.23
+- nouveau_pushbuf_marker_emit@Base 2.4.23
+- nouveau_pushbuf_marker_undo@Base 2.4.23
+- nouveau_pushbuf_submit@Base 2.4.23
+- nouveau_reloc_emit@Base 2.4.23
+- nouveau_resource_alloc@Base 2.4.23
+- nouveau_resource_destroy@Base 2.4.23
+- nouveau_resource_free@Base 2.4.23
+- nouveau_resource_init@Base 2.4.23
+diff --git a/debian/libdrm-nouveau2.install b/debian/libdrm-nouveau2.install
+new file mode 100644
+index 0000000..a573e71
+--- /dev/null
++++ b/debian/libdrm-nouveau2.install
+@@ -0,0 +1 @@
++usr/lib/*/libdrm_nouveau.so.2*
+diff --git a/debian/libdrm-nouveau2.symbols b/debian/libdrm-nouveau2.symbols
+new file mode 100644
+index 0000000..b975d93
+--- /dev/null
++++ b/debian/libdrm-nouveau2.symbols
+@@ -0,0 +1,41 @@
++libdrm_nouveau.so.2 libdrm-nouveau2 #MINVER#
++ abi16_bo_info@Base 2.4.33
++ abi16_bo_init@Base 2.4.33
++ abi16_chan_nv04@Base 2.4.33
++ abi16_chan_nvc0@Base 2.4.33
++ abi16_engobj@Base 2.4.33
++ abi16_ntfy@Base 2.4.33
++ nouveau_bo_map@Base 2.4.33
++ nouveau_bo_name_get@Base 2.4.33
++ nouveau_bo_name_ref@Base 2.4.33
++ nouveau_bo_new@Base 2.4.33
++ nouveau_bo_ref@Base 2.4.33
++ nouveau_bo_wait@Base 2.4.33
++ nouveau_bo_wrap@Base 2.4.33
++ nouveau_bufctx_del@Base 2.4.33
++ nouveau_bufctx_mthd@Base 2.4.33
++ nouveau_bufctx_new@Base 2.4.33
++ nouveau_bufctx_refn@Base 2.4.33
++ nouveau_bufctx_reset@Base 2.4.33
++ nouveau_client_del@Base 2.4.33
++ nouveau_client_new@Base 2.4.33
++ nouveau_debug@Base 2.4.33
++ nouveau_device_del@Base 2.4.33
++ nouveau_device_open@Base 2.4.33
++ nouveau_device_open_existing@Base 2.4.33
++ nouveau_device_wrap@Base 2.4.33
++ nouveau_getparam@Base 2.4.33
++ nouveau_object_del@Base 2.4.33
++ nouveau_object_find@Base 2.4.33
++ nouveau_object_new@Base 2.4.33
++ nouveau_pushbuf_bufctx@Base 2.4.33
++ nouveau_pushbuf_data@Base 2.4.33
++ nouveau_pushbuf_del@Base 2.4.33
++ nouveau_pushbuf_kick@Base 2.4.33
++ nouveau_pushbuf_new@Base 2.4.33
++ nouveau_pushbuf_refd@Base 2.4.33
++ nouveau_pushbuf_refn@Base 2.4.33
++ nouveau_pushbuf_reloc@Base 2.4.33
++ nouveau_pushbuf_space@Base 2.4.33
++ nouveau_pushbuf_validate@Base 2.4.33
++ nouveau_setparam@Base 2.4.33
+diff --git a/debian/rules b/debian/rules
+index 4c296ea..ac7a0b8 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -14,7 +14,7 @@ ifeq (linux, $(DEB_HOST_ARCH_OS))
+ 	confflags += --enable-libkms
+ 	LIBKMS = yes
+ 	confflags += --enable-vmwgfx-experimental-api
+-	confflags += --enable-nouveau-experimental-api
++	confflags += --enable-nouveau
+ 	NOUVEAU = yes
+ 	confflags += --enable-radeon
+ 	RADEON = yes
+@@ -23,7 +23,7 @@ else
+ 	confflags += --disable-libkms
+ 	LIBKMS = no
+ 	confflags += --disable-vmwgfx-experimental-api
+-	confflags += --disable-nouveau-experimental-api
++	confflags += --disable-nouveau
+ 	NOUVEAU = no
+ 	confflags += --disable-radeon
+ 	RADEON = no
+@@ -64,7 +64,7 @@ ifeq ($(INTEL), yes)
+ 	dh_strip -plibdrm-intel1 --dbg-package=libdrm-intel1-dbg
+ endif
+ ifeq ($(NOUVEAU), yes)
+-	dh_strip -plibdrm-nouveau1a --dbg-package=libdrm-nouveau1a-dbg
++	dh_strip -plibdrm-nouveau2 --dbg-package=libdrm-nouveau2-dbg
+ endif
+ ifeq ($(RADEON), yes)
+ 	dh_strip -plibdrm-radeon1 --dbg-package=libdrm-radeon1-dbg
+@@ -80,7 +80,7 @@ ifeq ($(INTEL), yes)
+ 	dh_makeshlibs -plibdrm-intel1 -V'libdrm-intel1 (>= 2.4.32)' -- -c4
+ endif
+ ifeq ($(NOUVEAU), yes)
+-	dh_makeshlibs -plibdrm-nouveau1a -V'libdrm-nouveau1a (>= 2.4.23)' -- -c4
++	dh_makeshlibs -plibdrm-nouveau2 -V'libdrm-nouveau2 (>= 2.4.33)' -- -c4
+ endif
+ ifeq ($(RADEON), yes)
+ 	dh_makeshlibs -plibdrm-radeon1 -V'libdrm-radeon1 (>= 2.4.31)' -- -c4
