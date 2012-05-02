@@ -32,17 +32,51 @@
 #
 ########################################################################
 
-# TODO: import bash functions
-
-# TODO: Update this once the official name is announced
-# TODO: (Or just query it from launchpad?)
-lts_codename=quixotic
+lts_codename=quantal
 suffix=lts-backport-${lts_codename}
 #codename=$(current-ubuntu-development-codename)
 
-# TODO: Usage
+usage() {
+    echo "Usage:  $0 [-hqv] <mapping-file>"
+    echo " -h:              This help text"
+    echo " -q:              Quell output"
+    echo " -v:              Extra verbose output"
+}
 
-# TODO: optparse
+while getopts "h\?qv" opt $*; do
+    case "$opt" in
+	h ) usage 0                                ;;
+	\?) usage 1                                ;;
+	q ) verbose=0                              ;;
+	v ) verbose=2                              ;;
+	* ) warn "Unknown option '$opt'"; usage 1  ;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+rename_mapping_file=$1
+if [ -z "${rename_mapping_file}" ]; then
+    usage 1
+elif [ ! -e "${rename_mapping_file}" ]; then
+    ERR "No such file ${rename_mapping_file}"
+    exit 1
+fi
+
+ERR() {
+    echo "Error: $*" 2>&1
+}
+
+msg() {
+    if [ $verbose -gt 0 ]; then
+	echo "$*"
+    fi
+}
+
+dbg() {
+    if [ $verbose -gt 1 ]; then
+	echo "$*"
+    fi
+}
 
 base_version() {
     buf=${1#*:}          # Strip epoch
@@ -64,11 +98,19 @@ if [ ! -e ${rules} ]; then
     exit 2
 fi
 
+control=debian/control
+if [ ! -e ${rules} ]; then
+    echo $PWD
+    echo "ERROR: Could not locate debian/control from the current dir"
+    exit 3
+fi
+
 old_package=$(head -n 1 ${changelog} | cut -d' ' -f1)
 old_package_version=$(head -n 1 ${changelog} | cut -d' ' -f2)
 old_package_version=${old_package_version//[\(\)/}  # Strip parens
 new_package=${old_package}-${suffix}
 base_version=$(base_version ${old_package_version})
+old_binaries=$(grep ^Package: ${control} | cut -f2 -d' ')
 
 if [[ "${old_package}" =~ ${suffix}$ ]]; then
     echo ${old_package}
@@ -99,13 +141,13 @@ dch --increment \
 echo
 
 echo "Processing the control file..."
-# TODO: dpkg-control is imaginary - needs written
 dpkg-control \
-    --source-name-append ${suffix} \
-    --binary-names-append ${suffix} \
-    --other-names-mappings ${rename_mapping_file} \
+    --source-suffix ${suffix} \
+    --binary-suffix ${suffix} \
+    --mapping-file ${rename_mapping_file} \
     --add-replaces ${old_package} \
-    --add-breaks "${old_package}=${old_package_version}"
+    --add-breaks "${old_package}=${old_package_version}" > ${control}.new
+mv ${control}.new ${control}
 echo
 
 echo "Checking rules..."
@@ -116,14 +158,21 @@ if [ $? != 0 ]; then
 fi
 echo
 
-# TODO: Actually this needs to iterate over the binary package names too...
-echo "Renaming any <package>.* files..."
-for old_file in debian/${old_package}.*; do
-    new_file=$(basename $old_file)
-    new_file=debian/${new_file/${old_package}/${new_package}}
-    echo "mv $old_file $new_file"
-    mv $old_file $new_file
+echo "Renaming binary install, etc. files..."
+for pkg in ${old_binaries}; do
+    echo "- Renaming ${pkg}.* files..."
+    files=$(ls debian/${pkg}.*)
+    if [ $? -ne 0 ]; then
+	continue
+    fi
+    for old_file in $files; do
+	echo $old_file
+	new_file=$(basename $old_file)
+	new_file=debian/${new_file/${old_package}/${new_package}}
+	echo "mv $old_file $new_file"
+	mv $old_file $new_file
     # TODO: Maybe using 'rename' would be better?
+    done
 done
 echo
 
