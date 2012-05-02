@@ -257,8 +257,9 @@ update_changelogs() {
         EPOCH=$(dpkg-parsechangelog | sed -n 's/^Version: \(.\):.*/\1/p')
     fi
 
-    # -b forces version even if missing epoch
-    dch -b --distribution $DISTRIBUTION --newversion ${EPOCH:+$EPOCH:}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
+    # -b forces version even if missing epoch, --force-distribution allows
+    # non-interactive updating when the release is not known
+    dch --force-distribution -b --distribution $DISTRIBUTION --newversion ${EPOCH:+$EPOCH:}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
     
     # Change Maintainer if on Ubuntu
     if [ "$(lsb_release -i -s)" = "Ubuntu" ] &&
