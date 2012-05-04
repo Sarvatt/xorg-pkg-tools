@@ -125,7 +125,7 @@ diff -ur ../mesa-8.0.2+git20120429+8.0.e995b41a/debian/rules debian/rules
    # LLVM is required for r300g and recommended for swrastg on x86:
    ifneq (,$(filter $(DEB_HOST_ARCH),amd64 i386 kfreebsd-amd64 kfreebsd-i386))
 -	confflags_GALLIUM += --enable-gallium-llvm
-+	confflags_GALLIUM += --enable-gallium-llvm --with-llvm-shared-libs
++	confflags_GALLIUM += --enable-gallium-llvm  
    endif
  
  	confflags_DIRECT_RENDERING = --enable-driglx-direct
