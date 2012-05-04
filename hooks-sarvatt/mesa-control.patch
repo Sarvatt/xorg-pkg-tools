@@ -1,0 +1,35 @@
+diff --git a/debian/control b/debian/control
+index 968a901..6d676ea 100644
+--- a/debian/control
++++ b/debian/control
+@@ -32,7 +32,7 @@ Build-Depends:
+  libudev-dev [linux-any],
+  flex,
+  bison,
+- llvm-3.0-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
++ llvm-3.1-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
+  libwayland-dev (>= 0.85.0) [linux-any],
+ Vcs-Git: git://git.debian.org/git/pkg-xorg/lib/mesa
+ Vcs-Browser: http://git.debian.org/?p=pkg-xorg/lib/mesa.git
+@@ -589,6 +589,7 @@ Architecture: any
+ Depends:
+  ${shlibs:Depends},
+  ${misc:Depends}
++Recommends: libtxc-dxtn0
+ Suggests: libglide3
+ Conflicts: xlibmesa-dri (<< 1:7.0.0)
+ Replaces: xlibmesa-dri (<< 1:7.0.0), libgl1-mesa-dri-experimental (<< 7.11.1)
+
+diff --git a/debian/patches/13-llvm-config-pick-a-version.diff b/debian/patches/13-llvm-config-pick-a-version.diff
+index 0350aa2..2893b22 100644
+--- a/debian/patches/13-llvm-config-pick-a-version.diff
++++ b/debian/patches/13-llvm-config-pick-a-version.diff
+@@ -13,7 +13,7 @@ Index: mesa/configure.ac
+  fi
+  if test "x$enable_gallium_llvm" = xyes; then
+ -    AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no])
+-+    AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.0], [no])
+++    AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no])
+  
+      if test "x$LLVM_CONFIG" != xno; then
+  	LLVM_VERSION=`$LLVM_CONFIG --version | sed 's/svn.*//g'`
