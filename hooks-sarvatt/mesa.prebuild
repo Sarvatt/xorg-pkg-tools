@@ -1,4 +1,6 @@
-sed -i -e "/^Build-Depends: /s/$/, libtool/" debian/control
+sed -i '/^Build-Depends:/a \
+ libtool,
+' debian/control
 CHANGES+=("hook: Add libtool to build depends.")
 
 patch -p1 < $HOOKS/mesa.patch
