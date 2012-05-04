@@ -7,7 +7,6 @@ getp() {
 #mesa master (8.1)
 drop 05_kfreebsd-egl-x11.diff fails
 drop 115_llvm_dynamic_linking.diff upstream
-drop 116_use_shared_galliumcore.diff fails
 drop 117_intel_fix_hiz_null_dereference.patch upstream
 
 ## Legacy unused hooks for reference
