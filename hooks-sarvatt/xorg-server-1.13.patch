@@ -1,0 +1,16 @@
+diff --git a/debian/patches/02_Add-libnettle-as-option-for-sha1.diff b/debian/patches/02_Add-libnettle-as-option-for-sha1.diff
+index bb0c338..b2571aa 100644
+--- a/debian/patches/02_Add-libnettle-as-option-for-sha1.diff
++++ b/debian/patches/02_Add-libnettle-as-option-for-sha1.diff
+@@ -16,8 +16,8 @@ Index: xorg-server/configure.ac
+  
+  # SHA1 hashing
+  AC_ARG_WITH([sha1],
+--            [AS_HELP_STRING([--with-sha1=libc|libmd|libgcrypt|libcrypto|libsha1|CommonCrypto],
+-+            [AS_HELP_STRING([--with-sha1=libc|libmd|libgcrypt|libcrypto|libsha1|CommonCrypto|nettle],
++-            [AS_HELP_STRING([--with-sha1=libc|libmd|libgcrypt|libcrypto|libsha1|CommonCrypto|CryptoAPI],
+++            [AS_HELP_STRING([--with-sha1=libc|libmd|libgcrypt|libcrypto|libsha1|CommonCrypto|CryptoAPI|nettle],
+                              [choose SHA1 implementation])])
+  AC_CHECK_FUNC([SHA1Init], [HAVE_SHA1_IN_LIBC=yes])
+  if test "x$with_sha1" = x && test "x$HAVE_SHA1_IN_LIBC" = xyes; then
+

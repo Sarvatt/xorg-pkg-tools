@@ -18,7 +18,7 @@ elif [ "$BRANCH" == "server-1.11-branch" ]; then
 	drop 210_pixman_null_ptr_check.patch upstream
 	drop 220_xi21_always_deliver_raw_events.diff fails
 
-elif [ "$BRANCH" == "server-1.12-branch" ]; then
+elif [ "$BRANCH" == "server-1.12-branch" -o "$BRANCH" == "master" ]; then
 	patch -p1 < $HOOKS/xorg-server-1.12.patch
 
 	drop 190_cache-xkbcomp_output_for_fast_start_up.patch needs-refresh
@@ -30,8 +30,15 @@ elif [ "$BRANCH" == "server-1.12-branch" ]; then
 	drop 505_query_pointer_touchscreen.patch upstream
 	drop 506_touchscreen_pointer_emulation_checks.patch upstream
 	drop 507_touchscreen_fixes.patch fails
+	drop 508_device_off_release_buttons.patch upstream
 		
 	getp 500_pointer_barrier_thresholds.diff
+fi
+
+if [ "$BRANCH" == "master" ]; then
+	patch -p1 < $HOOKS/xorg-server-1.13.patch
+	
+	drop 100_rethrow_signals.patch needs-refresh
 fi
 
 ## Legacy unused hooks for reference
