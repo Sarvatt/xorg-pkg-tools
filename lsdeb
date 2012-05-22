@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# List contents of most recently built deb
+
+debfile=$(ls  /var/cache/pbuilder/*-*/result/*.deb -t | head -n 1)
+
+dpkg-deb -c ${debfile}
+
+echo
+echo ${debfile}
