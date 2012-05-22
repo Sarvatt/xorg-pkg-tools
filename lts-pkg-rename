@@ -35,6 +35,7 @@
 lts_codename=quantal
 suffix=lts-backport-${lts_codename}
 #codename=$(current-ubuntu-development-codename)
+verbose=1
 
 usage() {
     echo "Usage:  $0 [-hqv] <mapping-file>"
@@ -43,26 +44,12 @@ usage() {
     echo " -v:              Extra verbose output"
 }
 
-while getopts "h\?qv" opt $*; do
-    case "$opt" in
-	h ) usage 0                                ;;
-	\?) usage 1                                ;;
-	q ) verbose=0                              ;;
-	v ) verbose=2                              ;;
-	* ) warn "Unknown option '$opt'"; usage 1  ;;
-    esac
-done
-shift `expr $OPTIND - 1`
-
-rename_mapping_file=$1
-if [ -z "${rename_mapping_file}" ]; then
-    usage 1
-elif [ ! -e "${rename_mapping_file}" ]; then
-    ERR "No such file ${rename_mapping_file}"
-    exit 1
-fi
-
 ERR() {
+    echo "Error: $*" 2>&1
+    exit 1
+}
+
+warn() {
     echo "Error: $*" 2>&1
 }
 
@@ -83,26 +70,41 @@ base_version() {
     echo ${buf%-*}       # Strip debian version
 }
 
+while getopts "h\?qv" opt $*; do
+    case "$opt" in
+	h ) usage 0                                ;;
+	\?) usage 1                                ;;
+	q ) verbose=0                              ;;
+	v ) verbose=2                              ;;
+	* ) warn "Unknown option '$opt'"; usage 1  ;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+rename_mapping_file=$1
+if [ -z "${rename_mapping_file}" ]; then
+    usage 1
+elif [ ! -e "${rename_mapping_file}" ]; then
+    ERR "No such file ${rename_mapping_file}"
+fi
+
 # Determine package name from the changelog
 changelog=debian/changelog
 if [ ! -e ${changelog} ]; then
-    echo $PWD
-    echo "ERROR: Could not locate debian/changelog from the current dir"
-    exit 1
+    dbg $PWD
+    ERR "Could not locate debian/changelog from the current dir"
 fi
 
 rules=debian/rules
 if [ ! -e ${rules} ]; then
-    echo $PWD
-    echo "ERROR: Could not locate debian/rules from the current dir"
-    exit 2
+    dbg $PWD
+    ERR "Could not locate debian/rules from the current dir"
 fi
 
 control=debian/control
 if [ ! -e ${rules} ]; then
-    echo $PWD
-    echo "ERROR: Could not locate debian/control from the current dir"
-    exit 3
+    msg $PWD
+    ERR "Could not locate debian/control from the current dir"
 fi
 
 old_package=$(head -n 1 ${changelog} | cut -d' ' -f1)
@@ -113,34 +115,33 @@ base_version=$(base_version ${old_package_version})
 old_binaries=$(grep ^Package: ${control} | cut -f2 -d' ')
 
 if [[ "${old_package}" =~ ${suffix}$ ]]; then
-    echo ${old_package}
-    echo "ERROR: Already renamed"
-    exit 3
+    dbg ${old_package}
+    ERR "Already renamed"
 fi
 
-echo "Renaming the orig.tar.gz..."
+msg "Renaming the orig.tar.gz..."
 old_orig=${old_package}_${base_version}.orig.tar.gz
 new_orig=${new_package}_${base_version}.orig.tar.gz
 if [ -e ../${new_orig} ]; then
-    echo "Warning: ../${new_orig} already exists so not renaming"
+    warn "../${new_orig} already exists so not renaming"
 else
     cp -via ../${old_orig} ../${new_orig}
 fi
-echo
+msg
 
-echo "Updating the maintainer..."
+msg "Updating the maintainer..."
 update-maintainer -q
-echo
+msg
 
-echo "Adding a changelog entry..."
+msg "Adding a changelog entry..."
 dch --increment \
     --package ${new_package} \
     --distribution ${lts_codename}-proposed \
     --force-distribution \
     "Rename package for the LTS point update, and add replaces/breaks"
-echo
+msg
 
-echo "Processing the control file..."
+msg "Processing the control file..."
 dpkg-control \
     --source-suffix ${suffix} \
     --binary-suffix ${suffix} \
@@ -148,36 +149,36 @@ dpkg-control \
     --add-replaces ${old_package} \
     --add-breaks "${old_package}=${old_package_version}" > ${control}.new
 mv ${control}.new ${control}
-echo
+msg
 
-echo "Checking rules..."
+msg "Checking rules..."
 grep ${old_package} ${rules}
 if [ $? != 0 ]; then
-    echo "${rules} mentions ${old_package}"
-    echo "Warning: Manual update of ${rules} required"
+    dbg "${rules} mentions ${old_package}"
+    warn "Manual update of ${rules} required"
 fi
-echo
+msg
 
-echo "Renaming binary install, etc. files..."
+msg "Renaming binary install, etc. files..."
 for pkg in ${old_binaries}; do
-    echo "- Renaming ${pkg}.* files..."
+    msg "- Renaming ${pkg}.* files..."
     files=$(ls debian/${pkg}.*)
     if [ $? -ne 0 ]; then
 	continue
     fi
     for old_file in $files; do
-	echo $old_file
+	dbg $old_file
 	new_file=$(basename $old_file)
 	new_file=debian/${new_file/${old_package}/${new_package}}
-	echo "mv $old_file $new_file"
+	msg "mv $old_file $new_file"
 	mv $old_file $new_file
     # TODO: Maybe using 'rename' would be better?
     done
 done
-echo
+msg
 
-echo "Generating changes file..."
+msg "Generating changes file..."
 debuild -S
-echo
+msg
 
-echo "${old_package} now renamed to ${new_package}"
+msg "${old_package} now renamed to ${new_package}"
