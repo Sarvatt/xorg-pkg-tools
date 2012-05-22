@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# Tools for reviewing/installing/testing debs built in pbuilder
+#
+# Bryce W. Harrington <bryce@canonical.com>
+
+command=$1
+target=$2
+if [ -z "${command}" ] || [ -z "${target}" ]; then
+    print "Usage: pdeb <command> <target>"
+    print
+    print "  Command      Target    Effect"
+    print "  ls           last      List contents of the most recently pbuilt deb"
+    print "  install      <*.deb>   Installs debs for binary packages that are already present on the system"
+    #print "  install      last      Install the most recently pbuilt deb[s]" # TODO: Unimplemented
+
+elif [ "${command}" = "ls" ]; then
+    if [ "${target}" = "last" ]; then
+        # List contents of most recently built deb
+	debfile=$(ls  /var/cache/pbuilder/*-*/result/*.deb -t | head -n 1)
+	dpkg-deb -c ${debfile}
+	echo
+	echo ${debfile}
+
+    else
+	echo "Unimplemented"
+    fi
+
+elif [ "${command}" = "install" ]; then
+    if [ "${target}" = "last" ]; then
+	echo "Unimplemented"
+
+    else
+	installable=
+	for file in $*; do
+	    if [ ${file%%.deb} = ${file} ]; then
+                # Skipping; not a .deb file
+		continue
+	    fi
+	    package=${file%%_*}
+	    installed=$(apt-cache policy ${package} | grep Installed | cut -d: -f2-)
+	    if [ "${installed}" = "(none)" ] ; then
+		continue
+	    fi
+	    echo $package $installed
+	    installable="${installable} ${file}"
+	done
+	
+	echo "dpkg -i ${installable}"
+	sudo dpkg -i ${installable}
+	echo
+    fi
+fi
