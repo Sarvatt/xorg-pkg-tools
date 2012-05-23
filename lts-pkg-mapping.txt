@@ -1,57 +1,69 @@
-libdbus-1-dev			libdbus-1-dev-lts-backport-quantal
-libdmx-dev			libdmx-dev-lts-backport-quantal
+# Stable upstream, won't need to depend on new versions
+#libdbus-1-dev			libdbus-1-dev-lts-backport-quantal
+#libhal-dev			libhal-dev-lts-backport-quantal
+#libgcrypt-dev			libgcrypt-dev-lts-backport-quantal
+#libselinux1-dev			libselinux1-dev-lts-backport-quantal
+
+# *Un*stable upstream, but intimately tied with kernel
+#libudev-dev			libudev-dev-lts-backport-quantal
+
+# Client libaries, not needed for main server build,
+# but needed for weird servers like xnest, xdmx, etc
+#libdmx-dev			libdmx-dev-lts-backport-quantal
+#libxext-dev			libxext-dev-lts-backport-quantal
+#libxfixes-dev			libxfixes-dev-lts-backport-quantal
+#libxi-dev			libxi-dev-lts-backport-quantal
+#libxinerama-dev		libxinerama-dev-lts-backport-quantal
+#libxmu-dev			libxmu-dev-lts-backport-quantal
+#libxmuu-dev			libxmuu-dev-lts-backport-quantal
+#libxpm-dev			libxpm-dev-lts-backport-quantal
+#libxrender-dev			libxrender-dev-lts-backport-quantal
+#libxres-dev			libxres-dev-lts-backport-quantal
+#libxt-dev			libxt-dev-lts-backport-quantal
+#libxtst-dev			libxtst-dev-lts-backport-quantal
+#libxv-dev			libxv-dev-lts-backport-quantal
+
+# Client libraries the server has an unversioned depends upon,
+# the Precise versions will be fine.
+#libx11-dev			libx11-dev-lts-backport-quantal
+#libxau-dev			libxau-dev-lts-backport-quantal
+#libxaw7-dev			libxaw7-dev-lts-backport-quantal
+#libxdmcp-dev			libxdmcp-dev-lts-backport-quantal
+#libxfont-dev			libxfont-dev-lts-backport-quantal
+#libxkbfile-dev			libxkbfile-dev-lts-backport-quantal
+
+# Protocol headers should be SRUable (discussion still pending)
+#x11proto-bigreqs-dev		x11proto-bigreqs-dev-lts-backport-quantal
+#x11proto-composite-dev		x11proto-composite-dev-lts-backport-quantal
+#x11proto-core-dev		x11proto-core-dev-lts-backport-quantal
+#x11proto-damage-dev		x11proto-damage-dev-lts-backport-quantal
+#x11proto-dmx-dev		x11proto-dmx-dev-lts-backport-quantal
+#x11proto-dri2-dev		x11proto-dri2-dev-lts-backport-quantal
+#x11proto-fixes-dev		x11proto-fixes-dev-lts-backport-quantal
+#x11proto-fonts-dev		x11proto-fonts-dev-lts-backport-quantal
+#x11proto-gl-dev			x11proto-gl-dev-lts-backport-quantal
+#x11proto-input-dev		x11proto-input-dev-lts-backport-quantal
+#x11proto-kb-dev			x11proto-kb-dev-lts-backport-quantal
+#x11proto-randr-dev		x11proto-randr-dev-lts-backport-quantal
+#x11proto-record-dev		x11proto-record-dev-lts-backport-quantal
+#x11proto-render-dev		x11proto-render-dev-lts-backport-quantal
+#x11proto-resource-dev		x11proto-resource-dev-lts-backport-quantal
+#x11proto-scrnsaver-dev		x11proto-scrnsaver-dev-lts-backport-quantal
+#x11proto-video-dev		x11proto-video-dev-lts-backport-quantal
+#x11proto-xcmisc-dev		x11proto-xcmisc-dev-lts-backport-quantal
+#x11proto-xext-dev		x11proto-xext-dev-lts-backport-quantal
+#x11proto-xf86bigfont-dev	x11proto-xf86bigfont-dev-lts-backport-quantal
+#x11proto-xf86dga-dev		x11proto-xf86dga-dev-lts-backport-quantal
+#x11proto-xf86dri-dev		x11proto-xf86dri-dev-lts-backport-quantal
+#x11proto-xf86vidmode-dev	x11proto-xf86vidmode-dev-lts-backport-quantal
+#x11proto-xinerama-dev		x11proto-xinerama-dev-lts-backport-quantal
+
 libdrm-dev			libdrm-dev-lts-backport-quantal
-libgcrypt-dev			libgcrypt-dev-lts-backport-quantal
 libgl1-mesa-dev			libgl1-mesa-dev-lts-backport-quantal
-libhal-dev			libhal-dev-lts-backport-quantal
 libpciaccess-dev		libpciaccess-dev-lts-backport-quantal
 libpixman-1-dev			libpixman-1-dev-lts-backport-quantal
-libselinux1-dev			libselinux1-dev-lts-backport-quantal
-libudev-dev			libudev-dev-lts-backport-quantal
-libx11-dev			libx11-dev-lts-backport-quantal
-libxau-dev			libxau-dev-lts-backport-quantal
-libxaw7-dev			libxaw7-dev-lts-backport-quantal
-libxdmcp-dev			libxdmcp-dev-lts-backport-quantal
-libxext-dev			libxext-dev-lts-backport-quantal
-libxfixes-dev			libxfixes-dev-lts-backport-quantal
-libxfont-dev			libxfont-dev-lts-backport-quantal
-libxi-dev			libxi-dev-lts-backport-quantal
-libxinerama-dev			libxinerama-dev-lts-backport-quantal
-libxkbfile-dev			libxkbfile-dev-lts-backport-quantal
-libxmu-dev			libxmu-dev-lts-backport-quantal
-libxmuu-dev			libxmuu-dev-lts-backport-quantal
-libxpm-dev			libxpm-dev-lts-backport-quantal
-libxrender-dev			libxrender-dev-lts-backport-quantal
-libxres-dev			libxres-dev-lts-backport-quantal
-libxt-dev			libxt-dev-lts-backport-quantal
-libxtst-dev			libxtst-dev-lts-backport-quantal
-libxv-dev			libxv-dev-lts-backport-quantal
 mesa-common-dev			mesa-common-dev-lts-backport-quantal
 x11-common			x11-common-lts-backport-quantal
-x11proto-bigreqs-dev		x11proto-bigreqs-dev-lts-backport-quantal
-x11proto-composite-dev		x11proto-composite-dev-lts-backport-quantal
-x11proto-core-dev		x11proto-core-dev-lts-backport-quantal
-x11proto-damage-dev		x11proto-damage-dev-lts-backport-quantal
-x11proto-dmx-dev		x11proto-dmx-dev-lts-backport-quantal
-x11proto-dri2-dev		x11proto-dri2-dev-lts-backport-quantal
-x11proto-fixes-dev		x11proto-fixes-dev-lts-backport-quantal
-x11proto-fonts-dev		x11proto-fonts-dev-lts-backport-quantal
-x11proto-gl-dev			x11proto-gl-dev-lts-backport-quantal
-x11proto-input-dev		x11proto-input-dev-lts-backport-quantal
-x11proto-kb-dev			x11proto-kb-dev-lts-backport-quantal
-x11proto-randr-dev		x11proto-randr-dev-lts-backport-quantal
-x11proto-record-dev		x11proto-record-dev-lts-backport-quantal
-x11proto-render-dev		x11proto-render-dev-lts-backport-quantal
-x11proto-resource-dev		x11proto-resource-dev-lts-backport-quantal
-x11proto-scrnsaver-dev		x11proto-scrnsaver-dev-lts-backport-quantal
-x11proto-video-dev		x11proto-video-dev-lts-backport-quantal
-x11proto-xcmisc-dev		x11proto-xcmisc-dev-lts-backport-quantal
-x11proto-xext-dev		x11proto-xext-dev-lts-backport-quantal
-x11proto-xf86bigfont-dev	x11proto-xf86bigfont-dev-lts-backport-quantal
-x11proto-xf86dga-dev		x11proto-xf86dga-dev-lts-backport-quantal
-x11proto-xf86dri-dev		x11proto-xf86dri-dev-lts-backport-quantal
-x11proto-xf86vidmode-dev	x11proto-xf86vidmode-dev-lts-backport-quantal
-x11proto-xinerama-dev		x11proto-xinerama-dev-lts-backport-quantal
 x11-xkb-utils			x11-xkb-utils-lts-backport-quantal
 x11-xkb-utils-udeb		x11-xkb-utils-udeb-lts-backport-quantal
 xauth				xauth-lts-backport-quantal
