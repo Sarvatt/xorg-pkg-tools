@@ -139,7 +139,10 @@ if __name__ == "__main__":
     re_prop = re.compile(r'^([-\w]+):\s*(.*)$')
 
     mappings = load_mappings(options.mapping_file)
-    killings = options.kill_binaries.split(',')
+    if options.kill_binaries != None:
+        killings = options.kill_binaries.split(',')
+    else:
+        killings = []
 
     kill_section = False
     section = None
