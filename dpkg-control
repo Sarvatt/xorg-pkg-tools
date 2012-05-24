@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+########################################################################
+# Copyright (C) 2012 Canonical, Ltd.
+# Author:  Bryce W. Harrington
+# License: MIT license, same as X
+#          (see http://www.opensource.org/licenses/mit-license.php)
+########################################################################
 import os
 import sys
 
@@ -14,6 +20,10 @@ def parse_options():
     parser.add_option(
         "-b", "--binary-suffix", dest="binary_suffix",
         help="Appends given suffix to all binary files present in the control file",
+        action="store", default=None)
+    parser.add_option(
+        "-k", "--kill-binaries", dest="kill_binaries",
+        help="Comma delimited list of binary packages to remove",
         action="store", default=None)
     parser.add_option(
         "-m", "--mapping-file", dest="mapping_file",
@@ -129,7 +139,9 @@ if __name__ == "__main__":
     re_prop = re.compile(r'^([-\w]+):\s*(.*)$')
 
     mappings = load_mappings(options.mapping_file)
+    killings = options.kill_binaries.split(',')
 
+    kill_section = False
     section = None
     prop = None
     breaks = None
@@ -148,11 +160,16 @@ if __name__ == "__main__":
 
             # Re-init
             print
+            kill_section = False
             section = None
             prop = None
             breaks = None
             replaces = None
             value = None
+
+        if kill_section:
+            print "#%s" %(orig_line)
+            continue
 
         line = orig_line.split('#')[0].strip() # Ignore comments
 
@@ -175,14 +192,19 @@ if __name__ == "__main__":
                 print orig_line
 
         elif 'Package' == prop:
-            if options.add_replaces and value:
-                replaces = value
-            if options.add_breaks and value:
-                breaks = value
-            if options.binary_suffix:
-                print "%s-%s" %(line, options.binary_suffix)
+            if value in killings:
+                kill_section = True
+                print "#%s" %(orig_line)
             else:
-                print orig_line
+                kill_section = False
+                if options.add_replaces and value:
+                    replaces = value
+                if options.add_breaks and value:
+                    breaks = value
+                if options.binary_suffix:
+                    print "%s-%s" %(line, options.binary_suffix)
+                else:
+                    print orig_line
 
         elif 'Description' == prop:
             print orig_line
@@ -216,4 +238,3 @@ if __name__ == "__main__":
                                       text)
 
             print text
-
