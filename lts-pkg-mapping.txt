@@ -109,10 +109,20 @@
 #xinput-calibrator
 
 # Core stack
+# Disabled for testing
+#libpciaccess-dev		libpciaccess-dev-lts-backport-quantal
+#libpixman-1-dev			libpixman-1-dev-lts-backport-quantal
+
+# Disabled because of libx11-dev depends
+#xutils-dev			xutils-dev-lts-backport-quantal
+#xtrans-dev			xtrans-dev-lts-backport-quantal
+
+# Enable because of breakage otherwise
+libxres-dev			libxres-dev-lts-backport-quantal
+
+# Rest of core stack
 libdrm-dev			libdrm-dev-lts-backport-quantal
 libgl1-mesa-dev			libgl1-mesa-dev-lts-backport-quantal
-libpciaccess-dev		libpciaccess-dev-lts-backport-quantal
-libpixman-1-dev			libpixman-1-dev-lts-backport-quantal
 mesa-common-dev			mesa-common-dev-lts-backport-quantal
 x11-common			x11-common-lts-backport-quantal
 x11-xkb-utils			x11-xkb-utils-lts-backport-quantal
@@ -124,8 +134,6 @@ xfonts-utils			xfonts-utils-lts-backport-quantal
 xkb-data			xkb-data-lts-backport-quantal
 xkb-data-udeb			xkb-data-udeb-lts-backport-quantal
 xserver-common			xserver-common-lts-backport-quantal
-xtrans-dev			xtrans-dev-lts-backport-quantal
-xutils-dev			xutils-dev-lts-backport-quantal
 
 # Not sure about these, but guessing we can leave these alone:
 #xorg
@@ -135,16 +143,23 @@ xutils-dev			xutils-dev-lts-backport-quantal
 #xorg-docs
 #xorg-sgml-doctools
 
+#evil blobs, might not need a big update
+#fglrx-dev				 fglrx-dev-lts-backport-quantal
+#nvidia-current-dev			 nvidia-current-dev-lts-backport-quantal
+#nvidia-173-dev				 nvidia-173-dev-lts-backport-quantal
+#nvidia-96-dev				 nvidia-96-dev-lts-backport-quantal
+#nvidia-current-updates-dev		 nvidia-current-updates-dev-lts-backport-quantal
+
 # DDX and other drivers
-fglrx-dev				 fglrx-dev-lts-backport-quantal
-nvidia-current-dev			 nvidia-current-dev-lts-backport-quantal
-nvidia-173-dev				 nvidia-173-dev-lts-backport-quantal
-nvidia-96-dev				 nvidia-96-dev-lts-backport-quantal
-nvidia-current-updates-dev		 nvidia-current-updates-dev-lts-backport-quantal
 xf86-input-mtrack			 xf86-input-mtrack-lts-backport-quantal
+xserver-xorg-input-mtrack		 xserver-xorg-input-mtrack-lts-backport-quantal
 xf86-input-wacom			 xf86-input-wacom-lts-backport-quantal
+xserver-xorg-input-wacom		 xserver-xorg-input-wacom-lts-backport-quantal
 xf86-video-msm				 xf86-video-msm-lts-backport-quantal
+xserver-xorg-video-msm			 xserver-xorg-video-msm-lts-backport-quantal
 xf86-video-omapfb			 xf86-video-omapfb-lts-backport-quantal
+xserver-xorg-video-omapfb		 xserver-xorg-video-omapfb-lts-backport-quantal
+
 xserver-xorg-input-evdev-dev		 xserver-xorg-input-evdev-dev-lts-backport-quantal
 xserver-xorg-input-joystick-dev		 xserver-xorg-input-joystick-dev-lts-backport-quantal
 xserver-xorg-input-keyboard		 xserver-xorg-input-keyboard-lts-backport-quantal
@@ -152,23 +167,22 @@ xserver-xorg-input-mouse		 xserver-xorg-input-mouse-lts-backport-quantal
 xserver-xorg-input-synaptics-dev	 xserver-xorg-input-synaptics-dev-lts-backport-quantal
 xserver-xorg-input-vmmouse		 xserver-xorg-input-vmmouse-lts-backport-quantal
 xserver-xorg-input-void			 xserver-xorg-input-void-lts-backport-quantal
-xserver-xorg-input-wacom		 xserver-xorg-input-wacom-dev-lts-backport-quantal
-xserver-xorg-video-ati		 	 xserver-xorg-video-ati-dev-lts-backport-quantal
-xserver-xorg-video-displaylink	 	 xserver-xorg-video-displaylink-dev-lts-backport-quantal
-xserver-xorg-video-dummy		 xserver-xorg-video-dummy-dev-lts-backport-quantal
-xserver-xorg-video-fbdev		 xserver-xorg-video-fbdev-dev-lts-backport-quantal
-xserver-xorg-video-geode		 xserver-xorg-video-geode-dev-lts-backport-quantal
-xserver-xorg-video-intel		 xserver-xorg-video-intel-dev-lts-backport-quantal
-xserver-xorg-video-mga			 xserver-xorg-video-mga-dev-lts-backport-quantal
-xserver-xorg-video-nouveau		 xserver-xorg-video-nouveau-dev-lts-backport-quantal
-xserver-xorg-video-openchrome	 	 xserver-xorg-video-openchrome-dev-lts-backport-quantal
-xserver-xorg-video-qxl		 	 xserver-xorg-video-qxl-dev-lts-backport-quantal
-xserver-xorg-video-r128		 	 xserver-xorg-video-r128-dev-lts-backport-quantal
-xserver-xorg-video-s3			 xserver-xorg-video-s3-dev-lts-backport-quantal
-xserver-xorg-video-savage		 xserver-xorg-video-savage-dev-lts-backport-quantal
-xserver-xorg-video-siliconmotion	 xserver-xorg-video-siliconmotion-dev-lts-backport-quantal
-xserver-xorg-video-sis			 xserver-xorg-video-sis-dev-lts-backport-quantal
-xserver-xorg-video-sisusb		 xserver-xorg-video-sisusb-dev-lts-backport-quantal
-xserver-xorg-video-trident		 xserver-xorg-video-trident-dev-lts-backport-quantal
-xserver-xorg-video-vesa		 	 xserver-xorg-video-vesa-dev-lts-backport-quantal
-xserver-xorg-video-vmware		 xserver-xorg-video-vmware-dev-lts-backport-quantal
+xserver-xorg-video-ati		 	 xserver-xorg-video-ati-lts-backport-quantal
+xserver-xorg-video-displaylink	 	 xserver-xorg-video-displaylink-lts-backport-quantal
+xserver-xorg-video-dummy		 xserver-xorg-video-dummy-lts-backport-quantal
+xserver-xorg-video-fbdev		 xserver-xorg-video-fbdev-lts-backport-quantal
+xserver-xorg-video-geode		 xserver-xorg-video-geode-lts-backport-quantal
+xserver-xorg-video-intel		 xserver-xorg-video-intel-lts-backport-quantal
+xserver-xorg-video-mga			 xserver-xorg-video-mga-lts-backport-quantal
+xserver-xorg-video-nouveau		 xserver-xorg-video-nouveau-lts-backport-quantal
+xserver-xorg-video-openchrome	 	 xserver-xorg-video-openchrome-lts-backport-quantal
+xserver-xorg-video-qxl		 	 xserver-xorg-video-qxl-lts-backport-quantal
+xserver-xorg-video-r128		 	 xserver-xorg-video-r128-lts-backport-quantal
+xserver-xorg-video-s3			 xserver-xorg-video-s3-lts-backport-quantal
+xserver-xorg-video-savage		 xserver-xorg-video-savage-lts-backport-quantal
+xserver-xorg-video-siliconmotion	 xserver-xorg-video-siliconmotion-lts-backport-quantal
+xserver-xorg-video-sis			 xserver-xorg-video-sis-lts-backport-quantal
+xserver-xorg-video-sisusb		 xserver-xorg-video-sisusb-lts-backport-quantal
+xserver-xorg-video-trident		 xserver-xorg-video-trident-lts-backport-quantal
+xserver-xorg-video-vesa		 	 xserver-xorg-video-vesa-lts-backport-quantal
+xserver-xorg-video-vmware		 xserver-xorg-video-vmware-lts-backport-quantal

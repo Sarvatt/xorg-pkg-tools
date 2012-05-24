@@ -16,6 +16,8 @@ else
     basedir="$(dirname $(readlink -e "$0"))"
 fi
 
+set -e
+
 declare -A stack
 
 echo "Will be renaming the following packages..."
@@ -36,9 +38,7 @@ done
 
 
 echo
-echo "Downloading source packages in 5 seconds..."
-echo "(Hit ctrl-C to cancel)"
-read -t 5
+echo "Downloading source packages..."
 
 if [ ! -d Stack ]; then
     mkdir -p Stack
@@ -46,17 +46,16 @@ fi
 cd Stack
 for pkg in ${stack[@]} ; do
     echo $pkg
-    apt-get source $pkg
+    apt-get -qq source $pkg
 done
 
 
 echo
-echo "Packages downloaded.  Proceding with rename in 5 seconds..."
-echo "(Hit ctrl-C to cancel)"
-read -t 5
+echo "Packages downloaded.  Proceeding with rename..."
 
 for pkgdir in */; do
     echo
     echo $pkgdir
     (cd $pkgdir && "${basedir}/lts-pkg-rename" "${basedir}/lts-pkg-mapping.txt")
 done
+echo "Done!"

@@ -45,6 +45,8 @@ suffix=lts-backport-${lts_codename}
 #codename=$(current-ubuntu-development-codename)
 verbose=1
 
+set -e
+
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
 else
@@ -130,7 +132,8 @@ old_binaries=$(grep ^Package: ${control} | cut -f2 -d' ')
 
 if [[ "${old_package}" =~ ${suffix}$ ]]; then
     dbg ${old_package}
-    ERR "Already renamed"
+    warn "Already renamed"
+    exit 0
 fi
 
 msg "Renaming the orig.tar.gz..."
@@ -139,7 +142,7 @@ for ext in gz bz2 lzma xz; do
     new_orig="${new_package}_${base_version}.orig.tar.${ext}"
     if [ ! -e "../${old_orig}" ]; then continue; fi
     if [ -e "../${new_orig}" ]; then
-        warn "../${new_orig} already exists so not renaming"
+        msg "../${new_orig} already exists so not renaming"
     else
         cp -via "../${old_orig}" "../${new_orig}"
         echo "${old_orig} -> ${new_orig}"
@@ -150,7 +153,6 @@ done
 
 msg "Updating the maintainer..."
 update-maintainer -q
-msg
 
 msg "Adding a changelog entry..."
 dch --increment \
@@ -158,7 +160,6 @@ dch --increment \
     --distribution ${lts_codename}-proposed \
     --force-distribution \
     "Rename package for the LTS point update, and add replaces/breaks"
-msg
 
 msg "Processing the control file..."
 ${basedir}/dpkg-control \
@@ -166,38 +167,40 @@ ${basedir}/dpkg-control \
     --binary-suffix ${suffix} \
     --mapping-file ${rename_mapping_file} \
     --add-replaces ${old_package} \
+    --add-provides ${old_package} \
     --add-breaks "${old_package}=${old_package_version}" > ${control}.new
 mv ${control}.new ${control}
-msg
 
 msg "Checking rules..."
-grep ${old_package} ${rules}
-if [ $? != 0 ]; then
+if ! grep -q ${old_package} ${rules}; then
     dbg "${rules} mentions ${old_package}"
     warn "Manual update of ${rules} required"
 fi
-msg
+sed -e "s/PACKAGE[[:space:]]*=.*/&-${suffix}/" -i debian/rules
 
 msg "Renaming binary install, etc. files..."
 for pkg in ${old_binaries}; do
     msg "- Renaming ${pkg}.* files..."
+    set +e
     files=$(ls debian/${pkg}.*)
-    if [ $? -ne 0 ]; then
+    err=$?
+    set -e
+    if [ $err -ne 0 ]; then
+	warn "Failed to list in ${old_package} for ${old_package} -> ${new_package}"
 	continue
     fi
     for old_file in $files; do
-	dbg $old_file
-	new_file=$(basename $old_file)
-	new_file=debian/${new_file/${old_package}/${new_package}}
-	msg "mv $old_file $new_file"
-	mv $old_file $new_file
+	new_file=${old_file/${pkg}/${pkg}-${suffix}}
+	mv -v ${old_file} ${new_file}
     # TODO: Maybe using 'rename' would be better?
     done
+
+    # Argh my eyes, so terribly sorry about this
+    sed -e "s@debian/${pkg}/@debian/${pkg}-${suffix}/@g" \
+        -e "s@${pkg}-${suffix}/usr/share/doc/${pkg}@&-${suffix}@" -i debian/rules
 done
-msg
 
 msg "Generating changes file..."
 debuild -S
-msg
 
 msg "${old_package} now renamed to ${new_package}"

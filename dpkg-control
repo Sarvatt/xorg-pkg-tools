@@ -34,6 +34,10 @@ def parse_options():
         help="Add or append a Replaces section to the control file for the old source package name",
         action="store_true", default=False)
     parser.add_option(
+        "-P", "--add-provides", dest="add_provides",
+        help="Add or append a Provides section to the control file for the old source package name",
+        action="store_true", default=False)
+    parser.add_option(
         "-B", "--add-breaks", dest="add_breaks",
         help="Add or append a Breaks section to the control file for the old source package name",
         action="store_true", default=False)
@@ -149,6 +153,7 @@ if __name__ == "__main__":
     prop = None
     breaks = None
     replaces = None
+    provides = None
     for orig_line in load_file("debian/control"):
         orig_line = orig_line.rstrip("\n")
         # Sections are separated by blank links
@@ -160,6 +165,9 @@ if __name__ == "__main__":
             if breaks:
                 print "Breaks: %s" %(breaks)
                 breaks = None
+            if provides:
+                print "Provides: %s" %(provides)
+                provides = None
 
             # Re-init
             print
@@ -204,12 +212,17 @@ if __name__ == "__main__":
                     replaces = value
                 if options.add_breaks and value:
                     breaks = value
+                if options.add_provides and value:
+                    provides = value
                 if options.binary_suffix:
-                    print "%s-%s" %(line, options.binary_suffix)
+                    if line.endswith("-dbg"):
+                        print "%s-%s-dbg" %(line.replace("-dbg",""), options.binary_suffix)
+                    else:
+                        print "%s-%s" %(line, options.binary_suffix)
                 else:
                     print orig_line
 
-        elif 'Description' == prop:
+        elif 'Description' == prop or 'Vcs-Git' == prop or 'Vcs-Browser' == prop:
             print orig_line
 
         elif 'Replaces' == prop and replaces:
@@ -227,7 +240,13 @@ if __name__ == "__main__":
                 breaks = None
             else:
                 print orig_line
-
+        elif 'Provides' == prop and provides:
+            if new_prop:
+                print "%s:" %(prop)
+                print " %s," %(provides)
+                provides = None
+            else:
+                print orig_line
         else:
             # For other packages referred to in Depends, Recommends, etc.
             # if mappings are defined, use them to modify the package names
