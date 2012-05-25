@@ -44,6 +44,7 @@ lts_codename=quantal
 suffix=lts-backport-${lts_codename}
 #codename=$(current-ubuntu-development-codename)
 verbose=1
+dry=""
 
 set -e
 
@@ -58,6 +59,7 @@ usage() {
     echo " -h:              This help text"
     echo " -q:              Quell output"
     echo " -v:              Extra verbose output"
+    echo " -n:              Only create rules.new and control.new (dry run)"
 }
 
 ERR() {
@@ -86,12 +88,13 @@ base_version() {
     echo ${buf%-*}       # Strip debian version
 }
 
-while getopts "h\?qv" opt $*; do
+while getopts "h\?qvn" opt $*; do
     case "$opt" in
 	h ) usage 0                                ;;
 	\?) usage 1                                ;;
 	q ) verbose=0                              ;;
 	v ) verbose=2                              ;;
+	n ) dry="echo"                             ;;
 	* ) warn "Unknown option '$opt'"; usage 1  ;;
     esac
 done
@@ -128,7 +131,7 @@ old_package_version=$(head -n 1 ${changelog} | cut -d' ' -f2)
 old_package_version=${old_package_version//[\(\)]/}  # Strip parens
 new_package=${old_package}-${suffix}
 base_version=$(base_version ${old_package_version})
-old_binaries=$(grep ^Package: ${control} | cut -f2 -d' ')
+old_binaries=$(grep ^Package: ${control} | grep -v -- -dbg | cut -f2 -d' ')
 
 if [[ "${old_package}" =~ ${suffix}$ ]]; then
     dbg ${old_package}
@@ -144,12 +147,18 @@ for ext in gz bz2 lzma xz; do
     if [ -e "../${new_orig}" ]; then
         msg "../${new_orig} already exists so not renaming"
     else
-        cp -via "../${old_orig}" "../${new_orig}"
-        echo "${old_orig} -> ${new_orig}"
+        mv -v "../${old_orig}" "../${new_orig}"
     fi
     msg
     break
 done
+
+# Make a backup of changelog
+if [ -f debian/changelog.old ]; then
+    cp debian/changelog.old debian/changelog
+else
+    cp debian/changelog debian/changelog.old
+fi
 
 msg "Updating the maintainer..."
 update-maintainer -q
@@ -161,6 +170,13 @@ dch --increment \
     --force-distribution \
     "Rename package for the LTS point update, and add replaces/breaks"
 
+if [ -n "$dry" ]; then
+    mv -v debian/changelog debian/changelog.new
+    mv debian/changelog.old debian/changelog
+else
+    rm debian/changelog.old
+fi
+
 msg "Processing the control file..."
 ${basedir}/dpkg-control \
     --source-suffix ${suffix} \
@@ -168,19 +184,23 @@ ${basedir}/dpkg-control \
     --mapping-file ${rename_mapping_file} \
     --add-replaces ${old_package} \
     --add-provides ${old_package} \
-    --add-breaks "${old_package}=${old_package_version}" > ${control}.new
-mv ${control}.new ${control}
+    --add-breaks "${old_package}<=${old_package_version}" > ${control}.new
 
 msg "Checking rules..."
 if ! grep -q ${old_package} ${rules}; then
     dbg "${rules} mentions ${old_package}"
     warn "Manual update of ${rules} required"
 fi
-sed -e "s/PACKAGE[[:space:]]*=.*/&-${suffix}/" -i debian/rules
 
 msg "Renaming binary install, etc. files..."
+cp debian/rules debian/rules.new
+sed -e "s/PACKAGE[[:space:]]*=.*/&-${suffix}/" -i debian/rules.new
+
 for pkg in ${old_binaries}; do
-    msg "- Renaming ${pkg}.* files..."
+    newpkg="${pkg}-${suffix}"
+
+    msg "- Renaming ${pkg}.* files to ${newpkg}.*"
+
     set +e
     files=$(ls debian/${pkg}.*)
     err=$?
@@ -190,17 +210,61 @@ for pkg in ${old_binaries}; do
 	continue
     fi
     for old_file in $files; do
-	new_file=${old_file/${pkg}/${pkg}-${suffix}}
-	mv -v ${old_file} ${new_file}
+	new_file=${old_file/${pkg}/${newpkg}}
+	$dry mv -v ${old_file} ${new_file}
     # TODO: Maybe using 'rename' would be better?
     done
 
     # Argh my eyes, so terribly sorry about this
-    sed -e "s@debian/${pkg}/@debian/${pkg}-${suffix}/@g" \
-        -e "s@${pkg}-${suffix}/usr/share/doc/${pkg}@&-${suffix}@" -i debian/rules
+    # substitute $(XXV) for ati
+    # dumb rename for packages install rules
+    # another dumb rename for doc and bugs
+
+    # dh_strip rules
+    # libdrm has a single -p libkms1, fix it to -plibkms1
+
+    # dh_makeshlibs is needed for libdrm
+    sed -e "s@\$(XXV)@xserver-xorg-video@g" \
+        -e "s@debian/${pkg}/@debian/${newpkg}/@g" \
+        -e "s@debian/${pkg}\.@debian/${newpkg}.@g" \
+        -e "/dh_strip/s/-p /-p/g" \
+        -e "/dh_strip/s/-p${pkg} /-p${newpkg} /" \
+        -e "/dh_strip/s/-N${pkg} /-N${newpkg} /" \
+        -e "/dh_strip/s/${pkg}-dbg/${newpkg}-dbg/" \
+        -e "/dh_makeshlibs/s/${pkg}\\([ ']\\)/${newpkg}\\1/g" \
+        -e "s@${newpkg}/usr/share/doc/${pkg}@&-${suffix}@" \
+        -e "s@${newpkg}/usr/share/bug/${pkg}@&-${suffix}@" \
+        -i debian/rules.new
+
+    if [ -f "debian/${newpkg}.symbols" ]; then
+        sed -e "s/ ${pkg} / ${newpkg} /" -i "debian/${newpkg}.symbols"
+    elif [ -n "$dry" -a "debian/${pkg}.symbols" ]; then
+        $dry sed -e "s/ ${pkg} / ${newpkg} /" -i "debian/${newpkg}.symbols"
+    fi
 done
 
+# Mesa is fun! :D
+sed -e "s/\\\$\\\$PACKAGE/&-${suffix}/" -i debian/rules.new
+
+if [ "${old_package}" = "xorg-server" ]; then
+    # Force the udeb building
+    # and fix the abi depends
+    sed -e "/ifneq.*-udeb/s/.*/ifeq (1, 1)/" \
+        -e "/-abi-/s/ xserver-xorg-core/&-${suffix}/" \
+        -i debian/rules.new
+
+    # And fix the xsf substvars
+    $dry sed -e "s/-udeb/&-${suffix}/g" \
+             -e "s/xserver-xorg-core/&-${suffix}/g" \
+             -e "/dbg/s/-dev/&-${suffix}/" \
+             -e "/dbg/s/-all/&-${suffix}/" \
+             -i debian/local/dh_xsf_substvars
+fi
+
+$dry mv debian/rules.new debian/rules
+$dry mv ${control}.new ${control}
+
 msg "Generating changes file..."
-debuild -S
+$dry debuild -S
 
 msg "${old_package} now renamed to ${new_package}"

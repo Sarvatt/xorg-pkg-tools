@@ -117,26 +117,31 @@
 #xutils-dev			xutils-dev-lts-backport-quantal
 #xtrans-dev			xtrans-dev-lts-backport-quantal
 
-# Enable because of breakage otherwise
-libxres-dev			libxres-dev-lts-backport-quantal
+# "xorg" virtual package
+# No renames, will need to be altered manually
+#x11-common			x11-common-lts-backport-quantal
+#xorg
+
+# Disabled: xfonts-base will add a versioned depends on xfonts-utils
+# because of dh_installxfonts, in fact.. ANY xfonts will do this
+#xfonts-utils			xfonts-utils-lts-backport-quantal
 
 # Rest of core stack
 libdrm-dev			libdrm-dev-lts-backport-quantal
 libgl1-mesa-dev			libgl1-mesa-dev-lts-backport-quantal
 mesa-common-dev			mesa-common-dev-lts-backport-quantal
-x11-common			x11-common-lts-backport-quantal
 x11-xkb-utils			x11-xkb-utils-lts-backport-quantal
 x11-xkb-utils-udeb		x11-xkb-utils-udeb-lts-backport-quantal
 xauth				xauth-lts-backport-quantal
-xdmx				xdmx-lts-backport-quantal
 xfonts-base			xfonts-base-lts-backport-quantal
-xfonts-utils			xfonts-utils-lts-backport-quantal
 xkb-data			xkb-data-lts-backport-quantal
 xkb-data-udeb			xkb-data-udeb-lts-backport-quantal
-xserver-common			xserver-common-lts-backport-quantal
+
+# xserver-xorg package, only necessary ones
+xserver-xorg-dev		xserver-xorg-dev-lts-backport-quantal
+xserver-xorg-core		xserver-xorg-core-lts-backport-quantal
 
 # Not sure about these, but guessing we can leave these alone:
-#xorg
 #xfs
 #xft
 #xinit
@@ -167,22 +172,25 @@ xserver-xorg-input-mouse		 xserver-xorg-input-mouse-lts-backport-quantal
 xserver-xorg-input-synaptics-dev	 xserver-xorg-input-synaptics-dev-lts-backport-quantal
 xserver-xorg-input-vmmouse		 xserver-xorg-input-vmmouse-lts-backport-quantal
 xserver-xorg-input-void			 xserver-xorg-input-void-lts-backport-quantal
-xserver-xorg-video-ati		 	 xserver-xorg-video-ati-lts-backport-quantal
-xserver-xorg-video-displaylink	 	 xserver-xorg-video-displaylink-lts-backport-quantal
+xserver-xorg-video-ati			 xserver-xorg-video-ati-lts-backport-quantal
+xserver-xorg-video-displaylink		 xserver-xorg-video-displaylink-lts-backport-quantal
 xserver-xorg-video-dummy		 xserver-xorg-video-dummy-lts-backport-quantal
 xserver-xorg-video-fbdev		 xserver-xorg-video-fbdev-lts-backport-quantal
 xserver-xorg-video-geode		 xserver-xorg-video-geode-lts-backport-quantal
 xserver-xorg-video-intel		 xserver-xorg-video-intel-lts-backport-quantal
+xserver-xorg-video-mach64		 xserver-xorg-video-mach64-lts-backport-quantal
+xserver-xorg-video-mach64-dbg		 xserver-xorg-video-mach64-lts-backport-quantal-dbg
 xserver-xorg-video-mga			 xserver-xorg-video-mga-lts-backport-quantal
 xserver-xorg-video-nouveau		 xserver-xorg-video-nouveau-lts-backport-quantal
-xserver-xorg-video-openchrome	 	 xserver-xorg-video-openchrome-lts-backport-quantal
-xserver-xorg-video-qxl		 	 xserver-xorg-video-qxl-lts-backport-quantal
-xserver-xorg-video-r128		 	 xserver-xorg-video-r128-lts-backport-quantal
+xserver-xorg-video-openchrome		 xserver-xorg-video-openchrome-lts-backport-quantal
+xserver-xorg-video-qxl			 xserver-xorg-video-qxl-lts-backport-quantal
+xserver-xorg-video-r128			 xserver-xorg-video-r128-lts-backport-quantal
+xserver-xorg-video-r128-dbg		 xserver-xorg-video-r128-lts-backport-quantal-dbg
 xserver-xorg-video-s3			 xserver-xorg-video-s3-lts-backport-quantal
 xserver-xorg-video-savage		 xserver-xorg-video-savage-lts-backport-quantal
 xserver-xorg-video-siliconmotion	 xserver-xorg-video-siliconmotion-lts-backport-quantal
 xserver-xorg-video-sis			 xserver-xorg-video-sis-lts-backport-quantal
 xserver-xorg-video-sisusb		 xserver-xorg-video-sisusb-lts-backport-quantal
 xserver-xorg-video-trident		 xserver-xorg-video-trident-lts-backport-quantal
-xserver-xorg-video-vesa		 	 xserver-xorg-video-vesa-lts-backport-quantal
+xserver-xorg-video-vesa			 xserver-xorg-video-vesa-lts-backport-quantal
 xserver-xorg-video-vmware		 xserver-xorg-video-vmware-lts-backport-quantal

@@ -154,6 +154,35 @@ if __name__ == "__main__":
     breaks = None
     replaces = None
     provides = None
+
+    # Scan for all packages to add them to our rename list first.
+    # For dbg packages, assume the normal package was declared first
+    # by gracefully printing a cryptic error message
+    if options.binary_suffix:
+        for orig_line in load_file("debian/control"):
+            orig_line = orig_line.rstrip("\n")
+            if len(orig_line) == 0:
+                prop = None
+                value = None
+                continue
+
+            line = orig_line.split('#')[0].strip() # Ignore comments
+            m = re_prop.match(line)
+            if m:
+                new_prop = m.group(1)
+                prop = new_prop
+                value = m.group(2)
+            elif orig_line and orig_line[0].isspace():
+                new_prop = None
+                value = line
+
+            if prop == 'Package' and not mappings.__contains__(value) and not value in killings:
+                if value.endswith("-dbg"):
+                    mappings[value] = "%s-dbg" %(mappings[value.replace("-dbg","")])
+                else:
+                    mappings[value] = "%s-%s" %(value, options.binary_suffix)
+
+    # Perform renames as needed
     for orig_line in load_file("debian/control"):
         orig_line = orig_line.rstrip("\n")
         # Sections are separated by blank links
@@ -215,10 +244,7 @@ if __name__ == "__main__":
                 if options.add_provides and value:
                     provides = value
                 if options.binary_suffix:
-                    if line.endswith("-dbg"):
-                        print "%s-%s-dbg" %(line.replace("-dbg",""), options.binary_suffix)
-                    else:
-                        print "%s-%s" %(line, options.binary_suffix)
+                    print "Package: %s" %(mappings[value])
                 else:
                     print orig_line
 
@@ -255,8 +281,18 @@ if __name__ == "__main__":
             if options.mapping_file:
                 for pkg in mappings.keys():
                     if pkg in line:
-                        text = re.sub(r"\b(%s)(?=[^-\w])" %(pkg),
+                        text = re.sub(r"\b(%s)(?=[^-\w]|$)" %(pkg),
                                       mappings[pkg],
                                       text)
-
             print text
+
+    # And flush out rest
+    if replaces:
+        print "Replaces: %s" %(replaces)
+        replaces = None
+    if breaks:
+        print "Breaks: %s" %(breaks)
+        breaks = None
+    if provides:
+        print "Provides: %s" %(provides)
+        provides = None

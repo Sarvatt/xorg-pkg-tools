@@ -20,42 +20,53 @@ set -e
 
 declare -A stack
 
-echo "Will be renaming the following packages..."
-for line in $(awk '{print $1}' "${basedir}/lts-pkg-mapping.txt"); do
-    if [ -z "${line}" ] || [ ${line:0:1} = '#' ]; then
-	continue
-    fi
-    source_package=$(apt-cache showsrc ${line} 2>/dev/null | grep ^Package: | head -n 1 | cut -d' ' -f2)
-    if [ $? = 0 ] && [ ! -z "$source_package" ]; then
-	if [ -z ${stack[$source_package]} ]; then
-	    echo ${source_package}
-	    stack[$source_package]=${source_package}
+if [ -d Stack ]; then
+    echo "Not checking out files, assuming already done"
+else
+    echo "Will be renaming the following packages..."
+    for line in $(awk '{print $1}' "${basedir}/lts-pkg-mapping.txt"); do
+	if [ -z "${line}" ] || [ ${line:0:1} = '#' ]; then
+	    continue
 	fi
-    else
-	echo "Error: No source found for ${line}" 1>&2
-    fi
-done
+	source_package=$(apt-cache showsrc ${line} 2>/dev/null | grep ^Package: | head -n 1 | cut -d' ' -f2)
+	if [ $? = 0 ] && [ ! -z "$source_package" ]; then
+	    if [ -z ${stack[$source_package]} ]; then
+		echo ${source_package}
+		stack[$source_package]=${source_package}
+	    fi
+	else
+	    echo "Error: No source found for ${line}" 1>&2
+	fi
+    done
 
+    echo
+    echo "Downloading source packages..."
 
-echo
-echo "Downloading source packages..."
-
-if [ ! -d Stack ]; then
     mkdir -p Stack
+    cd Stack
+    for pkg in ${stack[@]} ; do
+	echo $pkg
+	apt-get -qq source $pkg
+    done
+    cd ..
+
+    echo
+    echo "Packages downloaded.  Proceeding with rename..."
 fi
-cd Stack
-for pkg in ${stack[@]} ; do
-    echo $pkg
-    apt-get -qq source $pkg
-done
 
+if [ -d Stack-lts ]; then
+    rm -rf -- Stack-lts/*
+fi
+mkdir -p Stack-lts/drivers
 
-echo
-echo "Packages downloaded.  Proceeding with rename..."
+cd Stack-lts
+cp -r ../Stack/*/ ../Stack/*.orig.tar.* .
+mv xf86* xserver-xorg-* drivers/
 
-for pkgdir in */; do
+for pkgdir in */ drivers/*; do
+    if [ ! -d "${pkgdir}/debian" ]; then continue; fi
     echo
     echo $pkgdir
-    (cd $pkgdir && "${basedir}/lts-pkg-rename" "${basedir}/lts-pkg-mapping.txt")
+    (cd "${pkgdir}" && "${basedir}/lts-pkg-rename" "${basedir}/lts-pkg-mapping.txt")
 done
 echo "Done!"
