@@ -265,6 +265,6 @@ $dry mv debian/rules.new debian/rules
 $dry mv ${control}.new ${control}
 
 msg "Generating changes file..."
-$dry debuild -S
+$dry debuild -S -sa
 
 msg "${old_package} now renamed to ${new_package}"
