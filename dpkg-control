@@ -80,6 +80,14 @@ def load_mappings(filename):
             mappings[items[0]] = items[1]
     return mappings
 
+#def load_killings(filename):
+#    killings = []
+#    if filename:
+#        for line in load_file(filename):
+#            line = line.split('#')[0]
+#            killings.extend(line.split(','))
+#    return killings
+
 def ERR(*msg):
     msg = ' '.join(map(str, msg))
     sys.stderr.write("ERROR: %s\n" %(msg))

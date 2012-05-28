@@ -40,13 +40,15 @@
 #          (see http://www.opensource.org/licenses/mit-license.php)
 ########################################################################
 
-lts_codename=quantal
-suffix=lts-backport-${lts_codename}
+set -e
+
+lts_codename=precise
 #codename=$(current-ubuntu-development-codename)
+codename=quantal
+suffix=lts-backport-${codename}
 verbose=1
 dry=""
-
-set -e
+extraversion="+rename1."
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -166,9 +168,16 @@ update-maintainer -q
 msg "Adding a changelog entry..."
 dch --increment \
     --package ${new_package} \
-    --distribution ${lts_codename}-proposed \
+    --distribution ${lts_codename} \
     --force-distribution \
-    "Rename package for the LTS point update, and add replaces/breaks"
+    "Rename package for the LTS point update, and add replaces/breaks/provides"
+
+if [ -n "${extraversion}" ]; then
+    dch --local "${extraversion}" \
+    --distribution ${lts_codename} \
+    --force-distribution \
+    "Bump version number with ${extraversion}1 for ppa upload"
+fi
 
 if [ -n "$dry" ]; then
     mv -v debian/changelog debian/changelog.new
@@ -234,6 +243,8 @@ for pkg in ${old_binaries}; do
         -e "/dh_makeshlibs/s/${pkg}\\([ ']\\)/${newpkg}\\1/g" \
         -e "s@${newpkg}/usr/share/doc/${pkg}@&-${suffix}@" \
         -e "s@${newpkg}/usr/share/bug/${pkg}@&-${suffix}@" \
+        -e "/DEB_DBG_PACKAGE_ALL/s/ ${pkg}-dbg/ ${pkg}-${suffix}-dbg/" \
+        -e "/DEB_DH_STRIP_ARGS/s/=${pkg}-dbg/=${pkg}-${suffix}-dbg/" \
         -i debian/rules.new
 
     if [ -f "debian/${newpkg}.symbols" ]; then
@@ -244,7 +255,15 @@ for pkg in ${old_binaries}; do
 done
 
 # Mesa is fun! :D
-sed -e "s/\\\$\\\$PACKAGE/&-${suffix}/" -i debian/rules.new
+if [ "${old_package}" = "mesa" ]; then
+    sed -e "s/\\\$\\\$PACKAGE/&-${suffix}/" -i debian/rules.new
+    files="$(ls debian/*-i686.*)"
+    for x in $files; do
+        $dry mv -v "$x" "${x/i686/${suffix}-i686}"
+    done
+    sed -e "/dh_installchangelogs/s/-p[^[:space:]]*/&-${suffix}/" -i debian/rules.new
+    sed -e "/dh_install/s/-p[^[:space:]]*/&-${suffix}/" -i debian/rules.new
+fi
 
 if [ "${old_package}" = "xorg-server" ]; then
     # Force the udeb building
@@ -259,6 +278,16 @@ if [ "${old_package}" = "xorg-server" ]; then
              -e "/dbg/s/-dev/&-${suffix}/" \
              -e "/dbg/s/-all/&-${suffix}/" \
              -i debian/local/dh_xsf_substvars
+
+    if [ -f "debian/xserver-xorg-core-${suffix}.links" ]; then
+        ERR "links file for xserver-xorg-core already exists!"
+    fi
+    x="usr/share/bug/xserver-xorg-core-${suffix}/script usr/share/bug/xserver-xorg-core/script"
+    if [ -n "$dry" ]; then
+        $dry "echo ${x} >> debian/xserver-xorg-core-${suffix}.links"
+    else
+        echo ${x} >> debian/xserver-xorg-core-${suffix}.links
+    fi
 fi
 
 $dry mv debian/rules.new debian/rules

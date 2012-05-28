@@ -1,0 +1,49 @@
+#!/bin/bash
+
+if [ "$0" = "$(basename "$0")" ]; then
+    basedir="$(dirname $(readlink -e $(which "$0")))"
+else
+    basedir="$(dirname $(readlink -e "$0"))"
+fi
+
+set -e
+
+lts_codename=precise
+#codename=$(current-ubuntu-development-codename)
+codename=quantal
+suffix=lts-backport-${codename}
+
+# xorg package is special and worth of its own script
+# Only building: xserver-xorg, xserver-xorg-video-all and xserver-xorg-input-all
+
+apt-get -qq source xorg
+cd xorg-*/
+
+# debian/control
+# Remove any extra deps that were sneaked in from main xorg package
+sed -e "s/ |[^,]*-${suffix}//g" -i debian/control
+
+${basedir}/dpkg-control \
+    --source-suffix ${suffix} \
+    --binary-suffix ${suffix} \
+    --mapping-file "${basedir}/lts-pkg-mapping.txt" \
+    --kill-binaries x11-common,xbase-clients,xutils,xorg,xorg-dev \
+     > debian/control.new
+mv -v debian/control.new debian/control
+
+# debian/changelog
+dch --increment \
+    --package xorg-${suffix} \
+    --distribution ${lts_codename} \
+    --force-distribution \
+    "Rename package for the LTS point update, and add replaces/breaks/provides"
+
+# debian/rules
+cp "${basedir}/lts-xorg-rules" debian/rules
+
+rm -r xsf-docs
+sed -e "s/xserver-xorg[^[:space:],]*/&-${suffix}/g" -i debian/scripts/vars.*
+
+debuild -S
+
+cd ..

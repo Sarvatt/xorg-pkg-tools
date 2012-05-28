@@ -140,6 +140,7 @@ xkb-data-udeb			xkb-data-udeb-lts-backport-quantal
 # xserver-xorg package, only necessary ones
 xserver-xorg-dev		xserver-xorg-dev-lts-backport-quantal
 xserver-xorg-core		xserver-xorg-core-lts-backport-quantal
+xserver-xorg-core-udeb          xserver-xorg-core-udeb-backport-quantal
 
 # Not sure about these, but guessing we can leave these alone:
 #xfs
@@ -165,6 +166,7 @@ xserver-xorg-video-msm			 xserver-xorg-video-msm-lts-backport-quantal
 xf86-video-omapfb			 xf86-video-omapfb-lts-backport-quantal
 xserver-xorg-video-omapfb		 xserver-xorg-video-omapfb-lts-backport-quantal
 
+xserver-xorg-input-evdev		 xserver-xorg-input-evdev-lts-backport-quantal
 xserver-xorg-input-evdev-dev		 xserver-xorg-input-evdev-dev-lts-backport-quantal
 xserver-xorg-input-joystick-dev		 xserver-xorg-input-joystick-dev-lts-backport-quantal
 xserver-xorg-input-keyboard		 xserver-xorg-input-keyboard-lts-backport-quantal
@@ -174,6 +176,7 @@ xserver-xorg-input-vmmouse		 xserver-xorg-input-vmmouse-lts-backport-quantal
 xserver-xorg-input-void			 xserver-xorg-input-void-lts-backport-quantal
 xserver-xorg-video-ati			 xserver-xorg-video-ati-lts-backport-quantal
 xserver-xorg-video-displaylink		 xserver-xorg-video-displaylink-lts-backport-quantal
+xserver-xorg-video-cirrus		 xserver-xorg-video-cirrus-lts-backport-quantal
 xserver-xorg-video-dummy		 xserver-xorg-video-dummy-lts-backport-quantal
 xserver-xorg-video-fbdev		 xserver-xorg-video-fbdev-lts-backport-quantal
 xserver-xorg-video-geode		 xserver-xorg-video-geode-lts-backport-quantal
@@ -181,6 +184,7 @@ xserver-xorg-video-intel		 xserver-xorg-video-intel-lts-backport-quantal
 xserver-xorg-video-mach64		 xserver-xorg-video-mach64-lts-backport-quantal
 xserver-xorg-video-mach64-dbg		 xserver-xorg-video-mach64-lts-backport-quantal-dbg
 xserver-xorg-video-mga			 xserver-xorg-video-mga-lts-backport-quantal
+xserver-xorg-video-neomagic		 xserver-xorg-video-neomagic-lts-backport-quantal
 xserver-xorg-video-nouveau		 xserver-xorg-video-nouveau-lts-backport-quantal
 xserver-xorg-video-openchrome		 xserver-xorg-video-openchrome-lts-backport-quantal
 xserver-xorg-video-qxl			 xserver-xorg-video-qxl-lts-backport-quantal
@@ -191,6 +195,7 @@ xserver-xorg-video-savage		 xserver-xorg-video-savage-lts-backport-quantal
 xserver-xorg-video-siliconmotion	 xserver-xorg-video-siliconmotion-lts-backport-quantal
 xserver-xorg-video-sis			 xserver-xorg-video-sis-lts-backport-quantal
 xserver-xorg-video-sisusb		 xserver-xorg-video-sisusb-lts-backport-quantal
+xserver-xorg-video-tdfx			 xserver-xorg-video-tdfx-lts-backport-quantal
 xserver-xorg-video-trident		 xserver-xorg-video-trident-lts-backport-quantal
 xserver-xorg-video-vesa			 xserver-xorg-video-vesa-lts-backport-quantal
 xserver-xorg-video-vmware		 xserver-xorg-video-vmware-lts-backport-quantal
