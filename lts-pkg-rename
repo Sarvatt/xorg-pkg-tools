@@ -2,9 +2,6 @@
 
 # Script to do renames, replaces, breaks for LTS point updates
 
-# Copyright 2012 Canonical, Ltd.
-# Author:  Bryce W. Harrington
-# License: MIT license, same as X (see http://www.opensource.org/licenses/mit-license.php)
 ########################################################################
 # The new stacks will be introduced alongside the stock 12.04 stack and
 # will co-exist with them. All of the packages will be renamed to not
