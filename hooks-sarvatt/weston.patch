@@ -31,7 +31,9 @@ index 42a3fef..4d1ff05 100755
 index fd01e4b..017ce96 100644
 --- a/debian/weston.install
 +++ b/debian/weston.install
-@@ -1,13 +1,16 @@
+@@ -1,13 +1,18 @@
++usr/bin/wcap-decode
++usr/bin/wcap-snapshot
  usr/bin/weston
 +usr/bin/weston-launch
  usr/bin/weston-terminal
@@ -45,6 +47,6 @@ index fd01e4b..017ce96 100644
  usr/lib/weston/tablet-shell.so
  usr/lib/weston/wayland-backend.so
  usr/lib/weston/x11-backend.so
-+usr/lib/weston/xserver-launcher.so
++usr/lib/weston/xwayland.so
  
  usr/share/weston

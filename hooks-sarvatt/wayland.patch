@@ -1,3 +1,13 @@
+diff --git a/cursor/Makefile.am b/cursor/Makefile.am
+index 503559a..9403f92 100644
+--- a/cursor/Makefile.am
++++ b/cursor/Makefile.am
+@@ -11,4 +11,4 @@ libwayland_cursor_la_LIBADD = $(top_builddir)/src/libwayland-client.la
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = wayland-cursor.pc
+ 
+-AM_CFLAGS = $(GCC_CFLAGS) -I../src
++AM_CFLAGS = $(GCC_CFLAGS) -I$(top_srcdir)/src -I$(top_builddir)/src
 diff --git a/debian/rules b/debian/rules
 index 42a3fef..ca80f3f 100755
 --- a/debian/rules
@@ -13,3 +23,32 @@ index 42a3fef..ca80f3f 100755
  %:
  	dh $@ --with quilt,autoreconf
  
+diff --git a/debian/libwayland-dev.install b/debian/libwayland-dev.install
+index 02534df..9b01b5b 100644
+--- a/debian/libwayland-dev.install
++++ b/debian/libwayland-dev.install
+@@ -7,9 +7,12 @@ usr/include
+ # Use no wildcards to ensure we spot any update:
+ usr/lib/*/libwayland-client.a
+ usr/lib/*/libwayland-client.so
++usr/lib/*/libwayland-cursor.a
++usr/lib/*/libwayland-cursor.so
+ usr/lib/*/libwayland-server.a
+ usr/lib/*/libwayland-server.so
+ usr/lib/*/pkgconfig/wayland-client.pc
++usr/lib/*/pkgconfig/wayland-cursor.pc
+ usr/lib/*/pkgconfig/wayland-server.pc
+ usr/share/aclocal/wayland-scanner.m4
+ usr/share/aclocal/wayland-scanner.mk
+diff --git a/debian/libwayland0.install b/debian/libwayland0.install
+index 96fd067..4bac0c5 100644
+--- a/debian/libwayland0.install
++++ b/debian/libwayland0.install
+@@ -1,5 +1,7 @@
+ # Use no wildcards to ensure we spot any update:
+ usr/lib/*/libwayland-client.so.0
+ usr/lib/*/libwayland-client.so.0.0.0
++usr/lib/*/libwayland-cursor.so.0
++usr/lib/*/libwayland-cursor.so.0.0.0
+ usr/lib/*/libwayland-server.so.0
+ usr/lib/*/libwayland-server.so.0.0.0
