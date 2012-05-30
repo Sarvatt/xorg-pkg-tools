@@ -30,14 +30,15 @@
 #	echo ABI_XINPUT_VERSION:12.3 >> debian/serverminver
 #fi
 
-if [ "$BRANCH" == "server-1.12-branch" ]; then
-	echo 2:1.11.99 > debian/serverminver
-	echo ABI_VIDEODRV_VERSION:12.0 >> debian/serverminver
-	echo ABI_XINPUT_VERSION:16.0 >> debian/serverminver
+#if [ "$BRANCH" == "server-1.12-branch" ]; then
+#	echo 2:1.11.99 > debian/serverminver
+#	echo ABI_VIDEODRV_VERSION:12.0 >> debian/serverminver
+#	echo ABI_XINPUT_VERSION:16.0 >> debian/serverminver
+#fi
 
-elif [ "$BRANCH" == "master" ]; then
+if [ "$BRANCH" == "master" ]; then
 	echo 2:1.12.99 > debian/serverminver
-	echo ABI_VIDEODRV_VERSION:12.0 >> debian/serverminver
+	echo ABI_VIDEODRV_VERSION:13.0 >> debian/serverminver
 	echo ABI_XINPUT_VERSION:17.0 >> debian/serverminver
 fi
 

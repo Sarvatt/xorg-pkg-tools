@@ -14,3 +14,18 @@ index bb0c338..b2571aa 100644
   AC_CHECK_FUNC([SHA1Init], [HAVE_SHA1_IN_LIBC=yes])
   if test "x$with_sha1" = x && test "x$HAVE_SHA1_IN_LIBC" = xyes; then
 
+
+diff --git a/hw/xfree86/common/xf86Module.h b/hw/xfree86/common/xf86Module.h
+index 31f5c6a..bf56acd 100644
+--- a/hw/xfree86/common/xf86Module.h
++++ b/hw/xfree86/common/xf86Module.h
+@@ -82,7 +82,7 @@ typedef enum {
+  * mask is 0xFFFF0000.
+  */
+ #define ABI_ANSIC_VERSION      SET_ABI_VERSION(0, 4)
+-#define ABI_VIDEODRV_VERSION   SET_ABI_VERSION(12, 0)
++#define ABI_VIDEODRV_VERSION   SET_ABI_VERSION(13, 0)
+ #define ABI_XINPUT_VERSION     SET_ABI_VERSION(17, 0)
+ #define ABI_EXTENSION_VERSION  SET_ABI_VERSION(6, 0)
+ #define ABI_FONT_VERSION       SET_ABI_VERSION(0, 6)
+

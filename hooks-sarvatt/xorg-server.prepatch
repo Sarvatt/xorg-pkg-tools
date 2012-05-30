@@ -6,34 +6,30 @@ getp() {
 
 
 
-if [ "$BRANCH" == "server-1.10-branch" ]; then
-	patch -p1 < $HOOKS/xorg-server-1.10.patch
-
-	drop 210_pixman_null_ptr_check.patch upstream
-	getp 500_xi2.1.patch
-	drop 508_CVE-2011-4028.patch upstream
-	drop 509_CVE-2011-4029.patch upstream
-	
-elif [ "$BRANCH" == "server-1.11-branch" ]; then
-	drop 210_pixman_null_ptr_check.patch upstream
-	drop 220_xi21_always_deliver_raw_events.diff fails
-
-elif [ "$BRANCH" == "server-1.12-branch" -o "$BRANCH" == "master" ]; then
-	patch -p1 < $HOOKS/xorg-server-1.12.patch
-
-	drop 190_cache-xkbcomp_output_for_fast_start_up.patch needs-refresh
-	
-	drop 07-xfree86-fix-build-with-xv-disabled.diff upstream
-	drop 224_return_BadWindow_not_BadMatch.diff upstream
-	drop 225_non-root_config_paths.patch upstream
-
-	drop 505_query_pointer_touchscreen.patch upstream
-	drop 506_touchscreen_pointer_emulation_checks.patch upstream
-	drop 507_touchscreen_fixes.patch fails
-	drop 508_device_off_release_buttons.patch upstream
-		
-	getp 500_pointer_barrier_thresholds.diff
-fi
+#if [ "$BRANCH" == "server-1.10-branch" ]; then
+#	patch -p1 < $HOOKS/xorg-server-1.10.patch
+#
+#	drop 210_pixman_null_ptr_check.patch upstream
+#	getp 500_xi2.1.patch
+#	drop 508_CVE-2011-4028.patch upstream
+#	drop 509_CVE-2011-4029.patch upstream
+#	
+#elif [ "$BRANCH" == "server-1.11-branch" ]; then
+#	drop 210_pixman_null_ptr_check.patch upstream
+#	drop 220_xi21_always_deliver_raw_events.diff fails
+#
+#elif [ "$BRANCH" == "server-1.12-branch" ]; then
+#	patch -p1 < $HOOKS/xorg-server-1.12.patch
+#	drop 190_cache-xkbcomp_output_for_fast_start_up.patch needs-refresh
+#	drop 07-xfree86-fix-build-with-xv-disabled.diff upstream
+#	drop 224_return_BadWindow_not_BadMatch.diff upstream
+#	drop 225_non-root_config_paths.patch upstream
+#	drop 505_query_pointer_touchscreen.patch upstream
+#	drop 506_touchscreen_pointer_emulation_checks.patch upstream
+#	drop 507_touchscreen_fixes.patch fails
+#	drop 508_device_off_release_buttons.patch upstream
+#	getp 500_pointer_barrier_thresholds.diff
+#fi
 
 if [ "$BRANCH" == "master" ]; then
 	patch -p1 < $HOOKS/xorg-server-1.13.patch
