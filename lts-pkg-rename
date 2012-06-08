@@ -13,22 +13,22 @@
 # libX11 or any other client-side code.
 #
 # For package naming, kernel names source packages by appending
-# -lts-backports-$VERSION. They don't appear to need to rename binary
+# -lts-$VERSION. They don't appear to need to rename binary
 # packages since they already include the kernel version; instead I'm
 # assuming we would rename binary packages like sources - append
-# -lts-backports-$VERSION.
+# -lts-$VERSION.
 #
 # The X.org packages will be renamed following the kernel convention
-# ('linux-lts-backport-natty' c.f. bug #806586), to enable them to
+# ('linux-lts-natty' c.f. bug #806586), to enable them to
 # co-exist in the same archive. Thus, the X package names will have
-# 'lts-backport-VERSION' appended to them:
+# 'lts-VERSION' appended to them:
 #
-#   mesa-lts-backport-quixotic
-#   xserver-xorg-video-intel-lts-backport-quixotic
-#   xserver-xorg-video-intel-dbg-lts-backport-quixotic
-#   xorg-server-lts-backport-quixotic
-#   xserver-xorg-core-dbg-lts-backport-quixotic
-#   xserver-common-lts-backport-quixotic
+#   mesa-lts-quixotic
+#   xserver-xorg-video-intel-lts-quixotic
+#   xserver-xorg-video-intel-dbg-lts-quixotic
+#   xorg-server-lts-quixotic
+#   xserver-xorg-core-dbg-lts-quixotic
+#   xserver-common-lts-quixotic
 #
 ########################################################################
 # Copyright (C) 2012 Canonical, Ltd.
@@ -42,10 +42,10 @@ set -e
 lts_codename=precise
 #codename=$(current-ubuntu-development-codename)
 codename=quantal
-suffix=lts-backport-${codename}
+suffix=lts-${codename}
 verbose=1
 dry=""
-extraversion="+rename1."
+extraversion="+rename2."
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"

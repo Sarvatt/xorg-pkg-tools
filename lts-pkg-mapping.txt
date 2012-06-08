@@ -1,36 +1,36 @@
 # Stable upstream, won't need to depend on new versions
-#libdbus-1-dev			libdbus-1-dev-lts-backport-quantal
-#libhal-dev			libhal-dev-lts-backport-quantal
-#libgcrypt-dev			libgcrypt-dev-lts-backport-quantal
-#libselinux1-dev			libselinux1-dev-lts-backport-quantal
+#libdbus-1-dev			libdbus-1-dev-lts-quantal
+#libhal-dev			libhal-dev-lts-quantal
+#libgcrypt-dev			libgcrypt-dev-lts-quantal
+#libselinux1-dev			libselinux1-dev-lts-quantal
 
 # *Un*stable upstream, but intimately tied with kernel
-#libudev-dev			libudev-dev-lts-backport-quantal
+#libudev-dev			libudev-dev-lts-quantal
 
 # Client libaries, not needed for main server build,
 # but needed for weird servers like xnest, xdmx, etc
-#libdmx-dev			libdmx-dev-lts-backport-quantal
-#libxext-dev			libxext-dev-lts-backport-quantal
-#libxfixes-dev			libxfixes-dev-lts-backport-quantal
-#libxi-dev			libxi-dev-lts-backport-quantal
-#libxinerama-dev		libxinerama-dev-lts-backport-quantal
-#libxmu-dev			libxmu-dev-lts-backport-quantal
-#libxmuu-dev			libxmuu-dev-lts-backport-quantal
-#libxpm-dev			libxpm-dev-lts-backport-quantal
-#libxrender-dev			libxrender-dev-lts-backport-quantal
-#libxres-dev			libxres-dev-lts-backport-quantal
-#libxt-dev			libxt-dev-lts-backport-quantal
-#libxtst-dev			libxtst-dev-lts-backport-quantal
-#libxv-dev			libxv-dev-lts-backport-quantal
+#libdmx-dev			libdmx-dev-lts-quantal
+#libxext-dev			libxext-dev-lts-quantal
+#libxfixes-dev			libxfixes-dev-lts-quantal
+#libxi-dev			libxi-dev-lts-quantal
+#libxinerama-dev		libxinerama-dev-lts-quantal
+#libxmu-dev			libxmu-dev-lts-quantal
+#libxmuu-dev			libxmuu-dev-lts-quantal
+#libxpm-dev			libxpm-dev-lts-quantal
+#libxrender-dev			libxrender-dev-lts-quantal
+#libxres-dev			libxres-dev-lts-quantal
+#libxt-dev			libxt-dev-lts-quantal
+#libxtst-dev			libxtst-dev-lts-quantal
+#libxv-dev			libxv-dev-lts-quantal
 
 # Client libraries the server has an unversioned depends upon,
 # the Precise versions will be fine.
-#libx11-dev			libx11-dev-lts-backport-quantal
-#libxau-dev			libxau-dev-lts-backport-quantal
-#libxaw7-dev			libxaw7-dev-lts-backport-quantal
-#libxdmcp-dev			libxdmcp-dev-lts-backport-quantal
-#libxfont-dev			libxfont-dev-lts-backport-quantal
-#libxkbfile-dev			libxkbfile-dev-lts-backport-quantal
+#libx11-dev			libx11-dev-lts-quantal
+#libxau-dev			libxau-dev-lts-quantal
+#libxaw7-dev			libxaw7-dev-lts-quantal
+#libxdmcp-dev			libxdmcp-dev-lts-quantal
+#libxfont-dev			libxfont-dev-lts-quantal
+#libxkbfile-dev			libxkbfile-dev-lts-quantal
 
 # Other libs (need review)
 #libfontenc
@@ -54,30 +54,30 @@
 #libxxf86vm
 
 # Protocol headers should be SRUable (discussion still pending)
-#x11proto-bigreqs-dev		x11proto-bigreqs-dev-lts-backport-quantal
-#x11proto-composite-dev		x11proto-composite-dev-lts-backport-quantal
-#x11proto-core-dev		x11proto-core-dev-lts-backport-quantal
-#x11proto-damage-dev		x11proto-damage-dev-lts-backport-quantal
-#x11proto-dmx-dev		x11proto-dmx-dev-lts-backport-quantal
-#x11proto-dri2-dev		x11proto-dri2-dev-lts-backport-quantal
-#x11proto-fixes-dev		x11proto-fixes-dev-lts-backport-quantal
-#x11proto-fonts-dev		x11proto-fonts-dev-lts-backport-quantal
-#x11proto-gl-dev			x11proto-gl-dev-lts-backport-quantal
-#x11proto-input-dev		x11proto-input-dev-lts-backport-quantal
-#x11proto-kb-dev			x11proto-kb-dev-lts-backport-quantal
-#x11proto-randr-dev		x11proto-randr-dev-lts-backport-quantal
-#x11proto-record-dev		x11proto-record-dev-lts-backport-quantal
-#x11proto-render-dev		x11proto-render-dev-lts-backport-quantal
-#x11proto-resource-dev		x11proto-resource-dev-lts-backport-quantal
-#x11proto-scrnsaver-dev		x11proto-scrnsaver-dev-lts-backport-quantal
-#x11proto-video-dev		x11proto-video-dev-lts-backport-quantal
-#x11proto-xcmisc-dev		x11proto-xcmisc-dev-lts-backport-quantal
-#x11proto-xext-dev		x11proto-xext-dev-lts-backport-quantal
-#x11proto-xf86bigfont-dev	x11proto-xf86bigfont-dev-lts-backport-quantal
-#x11proto-xf86dga-dev		x11proto-xf86dga-dev-lts-backport-quantal
-#x11proto-xf86dri-dev		x11proto-xf86dri-dev-lts-backport-quantal
-#x11proto-xf86vidmode-dev	x11proto-xf86vidmode-dev-lts-backport-quantal
-#x11proto-xinerama-dev		x11proto-xinerama-dev-lts-backport-quantal
+#x11proto-bigreqs-dev		x11proto-bigreqs-dev-lts-quantal
+#x11proto-composite-dev		x11proto-composite-dev-lts-quantal
+#x11proto-core-dev		x11proto-core-dev-lts-quantal
+#x11proto-damage-dev		x11proto-damage-dev-lts-quantal
+#x11proto-dmx-dev		x11proto-dmx-dev-lts-quantal
+#x11proto-dri2-dev		x11proto-dri2-dev-lts-quantal
+#x11proto-fixes-dev		x11proto-fixes-dev-lts-quantal
+#x11proto-fonts-dev		x11proto-fonts-dev-lts-quantal
+#x11proto-gl-dev			x11proto-gl-dev-lts-quantal
+#x11proto-input-dev		x11proto-input-dev-lts-quantal
+#x11proto-kb-dev			x11proto-kb-dev-lts-quantal
+#x11proto-randr-dev		x11proto-randr-dev-lts-quantal
+#x11proto-record-dev		x11proto-record-dev-lts-quantal
+#x11proto-render-dev		x11proto-render-dev-lts-quantal
+#x11proto-resource-dev		x11proto-resource-dev-lts-quantal
+#x11proto-scrnsaver-dev		x11proto-scrnsaver-dev-lts-quantal
+#x11proto-video-dev		x11proto-video-dev-lts-quantal
+#x11proto-xcmisc-dev		x11proto-xcmisc-dev-lts-quantal
+#x11proto-xext-dev		x11proto-xext-dev-lts-quantal
+#x11proto-xf86bigfont-dev	x11proto-xf86bigfont-dev-lts-quantal
+#x11proto-xf86dga-dev		x11proto-xf86dga-dev-lts-quantal
+#x11proto-xf86dri-dev		x11proto-xf86dri-dev-lts-quantal
+#x11proto-xf86vidmode-dev	x11proto-xf86vidmode-dev-lts-quantal
+#x11proto-xinerama-dev		x11proto-xinerama-dev-lts-quantal
 #xcb-proto
 
 # Protocol headers we package but don't have any rdepends
@@ -110,37 +110,42 @@
 
 # Core stack
 # Disabled for testing
-#libpciaccess-dev		libpciaccess-dev-lts-backport-quantal
-#libpixman-1-dev			libpixman-1-dev-lts-backport-quantal
+#libpciaccess-dev		libpciaccess-dev-lts-quantal
+#libpixman-1-dev			libpixman-1-dev-lts-quantal
 
 # Disabled because of libx11-dev depends
-#xutils-dev			xutils-dev-lts-backport-quantal
-#xtrans-dev			xtrans-dev-lts-backport-quantal
+#xutils-dev			xutils-dev-lts-quantal
+#xtrans-dev			xtrans-dev-lts-quantal
 
 # "xorg" virtual package
-# No renames, will need to be altered manually
-#x11-common			x11-common-lts-backport-quantal
+# No renames, will need to be altered manually to add optional depends on renamed stack
+#x11-common
 #xorg
 
 # Disabled: xfonts-base will add a versioned depends on xfonts-utils
 # because of dh_installxfonts, in fact.. ANY xfonts will do this
-#xfonts-utils			xfonts-utils-lts-backport-quantal
+#xfonts-utils			xfonts-utils-lts-quantal
+
+# mesa
+libgl1-mesa-dev			libgl1-mesa-dev-lts-quantal
+mesa-common-dev			mesa-common-dev-lts-quantal
+libxatracker-dev		libxatracker-dev-lts-quantal
+libgl1-mesa-dri			libgl1-mesa-dri-lts-quantal
+libgl1-mesa-glx			libgl1-mesa-glx-lts-quantal
 
 # Rest of core stack
-libdrm-dev			libdrm-dev-lts-backport-quantal
-libgl1-mesa-dev			libgl1-mesa-dev-lts-backport-quantal
-mesa-common-dev			mesa-common-dev-lts-backport-quantal
-x11-xkb-utils			x11-xkb-utils-lts-backport-quantal
-x11-xkb-utils-udeb		x11-xkb-utils-udeb-lts-backport-quantal
-xauth				xauth-lts-backport-quantal
-xfonts-base			xfonts-base-lts-backport-quantal
-xkb-data			xkb-data-lts-backport-quantal
-xkb-data-udeb			xkb-data-udeb-lts-backport-quantal
+libdrm-dev			libdrm-dev-lts-quantal
+x11-xkb-utils			x11-xkb-utils-lts-quantal
+x11-xkb-utils-udeb		x11-xkb-utils-udeb-lts-quantal
+xauth				xauth-lts-quantal
+xfonts-base			xfonts-base-lts-quantal
+xkb-data			xkb-data-lts-quantal
+xkb-data-udeb			xkb-data-udeb-lts-quantal
 
 # xserver-xorg package, only necessary ones
-xserver-xorg-dev		xserver-xorg-dev-lts-backport-quantal
-xserver-xorg-core		xserver-xorg-core-lts-backport-quantal
-xserver-xorg-core-udeb          xserver-xorg-core-udeb-backport-quantal
+xserver-xorg-dev		xserver-xorg-dev-lts-quantal
+xserver-xorg-core		xserver-xorg-core-lts-quantal
+xserver-xorg-core-udeb		xserver-xorg-core-udeb-quantal
 
 # Not sure about these, but guessing we can leave these alone:
 #xfs
@@ -150,52 +155,52 @@ xserver-xorg-core-udeb          xserver-xorg-core-udeb-backport-quantal
 #xorg-sgml-doctools
 
 #evil blobs, might not need a big update
-#fglrx-dev				 fglrx-dev-lts-backport-quantal
-#nvidia-current-dev			 nvidia-current-dev-lts-backport-quantal
-#nvidia-173-dev				 nvidia-173-dev-lts-backport-quantal
-#nvidia-96-dev				 nvidia-96-dev-lts-backport-quantal
-#nvidia-current-updates-dev		 nvidia-current-updates-dev-lts-backport-quantal
+#fglrx-dev				fglrx-dev-lts-quantal
+#nvidia-current-dev			nvidia-current-dev-lts-quantal
+#nvidia-173-dev				nvidia-173-dev-lts-quantal
+#nvidia-96-dev				nvidia-96-dev-lts-quantal
+#nvidia-current-updates-dev		nvidia-current-updates-dev-lts-quantal
 
 # DDX and other drivers
-xf86-input-mtrack			 xf86-input-mtrack-lts-backport-quantal
-xserver-xorg-input-mtrack		 xserver-xorg-input-mtrack-lts-backport-quantal
-xf86-input-wacom			 xf86-input-wacom-lts-backport-quantal
-xserver-xorg-input-wacom		 xserver-xorg-input-wacom-lts-backport-quantal
-xf86-video-msm				 xf86-video-msm-lts-backport-quantal
-xserver-xorg-video-msm			 xserver-xorg-video-msm-lts-backport-quantal
-xf86-video-omapfb			 xf86-video-omapfb-lts-backport-quantal
-xserver-xorg-video-omapfb		 xserver-xorg-video-omapfb-lts-backport-quantal
+xf86-input-mtrack			xf86-input-mtrack-lts-quantal
+xserver-xorg-input-mtrack		xserver-xorg-input-mtrack-lts-quantal
+xf86-input-wacom			xf86-input-wacom-lts-quantal
+xserver-xorg-input-wacom		xserver-xorg-input-wacom-lts-quantal
+xf86-video-msm				xf86-video-msm-lts-quantal
+xserver-xorg-video-msm			xserver-xorg-video-msm-lts-quantal
+xf86-video-omapfb			xf86-video-omapfb-lts-quantal
+xserver-xorg-video-omapfb		xserver-xorg-video-omapfb-lts-quantal
 
-xserver-xorg-input-evdev		 xserver-xorg-input-evdev-lts-backport-quantal
-xserver-xorg-input-evdev-dev		 xserver-xorg-input-evdev-dev-lts-backport-quantal
-xserver-xorg-input-joystick-dev		 xserver-xorg-input-joystick-dev-lts-backport-quantal
-xserver-xorg-input-keyboard		 xserver-xorg-input-keyboard-lts-backport-quantal
-xserver-xorg-input-mouse		 xserver-xorg-input-mouse-lts-backport-quantal
-xserver-xorg-input-synaptics-dev	 xserver-xorg-input-synaptics-dev-lts-backport-quantal
-xserver-xorg-input-vmmouse		 xserver-xorg-input-vmmouse-lts-backport-quantal
-xserver-xorg-input-void			 xserver-xorg-input-void-lts-backport-quantal
-xserver-xorg-video-ati			 xserver-xorg-video-ati-lts-backport-quantal
-xserver-xorg-video-displaylink		 xserver-xorg-video-displaylink-lts-backport-quantal
-xserver-xorg-video-cirrus		 xserver-xorg-video-cirrus-lts-backport-quantal
-xserver-xorg-video-dummy		 xserver-xorg-video-dummy-lts-backport-quantal
-xserver-xorg-video-fbdev		 xserver-xorg-video-fbdev-lts-backport-quantal
-xserver-xorg-video-geode		 xserver-xorg-video-geode-lts-backport-quantal
-xserver-xorg-video-intel		 xserver-xorg-video-intel-lts-backport-quantal
-xserver-xorg-video-mach64		 xserver-xorg-video-mach64-lts-backport-quantal
-xserver-xorg-video-mach64-dbg		 xserver-xorg-video-mach64-lts-backport-quantal-dbg
-xserver-xorg-video-mga			 xserver-xorg-video-mga-lts-backport-quantal
-xserver-xorg-video-neomagic		 xserver-xorg-video-neomagic-lts-backport-quantal
-xserver-xorg-video-nouveau		 xserver-xorg-video-nouveau-lts-backport-quantal
-xserver-xorg-video-openchrome		 xserver-xorg-video-openchrome-lts-backport-quantal
-xserver-xorg-video-qxl			 xserver-xorg-video-qxl-lts-backport-quantal
-xserver-xorg-video-r128			 xserver-xorg-video-r128-lts-backport-quantal
-xserver-xorg-video-r128-dbg		 xserver-xorg-video-r128-lts-backport-quantal-dbg
-xserver-xorg-video-s3			 xserver-xorg-video-s3-lts-backport-quantal
-xserver-xorg-video-savage		 xserver-xorg-video-savage-lts-backport-quantal
-xserver-xorg-video-siliconmotion	 xserver-xorg-video-siliconmotion-lts-backport-quantal
-xserver-xorg-video-sis			 xserver-xorg-video-sis-lts-backport-quantal
-xserver-xorg-video-sisusb		 xserver-xorg-video-sisusb-lts-backport-quantal
-xserver-xorg-video-tdfx			 xserver-xorg-video-tdfx-lts-backport-quantal
-xserver-xorg-video-trident		 xserver-xorg-video-trident-lts-backport-quantal
-xserver-xorg-video-vesa			 xserver-xorg-video-vesa-lts-backport-quantal
-xserver-xorg-video-vmware		 xserver-xorg-video-vmware-lts-backport-quantal
+xserver-xorg-input-evdev		xserver-xorg-input-evdev-lts-quantal
+xserver-xorg-input-evdev-dev		xserver-xorg-input-evdev-dev-lts-quantal
+xserver-xorg-input-joystick-dev		xserver-xorg-input-joystick-dev-lts-quantal
+xserver-xorg-input-keyboard		xserver-xorg-input-keyboard-lts-quantal
+xserver-xorg-input-mouse		xserver-xorg-input-mouse-lts-quantal
+xserver-xorg-input-synaptics-dev	xserver-xorg-input-synaptics-dev-lts-quantal
+xserver-xorg-input-vmmouse		xserver-xorg-input-vmmouse-lts-quantal
+xserver-xorg-input-void			xserver-xorg-input-void-lts-quantal
+xserver-xorg-video-ati			xserver-xorg-video-ati-lts-quantal
+xserver-xorg-video-displaylink		xserver-xorg-video-displaylink-lts-quantal
+xserver-xorg-video-cirrus		xserver-xorg-video-cirrus-lts-quantal
+xserver-xorg-video-dummy		xserver-xorg-video-dummy-lts-quantal
+xserver-xorg-video-fbdev		xserver-xorg-video-fbdev-lts-quantal
+xserver-xorg-video-geode		xserver-xorg-video-geode-lts-quantal
+xserver-xorg-video-intel		xserver-xorg-video-intel-lts-quantal
+xserver-xorg-video-mach64		xserver-xorg-video-mach64-lts-quantal
+xserver-xorg-video-mach64-dbg		xserver-xorg-video-mach64-lts-quantal-dbg
+xserver-xorg-video-mga			xserver-xorg-video-mga-lts-quantal
+xserver-xorg-video-neomagic		xserver-xorg-video-neomagic-lts-quantal
+xserver-xorg-video-nouveau		xserver-xorg-video-nouveau-lts-quantal
+xserver-xorg-video-openchrome		xserver-xorg-video-openchrome-lts-quantal
+xserver-xorg-video-qxl			xserver-xorg-video-qxl-lts-quantal
+xserver-xorg-video-r128			xserver-xorg-video-r128-lts-quantal
+xserver-xorg-video-r128-dbg		xserver-xorg-video-r128-lts-quantal-dbg
+xserver-xorg-video-s3			xserver-xorg-video-s3-lts-quantal
+xserver-xorg-video-savage		xserver-xorg-video-savage-lts-quantal
+xserver-xorg-video-siliconmotion	xserver-xorg-video-siliconmotion-lts-quantal
+xserver-xorg-video-sis			xserver-xorg-video-sis-lts-quantal
+xserver-xorg-video-sisusb		xserver-xorg-video-sisusb-lts-quantal
+xserver-xorg-video-tdfx			xserver-xorg-video-tdfx-lts-quantal
+xserver-xorg-video-trident		xserver-xorg-video-trident-lts-quantal
+xserver-xorg-video-vesa			xserver-xorg-video-vesa-lts-quantal
+xserver-xorg-video-vmware		xserver-xorg-video-vmware-lts-quantal
