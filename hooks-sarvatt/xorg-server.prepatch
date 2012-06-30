@@ -35,6 +35,13 @@ if [ "$BRANCH" == "master" ]; then
 	patch -p1 < $HOOKS/xorg-server-1.13.patch
 	
 	drop 100_rethrow_signals.patch needs-refresh
+	
+	drop 510-dix-return-early-from-DisableDevice-if-the-device-is.patch upstream
+	drop 511-dix-move-freeing-the-sprite-into-a-function.patch upstream
+	drop 512-dix-free-the-sprite-when-disabling-the-device.patch upstream
+	drop 513-dix-disable-non-sprite-owners-first-when-disabling-p.patch upstream
+	drop 514-Xi-drop-forced-unpairing-when-changing-the-hierarchy.patch upstream
+	drop 515-dix-disable-all-devices-before-shutdown.patch upstream
 fi
 
 ## Legacy unused hooks for reference
