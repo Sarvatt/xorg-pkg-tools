@@ -1,13 +1,3 @@
-diff --git a/cursor/Makefile.am b/cursor/Makefile.am
-index 503559a..9403f92 100644
---- a/cursor/Makefile.am
-+++ b/cursor/Makefile.am
-@@ -11,4 +11,4 @@ libwayland_cursor_la_LIBADD = $(top_builddir)/src/libwayland-client.la
- pkgconfigdir = $(libdir)/pkgconfig
- pkgconfig_DATA = wayland-cursor.pc
- 
--AM_CFLAGS = $(GCC_CFLAGS) -I../src
-+AM_CFLAGS = $(GCC_CFLAGS) -I$(top_srcdir)/src -I$(top_builddir)/src
 diff --git a/debian/rules b/debian/rules
 index 42a3fef..ca80f3f 100755
 --- a/debian/rules

@@ -2,13 +2,14 @@ diff --git a/debian/control b/debian/control
 index 81322d3..956c7f9 100644
 --- a/debian/control
 +++ b/debian/control
-@@ -16,6 +16,9 @@ Build-Depends:
+@@ -16,6 +16,10 @@ Build-Depends:
   libegl1-mesa-dev (>= 8.0-2),
   libegl1-mesa-drivers (>= 8.0-2),
   libgles2-mesa-dev (>= 8.0-2),
 + libmtdev-dev,
 + libpam0g-dev,
 + libxcursor-dev,
++ libvpx-dev,
   libwayland-dev (>= 0.85),
   libxcb1-dev,
   libxcb-xfixes0-dev,
