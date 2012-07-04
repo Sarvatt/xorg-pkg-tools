@@ -163,18 +163,13 @@ msg "Updating the maintainer..."
 update-maintainer -q
 
 msg "Adding a changelog entry..."
-dch --increment \
+# ~precise1 is a downgrade so force version
+dch --newversion "${old_package_version}~precise1" \
+    --force-bad-version \
     --package ${new_package} \
     --distribution ${lts_codename} \
     --force-distribution \
     "Rename package for the LTS point update, and add replaces/breaks/provides"
-
-if [ -n "${extraversion}" ]; then
-    dch --local "${extraversion}" \
-    --distribution ${lts_codename} \
-    --force-distribution \
-    "Bump version number with ${extraversion}1 for ppa upload"
-fi
 
 if [ -n "$dry" ]; then
     mv -v debian/changelog debian/changelog.new
