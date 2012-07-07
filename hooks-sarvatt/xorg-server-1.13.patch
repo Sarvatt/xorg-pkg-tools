@@ -14,5 +14,20 @@ index bb0c338..b2571aa 100644
   AC_CHECK_FUNC([SHA1Init], [HAVE_SHA1_IN_LIBC=yes])
   if test "x$with_sha1" = x && test "x$HAVE_SHA1_IN_LIBC" = xyes; then
 
+diff --git a/debian/patches/226_fall_back_to_autoconfiguration.patch b/debian/patches/226_fall_back_to_autoconfiguration.patch
+index eb6383b..b58e570 100644
+--- a/debian/patches/226_fall_back_to_autoconfiguration.patch
++++ b/debian/patches/226_fall_back_to_autoconfiguration.patch
+@@ -3,9 +3,9 @@ index 0071004..ea66973 100644
+ --- a/hw/xfree86/common/xf86Globals.c
+ +++ b/hw/xfree86/common/xf86Globals.c
+ @@ -153,6 +153,7 @@ int xf86NumDrivers = 0;
+- InputDriverPtr *xf86InputDriverList = NULL;
+  int xf86NumInputDrivers = 0;
+  int xf86NumScreens = 0;
++ int xf86NumGPUScreens = 0;
+ +Bool xf86AttemptedFallback = FALSE;
+  
+  const char *xf86VisualNames[] = {
 
 
