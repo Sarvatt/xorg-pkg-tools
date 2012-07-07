@@ -1,0 +1,28 @@
+diff --git a/debian/patches/bsd-array-bounds.diff b/debian/patches/bsd-array-bounds.diff
+index 8db8d2e..6fb1835 100644
+--- a/debian/patches/bsd-array-bounds.diff
++++ b/debian/patches/bsd-array-bounds.diff
+@@ -16,10 +16,10 @@ Index: xserver-xorg-input-mouse/src/bsd_mouse.c
+  
+ -    for (i = 0; internalNames[i]; i++)
+ +    for (i = 0; i < (sizeof(internalNames) / sizeof(internalNames[0])); i++)
+- 	if (xf86NameCmp(protocol, internalNames[i]) == 0)
+- 	    return TRUE;
++         if (xf86NameCmp(protocol, internalNames[i]) == 0)
++             return TRUE;
+ -    for (i = 0; miscNames[i]; i++)
+ +    for (i = 0; i < (sizeof(miscNames) / sizeof(miscNames[0])); i++)
+- 	if (xf86NameCmp(protocol, miscNames[i]) == 0)
+- 	    return TRUE;
++         if (xf86NameCmp(protocol, miscNames[i]) == 0)
++             return TRUE;
+      return FALSE;
+
+diff --git a/debian/xserver-xorg-input-mouse.install b/debian/xserver-xorg-input-mouse.install
+index 97e3c20..b0d1510 100644
+--- a/debian/xserver-xorg-input-mouse.install
++++ b/debian/xserver-xorg-input-mouse.install
+@@ -1,2 +1,3 @@
++usr/include/xorg/xf86-mouse-properties.h
+ usr/lib/xorg/modules/input/*.so
+ usr/share/man
