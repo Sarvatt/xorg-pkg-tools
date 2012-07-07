@@ -1,4 +1,4 @@
-patch -p1 < $HOOKS/xserver-xorg-input-synaptics.patch
+#patch -p1 < $HOOKS/xserver-xorg-input-synaptics.patch
 	
 drop 03-man-no-hal.patch upstream
 drop 116_xi2_1.patch fails

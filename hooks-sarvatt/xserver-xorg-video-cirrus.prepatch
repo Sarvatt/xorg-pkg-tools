@@ -1,4 +1,5 @@
 # This will be sourced as a bash script
 
+drop 10-qemu.diff fails
 drop 20-faumachine-maxpitch.diff fails
 drop 200_fix_gd5446_maxpitch.patch fails
