@@ -45,7 +45,7 @@ codename=quantal
 suffix=lts-${codename}
 verbose=1
 dry=""
-extraversion="+rename2."
+extraversion="~precise1~ppa1"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -164,7 +164,7 @@ update-maintainer -q
 
 msg "Adding a changelog entry..."
 # ~precise1 is a downgrade so force version
-dch --newversion "${old_package_version}~precise1" \
+dch --newversion "${old_package_version}${extraversion}" \
     --force-bad-version \
     --package ${new_package} \
     --distribution ${lts_codename} \

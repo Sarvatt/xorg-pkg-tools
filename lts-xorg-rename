@@ -49,7 +49,7 @@ mv -v debian/control.new debian/control
 
 # debian/changelog
 # Our version will be older than the original
-dch --newversion "${old_package_version}~precise1" \
+dch --newversion "${old_package_version}${extraversion}" \
     --force-bad-version \
     --package xorg-${suffix} \
     --distribution ${lts_codename} \
