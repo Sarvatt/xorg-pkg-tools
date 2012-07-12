@@ -10,7 +10,8 @@ index 0350aa2..2893b22 100644
 ++    AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no])
   
       if test "x$LLVM_CONFIG" != xno; then
-  	LLVM_VERSION=`$LLVM_CONFIG --version | sed 's/svn.*//g'`diff --git a/debian/control b/debian/control
+  	LLVM_VERSION=`$LLVM_CONFIG --version | sed 's/svn.*//g'`
+diff --git a/debian/control b/debian/control
 index 2d83129..b1bab52 100644
 --- a/debian/control
 +++ b/debian/control
