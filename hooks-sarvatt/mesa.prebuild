@@ -1,7 +1,15 @@
-sed -i '/^Build-Depends:/a \
- libtool,
-' debian/control
-CHANGES+=("hook: Add libtool to build depends.")
+#sed -i '/^Build-Depends:/a \
+# libtool,
+#' debian/control
+#CHANGES+=("hook: Add libtool to build depends.")
+
+#patch -p1 < $HOOKS/mesa.patch
+#CHANGES+=("hook: Update build system for mesa master.")
+#patch -p1 < $HOOKS/mesa-control.patch
+#CHANGES+=("hook: Add libtxc-dxtn0 to libgl1-mesa-dri recommends.")
+#CHANGES+=("hook: Switch to llvm-3.1.")
+#patch -p1 < $HOOKS/mesa-more-symbols.patch
+#CHANGES+=("hook: Refresh libgbm1 symbols.")
 
 ## Legacy unused hooks for reference
 
