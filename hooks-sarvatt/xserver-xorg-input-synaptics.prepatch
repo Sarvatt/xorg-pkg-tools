@@ -1,5 +1,6 @@
 #patch -p1 < $HOOKS/xserver-xorg-input-synaptics.patch
-	
+
+drop 02-do-not-use-synaptics-for-keyboards.patch fails	
 drop 03-man-no-hal.patch upstream
 drop 116_xi2_1.patch fails
 drop 117_gestures.patch fails
