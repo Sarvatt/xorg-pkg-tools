@@ -17,3 +17,7 @@ drop 119_disable_relaxed_fencing.path upstream
 drop 119_disable_relaxed_fencing.patch upstream
 drop 120_check_privates.patch testing
 drop 121_fdo-28798-fix.patch upstream
+
+patch -p1 < $HOOKS/intel-sna.patch
+CHANGES+=("Note: SNA can now be picked via AccelMethod in xorg.conf.")
+
