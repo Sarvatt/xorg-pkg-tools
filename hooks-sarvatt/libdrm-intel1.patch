@@ -1,5 +1,5 @@
---- debian/libdrm-intel1.symbols (libdrm-intel1_2.4.34+git20120512.e07b6506-0ubuntu0ricotz_amd64)
-+++ dpkg-gensymbols2zTonM	2012-05-12 18:17:33.156185509 +0000
+--- a/debian/libdrm-intel1.symbols (libdrm-intel1_2.4.34+git20120512.e07b6506-0ubuntu0ricotz_amd64)
++++ b/debian/libdrm-intel1.symbols	2012-05-12 18:17:33.156185509 +0000
 @@ -38,6 +38,7 @@
   drm_intel_bufmgr_gem_enable_reuse@Base 2.4.1
   drm_intel_bufmgr_gem_get_devid@Base 2.4.32

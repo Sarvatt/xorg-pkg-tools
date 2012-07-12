@@ -1,17 +1,17 @@
 diff --git a/debian/control b/debian/control
-index 5b5d9f6..66cb1ab 100644
+index 71d057b..4ec2258 100644
 --- a/debian/control
 +++ b/debian/control
-@@ -23,7 +23,7 @@ Depends:
+@@ -23,7 +24,7 @@ Depends:
   libdrm2 (= ${binary:Version}),
   libdrm-intel1 (= ${binary:Version}) [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
   libdrm-radeon1 (= ${binary:Version}) [linux-any],
 - libdrm-nouveau1a (= ${binary:Version}) [linux-any],
 + libdrm-nouveau2 (= ${binary:Version}) [linux-any],
-  libdrm-omap1 (= ${binary:Version}) [any-arm],
   libkms1 (= ${binary:Version}) [linux-any],
   ${misc:Depends},
-@@ -102,12 +102,11 @@ Description: Userspace interface to intel-specific kernel DRM services -- debugg
+ Replaces:
+@@ -101,12 +102,11 @@ Description: Userspace interface to intel-specific kernel DRM services -- debugg
   .
   This package provides the debugging symbols for the libdrm-intel1 package.
  
@@ -25,7 +25,7 @@ index 5b5d9f6..66cb1ab 100644
  Pre-Depends: ${misc:Pre-Depends}
  Multi-Arch: same
  Description: Userspace interface to nouveau-specific kernel DRM services -- runtime
-@@ -116,13 +115,12 @@ Description: Userspace interface to nouveau-specific kernel DRM services -- runt
+@@ -115,13 +115,12 @@ Description: Userspace interface to nouveau-specific kernel DRM services -- runt
   kernelspace portion of the "Direct Rendering Infrastructure" (DRI). The DRI is
   currently used on Linux to provide hardware-accelerated OpenGL drivers.
  
@@ -41,7 +41,7 @@ index 5b5d9f6..66cb1ab 100644
  Multi-Arch: same
  Description: Userspace interface to nouveau-specific kernel DRM -- debugging symbols
   This library implements the userspace interface to the kernel DRM services.
-@@ -130,7 +128,7 @@ Description: Userspace interface to nouveau-specific kernel DRM -- debugging sym
+@@ -129,7 +128,7 @@ Description: Userspace interface to nouveau-specific kernel DRM -- debugging sym
   of the "Direct Rendering Infrastructure" (DRI). The DRI is currently used on
   Linux to provide hardware-accelerated OpenGL drivers.
   .
