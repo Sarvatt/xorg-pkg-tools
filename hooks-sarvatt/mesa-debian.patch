@@ -1,4 +1,16 @@
-diff --git a/debian/control b/debian/control
+diff --git a/debian/patches/13-llvm-config-pick-a-version.diff b/debian/patches/13-llvm-config-pick-a-version.diff
+index 0350aa2..2893b22 100644
+--- a/debian/patches/13-llvm-config-pick-a-version.diff
++++ b/debian/patches/13-llvm-config-pick-a-version.diff
+@@ -13,7 +13,7 @@ Index: mesa/configure.ac
+  fi
+  if test "x$enable_gallium_llvm" = xyes; then
+ -    AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no])
+-+    AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.0], [no])
+++    AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no])
+  
+      if test "x$LLVM_CONFIG" != xno; then
+  	LLVM_VERSION=`$LLVM_CONFIG --version | sed 's/svn.*//g'`diff --git a/debian/control b/debian/control
 index 2d83129..b1bab52 100644
 --- a/debian/control
 +++ b/debian/control
