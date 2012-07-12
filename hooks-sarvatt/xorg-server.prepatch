@@ -33,6 +33,7 @@ getp() {
 
 if [ "$BRANCH" == "master" ]; then
 	patch -p1 < $HOOKS/xorg-server-1.13.patch
+	CHANGES+=("hook: Make xserver-xorg-dev depend on x11proto-resource-dev, x11proto-scrnsaver-dev")
 	
 	drop 100_rethrow_signals.patch needs-refresh
 	
