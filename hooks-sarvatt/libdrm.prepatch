@@ -1,11 +1,1 @@
-patch -p1 < $HOOKS/libdrm-nouveau2.patch
-CHANGES+=("hook: Add libdrm-nouveau2 package.")
-
-patch -p1 < $HOOKS/libdrm-intel1.patch
-patch -p1 < $HOOKS/libdrm-intel1-2.patch
-patch -p1 < $HOOKS/libdrm-intel1-3.patch
-CHANGES+=("hook: Update libdrm-intel1 symbols.")
-
-patch -p1 < $HOOKS/libdrm2.patch
-CHANGES+=("hook: Update libdrm2 symbols.")
 
