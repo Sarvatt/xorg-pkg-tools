@@ -1,12 +1,5 @@
 # This will be sourced as a bash script
 
-CHANGES+=("Note: SNA is now disabled due to long-standing incompatibilities with unity.")
-
-patch -p1 < $HOOKS/xserver-xorg-video-intel.patch
-CHANGES+=("hooks: build-dep on libxcb-util0-dev | libxcb-aux0-dev to ease backporting.")
-
-
-
 # Tormod Volden 2009-03-08
 # 
 
