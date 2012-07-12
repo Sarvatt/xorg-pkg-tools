@@ -153,6 +153,8 @@ fdogitdir_for_fdopkg() {
         echo "xorg"
     elif [ ${fdopkg} = "drm" -o ${fdopkg} = "mesa" ]; then
         echo "mesa"
+    elif [ ${fdopkg} = "xf86-video-openchrome" ]; then
+        echo "openchrome"
     elif [ ${fdopkg} = "xf86-video-nouveau" ]; then
         echo "nouveau"
     elif [ ${fdopkg} = "xf86-video-avivo" ]; then
