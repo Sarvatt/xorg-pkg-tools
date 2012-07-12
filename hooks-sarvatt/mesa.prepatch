@@ -19,7 +19,8 @@ patch -p1 < $HOOKS/mesa-debian.patch
 CHANGES+=("hook: Update build system for mesa master.")
 CHANGES+=("hook: Add libtxc-dxtn0 to libgl1-mesa-dri recommends.")
 CHANGES+=("hook: Switch to llvm-3.1.")
-CHANGES+=("hook: Refresh libgbm1 symbols.")
+patch -p1 < $HOOKS/mesa-egl-symbols.patch
+CHANGES+=("hook: Refresh symbols.")
 patch -p1 < $HOOKS/mesa-out-of-tree.patch
 CHANGES+=("hook: Fix out of tree builds.")
 
