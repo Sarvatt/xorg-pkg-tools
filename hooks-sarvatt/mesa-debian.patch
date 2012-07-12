@@ -460,7 +460,7 @@ index f0326a3..96278ff 100755
  		; done
  
 -	dh_makeshlibs -s --remaining-packages -- -c4
-+	dh_makeshlibs -s --remaining-packages -- -c0
++	dh_makeshlibs -s --remaining-packages -- -c1
  else
  	# Temporarily work around FTBFS on sparc, ignore new symbols:
  	dh_makeshlibs -s -- -c1
