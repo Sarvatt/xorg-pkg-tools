@@ -1,3 +1,38 @@
+diff --git a/debian/patches/04_osmesa_version.diff b/debian/patches/04_osmesa_version.diff
+index 19bd568..9d9957b 100644
+--- a/debian/patches/04_osmesa_version.diff
++++ b/debian/patches/04_osmesa_version.diff
+@@ -1,17 +1,13 @@
+----
+- src/mesa/drivers/osmesa/Makefile |    2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-Index: mesa/src/mesa/drivers/osmesa/Makefile
+-===================================================================
+---- mesa.orig/src/mesa/drivers/osmesa/Makefile
+-+++ mesa/src/mesa/drivers/osmesa/Makefile
+-@@ -37,7 +37,7 @@
+- # -DCHAN_BITS=16/32.
+- $(TOP)/$(LIB_DIR)/$(OSMESA_LIB_NAME): $(OBJECTS) $(CORE_MESA)
+- 	$(MKLIB) -o $(OSMESA_LIB) -linker '$(CXX)' -ldflags '$(LDFLAGS)' \
+--		-major $(MESA_MAJOR) -minor $(MESA_MINOR) -patch $(MESA_TINY) \
+-+		-major 6 -minor 5 -patch 3 \
+- 		-install $(TOP)/$(LIB_DIR) -cplusplus $(MKLIB_OPTIONS) \
+- 		-id $(INSTALL_LIB_DIR)/lib$(OSMESA_LIB).$(MESA_MAJOR).dylib \
+- 		$(OSMESA_LIB_DEPS) $(OBJECTS) $(CORE_MESA)
++diff --git a/configure.ac b/configure.ac
++index 9227474..b4562eb 100644
++--- a/configure.ac
+++++ b/configure.ac
++@@ -1349,7 +1349,7 @@ if test "x$enable_osmesa" = xyes; then
++     OSMESA_PC_LIB_PRIV="-lm -lpthread $SELINUX_LIBS $DLOPEN_LIBS"
++ fi
++ 
++-OSMESA_VERSION=`echo "$VERSION" | $SED 's/\./:/g'`
+++OSMESA_VERSION="6:5:3"
++ 
++ AC_SUBST([OSMESA_LIB_DEPS])
++ AC_SUBST([OSMESA_MESA_DEPS])
 diff --git a/debian/patches/13-llvm-config-pick-a-version.diff b/debian/patches/13-llvm-config-pick-a-version.diff
 index 0350aa2..2893b22 100644
 --- a/debian/patches/13-llvm-config-pick-a-version.diff
