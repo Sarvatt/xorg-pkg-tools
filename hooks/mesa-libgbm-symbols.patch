@@ -1,0 +1,21 @@
+diff --git a/debian/libgbm1.symbols b/debian/libgbm1.symbols
+index 9323077..98d7def 100644
+--- a/debian/libgbm1.symbols
++++ b/debian/libgbm1.symbols
+@@ -8,14 +8,14 @@ libgbm.so.1 libgbm1 #MINVER#
+  dri2_loader_extension@Base 8.1~
+  dri_fd_get_driver_name@Base 8.1~
+  gbm_bo_create@Base 7.11~1
+- gbm_bo_create_from_egl_image@Base 7.11~1
+  gbm_bo_destroy@Base 7.11~1
+  gbm_bo_get_device@Base 8.1~
+  gbm_bo_get_format@Base 8.1~
+  gbm_bo_get_handle@Base 7.11~1
+  gbm_bo_get_height@Base 7.11~1
+- gbm_bo_get_pitch@Base 7.11~1
++ gbm_bo_get_stride@Base 8.1~
+  gbm_bo_get_user_data@Base 8.1~
++ gbm_bo_import@Base 8.1~
+  gbm_bo_get_width@Base 7.11~1
+  gbm_bo_set_user_data@Base 8.1~
+  gbm_bo_write@Base 8.1~
