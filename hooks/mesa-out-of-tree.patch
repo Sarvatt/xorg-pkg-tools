@@ -11,31 +11,29 @@ index 5a6d4db..e5e3b1a 100644
  
  if HAVE_X86_ASM
 diff --git a/src/mesa/Makefile.am b/src/mesa/Makefile.am
-index a059345..94b79dd 100644
+index 6499e3c..9a1c4bb 100644
 --- a/src/mesa/Makefile.am
 +++ b/src/mesa/Makefile.am
-@@ -98,7 +98,21 @@ noinst_LTLIBRARIES = libmesa.la libmesagallium.la
+@@ -98,6 +98,19 @@ noinst_LTLIBRARIES = libmesa.la libmesagallium.la
  SRCDIR = $(top_srcdir)/src/mesa
  include sources.mak
  
 +if HAVE_X86_ASM
 +INCLUDE_DIRS += \
-+	-I$(top_builddir)/src/mesa/x86
++       -I$(top_builddir)/src/mesa/x86
 +endif
 +if HAVE_X86_64_ASM
 +INCLUDE_DIRS += \
-+	-I$(top_builddir)/src/mesa/x86-64
++       -I$(top_builddir)/src/mesa/x86-64
 +endif
 +if HAVE_SPARC_ASM
 +INCLUDE_DIRS += \
-+	-I$(top_builddir)/src/mesa/sparc
++       -I$(top_builddir)/src/mesa/sparc
 +endif
 +
- AM_CFLAGS = $(API_DEFINES) $(DEFINES) $(INCLUDE_DIRS) $(LLVM_CFLAGS) $(CFLAGS)
-+AM_CPPFLAGS = $(API_DEFINES) $(DEFINES) $(INCLUDE_DIRS) $(LLVM_CFLAGS) $(CXXFLAGS)
- AM_CXXFLAGS = $(API_DEFINES) $(DEFINES) $(INCLUDE_DIRS) $(LLVM_CFLAGS) $(CXXFLAGS)
- 
- # cannot just add $(MESA_ASM_FILES) to libmesa_la_SOURCES as it contains a configure substitution
+ AM_CPPFLAGS = $(API_DEFINES) $(DEFINES) $(INCLUDE_DIRS)
+ AM_CFLAGS = $(LLVM_CFLAGS)
+ AM_CXXFLAGS = $(LLVM_CFLAGS)
 diff --git a/src/glsl/Makefile.sources b/src/glsl/Makefile.sources
 index 0425fa3..70edc04 100644
 --- a/src/glsl/Makefile.sources
