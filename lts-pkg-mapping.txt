@@ -133,14 +133,14 @@ libxatracker-dev		libxatracker-dev-lts-quantal
 libgl1-mesa-dri			libgl1-mesa-dri-lts-quantal
 libgl1-mesa-glx			libgl1-mesa-glx-lts-quantal
 
-# Rest of core stack
-libdrm-dev			libdrm-dev-lts-quantal
-x11-xkb-utils			x11-xkb-utils-lts-quantal
-x11-xkb-utils-udeb		x11-xkb-utils-udeb-lts-quantal
-xauth				xauth-lts-quantal
-xfonts-base			xfonts-base-lts-quantal
-xkb-data			xkb-data-lts-quantal
-xkb-data-udeb			xkb-data-udeb-lts-quantal
+# Rest of core stack should be SRU'd as needed...
+#libdrm-dev			libdrm-dev-lts-quantal
+#x11-xkb-utils			x11-xkb-utils-lts-quantal
+#x11-xkb-utils-udeb		x11-xkb-utils-udeb-lts-quantal
+#xauth				xauth-lts-quantal
+#xfonts-base			xfonts-base-lts-quantal
+#xkb-data			xkb-data-lts-quantal
+#xkb-data-udeb			xkb-data-udeb-lts-quantal
 
 # xserver-xorg package, only necessary ones
 xserver-xorg-dev		xserver-xorg-dev-lts-quantal
@@ -168,8 +168,10 @@ xf86-input-wacom			xf86-input-wacom-lts-quantal
 xserver-xorg-input-wacom		xserver-xorg-input-wacom-lts-quantal
 xf86-video-msm				xf86-video-msm-lts-quantal
 xserver-xorg-video-msm			xserver-xorg-video-msm-lts-quantal
-xf86-video-omapfb			xf86-video-omapfb-lts-quantal
-xserver-xorg-video-omapfb		xserver-xorg-video-omapfb-lts-quantal
+
+# XXX: Renamed to xserver-xorg-video-omap and version bumped, TODO
+#xf86-video-omapfb			xf86-video-omapfb-lts-quantal
+#xserver-xorg-video-omapfb		xserver-xorg-video-omapfb-lts-quantal
 
 xserver-xorg-input-evdev		xserver-xorg-input-evdev-lts-quantal
 xserver-xorg-input-evdev-dev		xserver-xorg-input-evdev-dev-lts-quantal
