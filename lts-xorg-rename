@@ -13,6 +13,9 @@ eval $(grep ^lts_codename= "${basedir}/lts-pkg-rename")
 eval $(grep ^codename= "${basedir}/lts-pkg-rename")
 eval $(grep ^suffix= "${basedir}/lts-pkg-rename")
 eval $(grep ^extraversion= "${basedir}/lts-pkg-rename")
+new_package=xorg-lts-quantal
+old_package=xorg
+old_binaries=xserver-xorg
 
 # xorg package is special and worth of its own script
 # Only building: xserver-xorg, xserver-xorg-video-all and xserver-xorg-input-all
@@ -44,8 +47,70 @@ ${basedir}/dpkg-control \
     --binary-suffix ${suffix} \
     --mapping-file "${basedir}/lts-pkg-mapping.txt" \
     --kill-binaries x11-common,xbase-clients,xutils,xorg,xorg-dev \
+    --add-replaces --add-provides --add-breaks \
      > debian/control.new
+
+sed -e "/Replaces: xserver-xorg$/s/$/\nConflicts: xserver-common (>= 0)/" -i debian/control.new
+
 mv -v debian/control.new debian/control
+
+# debian/rules
+#cp "${basedir}/lts-xorg-rules" debian/rules
+
+cp debian/rules debian/rules.new
+sed -e '/$(MAKE)/d' -i debian/rules.new
+sed -e '/x11-common/d' -i debian/rules.new
+sed -e "s/^xserver-xorg/&-${suffix}/" -i \
+    debian/xserver-xorg.lintian-overrides
+
+for pkg in ${old_binaries}; do
+    newpkg="${pkg}-${suffix}"
+
+    echo "- Renaming ${pkg}.* files to ${newpkg}.*"
+
+    set +e
+    files=$(ls debian/${pkg}.*)
+    err=$?
+    set -e
+    if [ $err -ne 0 ]; then
+	echo "Failed to list in ${old_package} for ${old_package} -> ${new_package}"
+	continue
+    fi
+    for old_file in $files; do
+	new_file=${old_file/${pkg}/${newpkg}}
+	mv -v ${old_file} ${new_file}
+    # TODO: Maybe using 'rename' would be better?
+    done
+
+    # Argh my eyes, so terribly sorry about this
+    # substitute $(XXV) for ati
+    # dumb rename for packages install rules
+    # another dumb rename for doc and bugs
+
+    # dh_strip rules
+    # libdrm has a single -p libkms1, fix it to -plibkms1
+
+    # dh_makeshlibs is needed for libdrm
+    sed -e "s@\$(XXV)@xserver-xorg-video@g" \
+        -e "s@debian/${pkg}/@debian/${newpkg}/@g" \
+        -e "s@debian/${pkg}\.@debian/${newpkg}.@g" \
+        -e "/dh_strip/s/-p /-p/g" \
+        -e "/dh_strip/s/-p${pkg} /-p${newpkg} /" \
+        -e "/dh_strip/s/-N${pkg} /-N${newpkg} /" \
+        -e "/dh_strip/s/${pkg}-dbg/${newpkg}-dbg/" \
+        -e "/dh_makeshlibs/s/${pkg}\\([ ']\\)/${newpkg}\\1/g" \
+        -e "s@${newpkg}/usr/share/doc/${pkg}@&-${suffix}@" \
+        -e "s@${newpkg}/usr/share/bug/${pkg}@&-${suffix}@" \
+        -e "/DEB_DBG_PACKAGE_ALL/s/ ${pkg}-dbg/ ${pkg}-${suffix}-dbg/" \
+        -e "/DEB_DH_STRIP_ARGS/s/=${pkg}-dbg/=${pkg}-${suffix}-dbg/" \
+        -i debian/rules.new
+
+    if [ -f "debian/${newpkg}.symbols" ]; then
+        sed -e "s/ ${pkg} / ${newpkg} /" -i "debian/${newpkg}.symbols"
+    fi
+done
+
+mv debian/rules.new debian/rules
 
 # debian/changelog
 # Our version will be older than the original
@@ -55,9 +120,6 @@ dch --newversion "${old_package_version}${extraversion}" \
     --distribution ${lts_codename} \
     --force-distribution \
     "Rename package for the LTS point update, and add replaces/breaks/provides"
-
-# debian/rules
-cp "${basedir}/lts-xorg-rules" debian/rules
 
 rm -r xsf-docs
 sed -e "s/xserver-xorg[^[:space:],]*/&-${suffix}/g" -i debian/scripts/vars.*
