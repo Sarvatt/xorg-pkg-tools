@@ -42,6 +42,10 @@ def parse_options():
         help="Add or append a Breaks section to the control file for the old source package name",
         action="store_true", default=False)
     parser.add_option(
+        "-C", "--add-conflicts", dest="add_conflicts",
+        help="Add or append a Conflicts section to the control file for the old source package name",
+        action="store_true", default=False)
+    parser.add_option(
         "-t", "--test", dest="test",
         help="Run the test suite instead of normal operation",
         action="store_true", default=False)
@@ -162,6 +166,7 @@ if __name__ == "__main__":
     breaks = None
     replaces = None
     provides = None
+    conflicts = None
 
     # Scan for all packages to add them to our rename list first.
     # For dbg packages, assume the normal package was declared first
@@ -205,6 +210,9 @@ if __name__ == "__main__":
             if provides:
                 print "Provides: %s" %(provides)
                 provides = None
+            if conflicts:
+                print "Conflicts: %s" %(conflicts)
+                conflicts = None
 
             # Re-init
             print
@@ -214,6 +222,7 @@ if __name__ == "__main__":
             breaks = None
             replaces = None
             value = None
+            conflicts = None
 
         if kill_section:
             print "#%s" %(orig_line)
@@ -251,6 +260,8 @@ if __name__ == "__main__":
                     breaks = value
                 if options.add_provides and value:
                     provides = value
+                if options.add_conflicts and value:
+                    conflicts = value
                 if options.binary_suffix:
                     print "Package: %s" %(mappings[value])
                 else:
@@ -279,6 +290,13 @@ if __name__ == "__main__":
                 print "%s:" %(prop)
                 print " %s," %(provides)
                 provides = None
+            else:
+                print orig_line
+        elif 'Conflicts' == prop and conflicts:
+            if new_prop:
+                print "%s:" %(prop)
+                print " %s," %(conflicts)
+                conflicts = None
             else:
                 print orig_line
         else:

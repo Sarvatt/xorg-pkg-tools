@@ -45,7 +45,7 @@ codename=quantal
 suffix=lts-${codename}
 verbose=1
 dry=""
-extraversion="~precise1~ppa2"
+extraversion="~precise1~ppa3"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -183,9 +183,8 @@ ${basedir}/dpkg-control \
     --source-suffix ${suffix} \
     --binary-suffix ${suffix} \
     --mapping-file ${rename_mapping_file} \
-    --add-replaces ${old_package} \
-    --add-provides ${old_package} \
-    --add-breaks "${old_package}<=${old_package_version}" > ${control}.new
+    --add-replaces --add-provides --add-conflicts \
+    > ${control}.new
 
 msg "Checking rules..."
 if ! grep -q ${old_package} ${rules}; then
