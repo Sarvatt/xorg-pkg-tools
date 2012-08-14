@@ -22,8 +22,8 @@ CHANGES+=("hook: Switch to llvm-3.1.")
 patch -p1 < $HOOKS/mesa-egl-symbols.patch
 patch -p1 < $HOOKS/mesa-libgbm-symbols.patch
 CHANGES+=("hook: Refresh symbols.")
-patch -p1 < $HOOKS/mesa-out-of-tree.patch
-CHANGES+=("hook: Fix out of tree builds.")
+#patch -p1 < $HOOKS/mesa-out-of-tree.patch
+#CHANGES+=("hook: Fix out of tree builds.")
 
 
 
