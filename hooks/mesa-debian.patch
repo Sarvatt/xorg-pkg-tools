@@ -34,18 +34,30 @@ index 19bd568..9d9957b 100644
 + AC_SUBST([OSMESA_LIB_DEPS])
 + AC_SUBST([OSMESA_MESA_DEPS])
 diff --git a/debian/patches/13-llvm-config-pick-a-version.diff b/debian/patches/13-llvm-config-pick-a-version.diff
-index 0350aa2..2893b22 100644
+index 5a6a266..4ffba86 100644
 --- a/debian/patches/13-llvm-config-pick-a-version.diff
 +++ b/debian/patches/13-llvm-config-pick-a-version.diff
-@@ -13,7 +13,7 @@ Index: mesa/configure.ac
+@@ -8,12 +8,15 @@ Index: mesa/configure.ac
+ ===================================================================
+ --- mesa.orig/configure.ac	2012-05-21 18:19:43.639922922 -0400
+ +++ mesa/configure.ac	2012-05-21 18:19:43.947922933 -0400
+-@@ -1762,7 +1762,7 @@
+-     esac
++@@ -1822,9 +1822,9 @@ if test "x$enable_gallium_llvm" = xauto; then
   fi
   if test "x$enable_gallium_llvm" = xyes; then
- -    AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no])
+--    AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no])
 -+    AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.0], [no])
-++    AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no])
++     if test "x$llvm_prefix" != x; then
++-        AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no], ["$llvm_prefix/bin"])
+++        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no], ["$llvm_prefix/bin"])
++     else
++-        AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no])
+++        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no])
++     fi
   
       if test "x$LLVM_CONFIG" != xno; then
-  	LLVM_VERSION=`$LLVM_CONFIG --version | sed 's/svn.*//g'`
+- 	LLVM_VERSION=`$LLVM_CONFIG --version | sed 's/svn.*//g'`
 diff --git a/debian/control b/debian/control
 index 2d83129..b1bab52 100644
 --- a/debian/control
@@ -486,7 +498,7 @@ index f0326a3..96278ff 100755
 +	find debian/tmp -name '*.la' -delete
  
 -	dh_install -s --fail-missing
-+	dh_install -s
++	dh_install -s --list-missing
  
  # If the llvmpipe driver was built, copy it to the package dir
  ifneq (,$(filter swrast,$(GALLIUM_DRIVERS)))
