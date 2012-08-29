@@ -4,24 +4,15 @@ getp() {
  CHANGES+=("hook: Refresh $1")
 }
 
-#mesa master (8.1)
-drop 05_kfreebsd-egl-x11.diff fails
-drop 100_no_abi_tag.patch fails
-drop 101_ubuntu_hidden_glname.patch fails
-drop 14-libdrm_nouveau1.diff outdated
-drop 115_llvm_dynamic_linking.diff upstream
-drop 116_use_shared_galliumcore.diff fails
-drop 117_intel_fix_hiz_null_dereference.patch upstream
-drop 118_fix_rendering_from_textures.patch upstream
-drop 118_glsl_initialize_samplers.patch upstream
+#mesa master (9.0)
+drop 04_osmesa_version.diff fails
+drop 118-remove-assertion.diff upstream
 
 patch -p1 < $HOOKS/mesa-debian.patch
-CHANGES+=("hook: Update build system for mesa master.")
 CHANGES+=("hook: Add libtxc-dxtn0 to libgl1-mesa-dri recommends.")
-CHANGES+=("hook: Switch to llvm-3.1.")
-patch -p1 < $HOOKS/mesa-egl-symbols.patch
-patch -p1 < $HOOKS/mesa-libgbm-symbols.patch
-CHANGES+=("hook: Refresh symbols.")
+#patch -p1 < $HOOKS/mesa-egl-symbols.patch
+#patch -p1 < $HOOKS/mesa-libgbm-symbols.patch
+#CHANGES+=("hook: Refresh symbols.")
 #patch -p1 < $HOOKS/mesa-out-of-tree.patch
 #CHANGES+=("hook: Fix out of tree builds.")
 
