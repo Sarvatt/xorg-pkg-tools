@@ -4,9 +4,8 @@ getp() {
  CHANGES+=("hook: Refresh $1")
 }
 
-#mesa master (9.0)
-drop 04_osmesa_version.diff fails
-drop 118-remove-assertion.diff upstream
+#mesa master (9.1)
+#drop 04_osmesa_version.diff fails
 
 patch -p1 < $HOOKS/mesa-debian.patch
 CHANGES+=("hook: Add libtxc-dxtn0 to libgl1-mesa-dri recommends.")
