@@ -1,5 +1,5 @@
-patch -p1 < $HOOKS/libxkbcommon.patch
-CHANGES+=("hook: Adjust install path for headers in libxkbcommon-dev")
+#patch -p1 < $HOOKS/libxkbcommon.patch
+#CHANGES+=("hook: Adjust install path for headers in libxkbcommon-dev")
 
 patch -p1 < $HOOKS/libxkbcommon-no-hard-dep.patch
 CHANGES+=("hook: Drop hard dependency generation")
