@@ -1,1 +1,3 @@
+drop 02_build_libkms_against_in_tree_drm.diff upstream
+
 patch -p1 < $HOOKS/libdrm-debian.patch

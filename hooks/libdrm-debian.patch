@@ -1,3 +1,11 @@
+diff --git a/debian/libdrm2.install b/debian/libdrm2.install
+index 6e2fd9b..e392e31 100644
+--- a/debian/libdrm2.install
++++ b/debian/libdrm2.install
+@@ -1 +1,2 @@
+ usr/lib/*/libdrm.so.2*
++usr/share/man
+
 diff --git a/debian/rules b/debian/rules
 index 95e94d6..d0ae223 100755
 --- a/debian/rules
@@ -19,8 +27,8 @@ index 95e94d6..d0ae223 100755
 +	dh_makeshlibs -plibdrm-nouveau2 -V'libdrm-nouveau2 (>= 2.4.38)' -- -c1
  endif
  ifeq ($(RADEON), yes)
--	dh_makeshlibs -plibdrm-radeon1 -V'libdrm-radeon1 (>= 2.4.31)' -- -c4
-+	dh_makeshlibs -plibdrm-radeon1 -V'libdrm-radeon1 (>= 2.4.31)' -- -c1
+-	dh_makeshlibs -plibdrm-radeon1 -V'libdrm-radeon1 (>= 2.4.39)' -- -c4
++	dh_makeshlibs -plibdrm-radeon1 -V'libdrm-radeon1 (>= 2.4.39)' -- -c1
  endif
  ifeq ($(OMAP), yes)
 -	dh_makeshlibs -plibdrm-omap1 -V'libdrm-omap1 (>= 2.4.38)' -- -c4
