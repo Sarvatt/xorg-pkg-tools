@@ -84,6 +84,15 @@ def load_mappings(filename):
             mappings[items[0]] = items[1]
     return mappings
 
+def run_mappings(text):
+    if text == "" or text == " ":
+        return None
+    if options.mapping_file:
+        for pkg in mappings.keys():
+            if pkg in line:
+                text = re.sub(r"\b(%s)(?=[^-\w]|$)" %(pkg), mappings[pkg], text)
+    return text
+
 #def load_killings(filename):
 #    killings = []
 #    if filename:
@@ -219,6 +228,7 @@ if __name__ == "__main__":
             kill_section = False
             section = None
             prop = None
+            provides = None
             breaks = None
             replaces = None
             value = None
@@ -274,43 +284,48 @@ if __name__ == "__main__":
             if new_prop:
                 print "%s:" %(prop)
                 print " %s," %(replaces)
+                value = run_mappings(value)
+                if value:
+                    print " %s" %(value)
                 replaces = None
             else:
-                print orig_line
+                print run_mappings(orig_line)
 
         elif 'Breaks' == prop and breaks:
             if new_prop:
                 print "%s:" %(prop)
                 print " %s," %(breaks)
+                value = run_mappings(value)
+                if value:
+                    print " %s" %(value)
                 breaks = None
             else:
-                print orig_line
+                print run_mappings(orig_line)
         elif 'Provides' == prop and provides:
             if new_prop:
                 print "%s:" %(prop)
                 print " %s," %(provides)
+                value = run_mappings(value)
+                if value:
+                    print " %s" %(value)
                 provides = None
             else:
-                print orig_line
+                print run_mappings(orig_line)
         elif 'Conflicts' == prop and conflicts:
             if new_prop:
                 print "%s:" %(prop)
                 print " %s," %(conflicts)
+                value = run_mappings(value)
+                if value:
+                    print " %s" %(value)
                 conflicts = None
             else:
-                print orig_line
+                print run_mappings(orig_line)
         else:
             # For other packages referred to in Depends, Recommends, etc.
             # if mappings are defined, use them to modify the package names
-            text = orig_line
             # Perhaps this should split the elements and look them up?
-            if options.mapping_file:
-                for pkg in mappings.keys():
-                    if pkg in line:
-                        text = re.sub(r"\b(%s)(?=[^-\w]|$)" %(pkg),
-                                      mappings[pkg],
-                                      text)
-            print text
+            print run_mappings(orig_line)
 
     # And flush out rest
     if replaces:
