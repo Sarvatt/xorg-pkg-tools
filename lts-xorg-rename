@@ -50,7 +50,10 @@ ${basedir}/dpkg-control \
     --add-replaces --add-provides --add-breaks \
      > debian/control.new
 
-sed -e "/Replaces: xserver-xorg$/s/$/\nConflicts: xserver-common (>= 0)/" -i debian/control.new
+# Full list, just to make old stack gone
+conflicts="Conflicts: libxatracker1 (>= 0~), libxatracker-dev (>= 0~), libgbm1 (>= 0~), libgbm-dev (>= 0~), libegl1-mesa (>= 0~), libegl1-mesa-dev (>= 0~), libegl1-mesa-drivers (>= 0~), libopenvg1-mesa (>= 0~), libopenvg1-mesa-dev (>= 0~), libgles1-mesa (>= 0~), libgles1-mesa-dev (>= 0~), libgles2-mesa (>= 0~), libgles2-mesa-dev (>= 0~), libglapi-mesa (>= 0~), libgl1-mesa-glx (>= 0~), libgl1-mesa-dri (>= 0~), libgl1-mesa-dri-experimental (>= 0~), libgl1-mesa-dev (>= 0~), mesa-common-dev (>= 0~), libosmesa6 (>= 0~), libosmesa6-dev (>= 0~), xserver-xorg-core (>= 0~), xserver-xorg-core-udeb-quantal, xserver-xorg-dev (>= 0~), xdmx (>= 0~), xdmx-tools (>= 0~), xnest (>= 0~), xvfb (>= 0~), xserver-xephyr (>= 0~), xserver-xfbdev (>= 0~), xserver-common (>= 0~),"
+
+sed -e "/Replaces: xserver-xorg$/s@\$@\n${conflicts}@" -i debian/control.new
 
 mv -v debian/control.new debian/control
 
