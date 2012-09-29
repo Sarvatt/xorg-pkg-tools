@@ -6,9 +6,6 @@ drop 102_disable_pageflipping_for_transformed_displays.patch upstream
 drop 101_llano-support.diff upstream
 drop 102_llano-pciids.diff upstream
 
-patch -p1 < $HOOKS/ati.patch
-CHANGES+=("hook: Stop installing removed multimedia drivers.")
-
 
 
 
