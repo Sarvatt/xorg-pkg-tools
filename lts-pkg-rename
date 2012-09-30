@@ -236,6 +236,7 @@ for pkg in ${old_binaries}; do
         -e "s@${newpkg}/usr/share/bug/${pkg}@&-${suffix}@" \
         -e "/DEB_DBG_PACKAGE_ALL/s/ ${pkg}-dbg/ ${pkg}-${suffix}-dbg/" \
         -e "/DEB_DH_STRIP_ARGS/s/=${pkg}-dbg/=${pkg}-${suffix}-dbg/" \
+	-e "/--link-doc/s/=${pkg}/&-${suffix}/" \
         -i debian/rules.new
 
     if [ -f "debian/${newpkg}.symbols" ]; then
