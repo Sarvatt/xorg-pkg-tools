@@ -45,7 +45,7 @@ codename=quantal
 suffix=lts-${codename}
 verbose=1
 dry=""
-extraversion="~precise1~ppa6.1"
+extraversion="~precise1~ppa6.3"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -291,7 +291,7 @@ elif [ "${old_package}" = "xorg-server" ]; then
         -i debian/rules.new
 
     # Kill of xvfb-run too
-    sed -e "/xvfb-run/d" -e "/PATH=/d" -e "/Xvfb/d" -i debian/rules.new
+    sed -e "/xvfb-run/d" -e "/^.PATH=/d" -e "/Xvfb/d" -i debian/rules.new
 
     # And fix the xsf substvars
     $dry sed -e "s/-udeb/&-${suffix}/g" \
@@ -309,6 +309,9 @@ elif [ "${old_package}" = "xorg-server" ]; then
     else
         echo ${x} >> debian/xserver-xorg-core-${suffix}.links
     fi
+
+    # and unrename xserver-common since it's a special case
+    $dry mv debian/xserver-common-lts-quantal.install debian/xserver-common.install
 fi
 
 $dry mv debian/rules.new debian/rules

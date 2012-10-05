@@ -276,6 +276,14 @@ if __name__ == "__main__":
                     conflicts = value
                 if options.binary_suffix:
                     print "Package: %s" %(mappings[value])
+                    if mappings[value] == value:
+                        # Not really renamed any more, but you get the idea
+                        if options.add_provides:
+                            provides = "xorg-renamed-package, "
+                            provides += "xorg-renamed-package-%s" %(options.binary_suffix)
+                        breaks = None
+                        replaces = None
+                        conflicts = None
                 else:
                     print orig_line
 
