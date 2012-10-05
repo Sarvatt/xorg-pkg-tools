@@ -179,12 +179,32 @@ else
 fi
 
 msg "Processing the control file..."
-${basedir}/dpkg-control \
-    --source-suffix ${suffix} \
-    --binary-suffix ${suffix} \
-    --mapping-file ${rename_mapping_file} \
-    --add-replaces --add-provides --add-conflicts \
-    > ${control}.new
+
+if [ "${old_package}" = "mesa" ]; then
+    ${basedir}/dpkg-control \
+        --source-suffix ${suffix} \
+        --binary-suffix ${suffix} \
+        --mapping-file ${rename_mapping_file} \
+        --add-replaces --add-provides --add-conflicts \
+        --kill-binaries "libosmesa6,libosmesa6-dev,libgl1-mesa-dri-experimental,libgl1-mesa-dri-experimental-dbg" \
+        > ${control}.new
+elif [ "${old_package}" = "xorg-server" ]; then
+    ${basedir}/dpkg-control \
+        --source-suffix ${suffix} \
+        --binary-suffix ${suffix} \
+        --mapping-file ${rename_mapping_file} \
+        --add-replaces --add-provides --add-conflicts \
+        --kill-binaries "xdmx,xdmx-tools,xnest,xvfb,xserver-xephyr,xserver-xfbdev" \
+        > ${control}.new
+else
+    ${basedir}/dpkg-control \
+        --source-suffix ${suffix} \
+        --binary-suffix ${suffix} \
+        --mapping-file ${rename_mapping_file} \
+        --add-replaces --add-provides --add-conflicts \
+        --kill-binaries "" \
+        > ${control}.new
+fi
 
 msg "Checking rules..."
 if ! grep -q ${old_package} ${rules}; then
@@ -255,9 +275,7 @@ if [ "${old_package}" = "mesa" ]; then
     done
     sed -e "/dh_installchangelogs/s/-p[^[:space:]]*/&-${suffix}/" -i debian/rules.new
     sed -e "/dh_install/s/-p[^[:space:]]*/&-${suffix}/" -i debian/rules.new
-fi
-
-if [ "${old_package}" = "xorg-server" ]; then
+elif [ "${old_package}" = "xorg-server" ]; then
     # Force the udeb building
     # and fix the abi depends
     sed -e "/ifneq.*-udeb/s/.*/ifeq (1, 1)/" \

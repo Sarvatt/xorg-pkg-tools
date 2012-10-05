@@ -45,11 +45,14 @@ else
     mkdir -p Stack
     cd Stack
     for pkg in ${stack[@]} ; do
-	echo $pkg
-	apt-get -qq source $pkg
+        echo -n $pkg
+        apt-get -qq source $pkg
+        echo .
     done
     cd ..
 
+    rm -f xorg_7*ubuntu* xorg-lts-quantal_7*.*
+    apt-get -qq source xorg
     echo
     echo "Packages downloaded.  Proceeding with rename..."
 fi
