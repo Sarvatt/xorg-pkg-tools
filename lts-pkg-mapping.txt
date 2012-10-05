@@ -4,11 +4,14 @@ mesa-common-dev			mesa-common-dev-lts-quantal
 libxatracker-dev		libxatracker-dev-lts-quantal
 libgl1-mesa-dri			libgl1-mesa-dri-lts-quantal
 libgl1-mesa-glx			libgl1-mesa-glx-lts-quantal
+libgl1-mesa-dri-experimental	libgl1-mesa-dri-lts-quantal
 
 # xserver-xorg package, only necessary ones
 xserver-xorg-dev		xserver-xorg-dev-lts-quantal
 xserver-xorg-core		xserver-xorg-core-lts-quantal
 xserver-xorg-core-udeb		xserver-xorg-core-udeb-lts-quantal
+#xserver-common is staying unrenamed..
+xserver-common			xserver-common
 
 #evil blobs, might not need a big update
 #fglrx-dev				fglrx-dev-lts-quantal
