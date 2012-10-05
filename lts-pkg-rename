@@ -45,7 +45,7 @@ codename=quantal
 suffix=lts-${codename}
 verbose=1
 dry=""
-extraversion="~precise1~ppa5.2"
+extraversion="~precise1~ppa6.1"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -275,12 +275,23 @@ if [ "${old_package}" = "mesa" ]; then
     done
     sed -e "/dh_installchangelogs/s/-p[^[:space:]]*/&-${suffix}/" -i debian/rules.new
     sed -e "/dh_install/s/-p[^[:space:]]*/&-${suffix}/" -i debian/rules.new
+    sed -e "s/--enable-osmesa/--disable-osmesa/" -i debian/rules.new
+    $dry sed -e "/NOT_INSTALLED/s@:=@:= dri/usr/include/GL/osmesa.h@" -i debian/not-installed
 elif [ "${old_package}" = "xorg-server" ]; then
     # Force the udeb building
     # and fix the abi depends
     sed -e "/ifneq.*-udeb/s/.*/ifeq (1, 1)/" \
         -e "/-abi-/s/ xserver-xorg-core/&-${suffix}/" \
+        -e "s/--enable-dmx/--disable-dmx/" \
+        -e "s/--enable-kdrive/--disable-kdrive/" \
+        -e "s/--enable-xnest/--disable-xnest/" \
+        -e "s/--enable-xvfb/--disable-xvfb/" \
+        -e "s/--enable-xephyr/--disable-xephyr/" \
+        -e "s/--enable-xfbdev/--disable-xfbdev/" \
         -i debian/rules.new
+
+    # Kill of xvfb-run too
+    sed -e "/xvfb-run/d" -e "/PATH=/d" -e "/Xvfb/d" -i debian/rules.new
 
     # And fix the xsf substvars
     $dry sed -e "s/-udeb/&-${suffix}/g" \

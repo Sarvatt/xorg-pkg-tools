@@ -269,7 +269,7 @@ if __name__ == "__main__":
                 if options.add_breaks and value:
                     breaks = value
                 if options.add_provides and value:
-                    provides = "%s, xorg-renamed-package" %(value,value)
+                    provides = "%s, xorg-renamed-package" %(value)
                     if options.binary_suffix:
                         provides += ", xorg-renamed-package-%s" %(options.binary_suffix)
                 if options.add_conflicts and value:

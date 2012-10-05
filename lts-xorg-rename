@@ -51,7 +51,7 @@ ${basedir}/dpkg-control \
      > debian/control.new
 
 # Full list, just to make old stack gone
-conflicts="Conflicts: libxatracker1 (>= 0~), libgbm1 (>= 0~), libegl1-mesa (>= 0~), libegl1-mesa-drivers (>= 0~), libopenvg1-mesa (>= 0~), libgles1-mesa (>= 0~), libgles2-mesa (>= 0~), libglapi-mesa (>= 0~), libgl1-mesa-glx (>= 0~), libgl1-mesa-dri (>= 0~), libgl1-mesa-dri-experimental (>= 0~), xserver-xorg-core (>= 0~), xserver-xorg-dev (>= 0~), xserver-common (>= 0~), xserver-xorg-video-all (>= 0~), xserver-xorg-input-all (>= 0~)"
+conflicts="Conflicts: libxatracker1 (>= 0~), libgbm1 (>= 0~), libegl1-mesa (>= 0~), libegl1-mesa-drivers (>= 0~), libopenvg1-mesa (>= 0~), libgles1-mesa (>= 0~), libgles2-mesa (>= 0~), libglapi-mesa (>= 0~), libgl1-mesa-glx (>= 0~), libgl1-mesa-dri (>= 0~), libgl1-mesa-dri-experimental (>= 0~), xserver-xorg-core (>= 0~), xserver-xorg-dev (>= 0~), xserver-xorg-video-all (>= 0~), xserver-xorg-input-all (>= 0~)"
 
 sed -e "/Replaces: xserver-xorg$/s@\$@\n${conflicts}@" -i debian/control.new
 
@@ -126,6 +126,9 @@ dch --newversion "${old_package_version}${extraversion}" \
 
 rm -r xsf-docs
 sed -e "s/xserver-xorg[^[:space:],]*/&-${suffix}/g" -i debian/scripts/vars.*
+
+# qxl requires a spice upgrade, and there is no reason to upgrade it, so just nuke it
+sed -e "/xserver-xorg-video-qxl/d" -i debian/scripts/vars.*
 
 debuild -S
 
