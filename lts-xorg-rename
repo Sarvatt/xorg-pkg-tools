@@ -54,6 +54,7 @@ ${basedir}/dpkg-control \
 conflicts="Conflicts: libxatracker1 (>= 0~), libgbm1 (>= 0~), libegl1-mesa (>= 0~), libegl1-mesa-drivers (>= 0~), libopenvg1-mesa (>= 0~), libgles1-mesa (>= 0~), libgles2-mesa (>= 0~), libglapi-mesa (>= 0~), libgl1-mesa-glx (>= 0~), libgl1-mesa-dri (>= 0~), libgl1-mesa-dri-experimental (>= 0~), xserver-xorg-core (>= 0~), xserver-xorg-dev (>= 0~), xserver-xorg-video-all (>= 0~), xserver-xorg-input-all (>= 0~)"
 
 sed -e "/Replaces: xserver-xorg$/s@\$@\n${conflicts}@" -i debian/control.new
+sed -e "s/libgl1-mesa-dri-${suffix}/&, libglapi-mesa-${suffix}/" -i debian/control.new
 
 mv -v debian/control.new debian/control
 
