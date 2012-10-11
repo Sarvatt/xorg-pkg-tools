@@ -5,7 +5,7 @@ getp() {
 }
 
 #mesa master (9.1)
-#drop 04_osmesa_version.diff fails
+drop 06_kfreebsd-ftbfs.diff fails
 
 patch -p1 < $HOOKS/mesa-debian.patch
 CHANGES+=("hook: Add libtxc-dxtn0 to libgl1-mesa-dri recommends.")
