@@ -52,7 +52,7 @@ xserver-xorg-video-modesetting		xserver-xorg-video-modesetting-lts-quantal
 xserver-xorg-video-neomagic		xserver-xorg-video-neomagic-lts-quantal
 xserver-xorg-video-nouveau		xserver-xorg-video-nouveau-lts-quantal
 xserver-xorg-video-openchrome		xserver-xorg-video-openchrome-lts-quantal
-xserver-xorg-video-qxl			xserver-xorg-video-qxl-lts-quantal
+#xserver-xorg-video-qxl -- Removed, requires a new libspice-dev to build
 xserver-xorg-video-r128			xserver-xorg-video-r128-lts-quantal
 xserver-xorg-video-r128-dbg		xserver-xorg-video-r128-lts-quantal-dbg
 xserver-xorg-video-s3			xserver-xorg-video-s3-lts-quantal
