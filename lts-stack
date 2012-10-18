@@ -51,7 +51,7 @@ else
     done
     cd ..
 
-    rm -f xorg_7*ubuntu* xorg-lts-quantal_7*.*
+    rm -f xorg_7*ubuntu* xorg-lts-*_7*.*
     apt-get -qq source xorg
     echo
     echo "Packages downloaded.  Proceeding with rename..."

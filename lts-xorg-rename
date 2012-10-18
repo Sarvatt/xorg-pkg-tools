@@ -13,7 +13,7 @@ eval $(grep ^lts_codename= "${basedir}/lts-pkg-rename")
 eval $(grep ^codename= "${basedir}/lts-pkg-rename")
 eval $(grep ^suffix= "${basedir}/lts-pkg-rename")
 eval $(grep ^extraversion= "${basedir}/lts-pkg-rename")
-new_package=xorg-lts-quantal
+new_package=xorg-${suffix}
 old_package=xorg
 old_binaries=xserver-xorg
 

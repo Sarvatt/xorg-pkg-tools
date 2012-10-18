@@ -45,7 +45,7 @@ codename=quantal
 suffix=lts-${codename}
 verbose=1
 dry=""
-extraversion="~precise1~ppa6.3"
+extraversion="~precise1~ppa6.4"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -311,7 +311,7 @@ elif [ "${old_package}" = "xorg-server" ]; then
     fi
 
     # and unrename xserver-common since it's a special case
-    $dry mv debian/xserver-common-lts-quantal.install debian/xserver-common.install
+    $dry mv debian/xserver-common-${suffix}.install debian/xserver-common.install
 fi
 
 $dry mv debian/rules.new debian/rules
