@@ -1,2 +1,2 @@
-#patch -p1 < $HOOKS/wayland.patch
-#CHANGES+=("hook: Ignore test failures.")
+patch -p1 < $HOOKS/wayland.patch
+CHANGES+=("hook: Disable documentation.")
