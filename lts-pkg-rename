@@ -347,7 +347,7 @@ elif [ "${old_package}" = "xorg-server" ]; then
 elif [ "${old_package}" = "xserver-xorg-video-intel" ]; then
 
     # Can no longer rely on real name, so fixup
-    $dry sed -e 's/-ldrm_intel/$(shell $(PKG_CONFIG) --libs libdrm_intel)/' -i src/xvmc/Makefile.am
+    $dry sed -e 's/-ldrm_intel/@DRMINTEL_LIBS@/' -i src/xvmc/Makefile.am
 fi
 
 $dry mv debian/rules.new debian/rules
