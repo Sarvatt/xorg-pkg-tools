@@ -277,6 +277,11 @@ if [ "${old_package}" = "mesa" ]; then
     sed -e "/dh_install/s/-p[^[:space:]]*/&-${suffix}/" -i debian/rules.new
     sed -e "s/--enable-osmesa/--disable-osmesa/" -i debian/rules.new
     $dry sed -e "/NOT_INSTALLED/s@:=@:= dri/usr/include/GL/osmesa.h@" -i debian/not-installed
+
+    # Use sonames for all instances of -ldrm*
+    for lib in _radeon _nouveau _intel ""; do
+        $dry sed -e "s/-ldrm${lib}/\$(shell \$(PKG_CONFIG) libdrm${lib} --libs)/" -i $(grep -l -r -- -ldrm${lib} src/)
+    done
 elif [ "${old_package}" = "xorg-server" ]; then
     # Force the udeb building
     # and fix the abi depends
@@ -334,6 +339,10 @@ elif [ "${old_package}" = "xorg-server" ]; then
     $dry cp ${basedir}/lts-patches/xorg-server-legacy-bgnone.patch debian/patches
 
     $dry echo xorg-server-legacy-bgnone.patch | $dry tee -a debian/patches/series
+elif [ "${old_package}" = "xserver-xorg-video-intel" ]; then
+
+    # Can no longer rely on real name, so fixup
+    $dry sed -e 's/-ldrm_intel/$(shell $(PKG_CONFIG) --libs libdrm_intel)/' -i src/xvmc/Makefile.am
 fi
 
 $dry mv debian/rules.new debian/rules
