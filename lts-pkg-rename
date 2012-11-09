@@ -178,6 +178,11 @@ else
     rm debian/changelog.old
 fi
 
+# libdrm is a massive mess worth its own script to keep this slightly clean..
+if [ "${old_package}" = "libdrm" ]; then
+    exec ${basedir}/lts-libdrm-rename
+fi
+
 msg "Processing the control file..."
 
 if [ "${old_package}" = "mesa" ]; then

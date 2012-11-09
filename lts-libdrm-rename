@@ -1,0 +1,136 @@
+#!/bin/bash
+
+if [ "$0" = "$(basename "$0")" ]; then
+    basedir="$(dirname $(readlink -e $(which "$0")))"
+else
+    basedir="$(dirname $(readlink -e "$0"))"
+fi
+
+set -e
+
+# copy values from lts-pkg-rename
+eval $(grep ^lts_codename= "${basedir}/lts-pkg-rename")
+eval $(grep ^codename= "${basedir}/lts-pkg-rename")
+eval $(grep ^suffix= "${basedir}/lts-pkg-rename")
+eval $(grep ^extraversion= "${basedir}/lts-pkg-rename")
+new_package=libdrm-${suffix}
+old_package=libdrm
+old_binaries="libkms1 2 -intel1 -nouveau2 -omap1 -radeon1"
+
+# debian/control
+
+# the only package not to have conflicts/replaces/provides
+${basedir}/dpkg-control \
+    --source-suffix ${suffix} \
+    --binary-suffix ${suffix} \
+    --mapping-file "${basedir}/lts-pkg-mapping.txt" \
+    --kill-binaries "libdrm2-udeb,libdrm-nouveau1a,libdrm-nouveau1a-dbg" \
+    > debian/control.new
+
+# .. except in libdrm-dev renamed, which is special
+conflicts="Conflicts: libdrm-dev, libdrm-dev-renamed"
+provides="Provides: libdrm-dev-${suffix}, libdrm-dev-renamed, xorg-renamed-package, xorg-renamed-package-${suffix}"
+
+# add conflicts to libdrm-dev
+sed -e "/Package: libdrm-dev-${suffix}\$/s@\$@\n${conflicts}\n${provides}@" -i debian/control.new
+
+# what libdrm-nouveau1a?
+sed -e "/ libdrm-nouveau1a/d" -i debian/control.new
+rm debian/libdrm-nouveau1a.*
+
+mv -v debian/control.new debian/control
+
+# debian/rules fixes
+
+cp debian/rules debian/rules.new
+
+# remove libdrm2-udeb and nouveau1a from rules too
+sed -e "s/--add-udeb=libdrm2-udeb//" -i debian/rules.new
+sed -e "/libdrm-nouveau1a/d" -i debian/rules.new
+
+# Zap temporary nouveau rules, which were needed for nouveau1a
+sed -e "/libdrm_nouveau/d" -i debian/rules.new
+
+# big mess, since we're special
+mv debian/libdrm-dev.install debian/libdrm-dev-${suffix}.install
+sed -e "s/^lib.../&-ltsq/" -i debian/*.lintian-overrides
+
+for pkg in ${old_binaries}; do
+    if [ "${pkg}" = "libkms1" ]; then
+        newpkg="libkms-ltsq1"
+    else
+        newpkg="libdrm-ltsq${pkg}"
+        pkg="libdrm${pkg}"
+    fi
+
+    echo "- Renaming ${pkg}.* files to ${newpkg}.*"
+
+    set +e
+    files=$(ls debian/${pkg}.*)
+    err=$?
+    set -e
+    if [ $err -ne 0 ]; then
+        echo "Failed to list in ${old_package} for ${old_package} -> ${new_package}"
+        continue
+    fi
+    for old_file in $files; do
+        new_file=${old_file/${pkg}/${newpkg}}
+        mv -v ${old_file} ${new_file}
+    # TODO: Maybe using 'rename' would be better?
+    done
+
+    # Argh my eyes, so terribly sorry about this
+    # substitute $(XXV) for ati
+    # dumb rename for packages install rules
+    # another dumb rename for doc and bugs
+
+    # dh_strip rules
+    # libdrm has a single -p libkms1, fix it to -plibkms1
+
+    # dh_makeshlibs is needed for libdrm
+    sed -e "s@\$(XXV)@xserver-xorg-video@g" \
+        -e "s@debian/${pkg}/@debian/${newpkg}/@g" \
+        -e "s@debian/${pkg}\.@debian/${newpkg}.@g" \
+        -e "/dh_strip/s/-p /-p/g" \
+        -e "/dh_strip/s/-p${pkg} /-p${newpkg} /" \
+        -e "/dh_strip/s/-N${pkg} /-N${newpkg} /" \
+        -e "/dh_strip/s/${pkg}-dbg/${newpkg}-dbg/" \
+        -e "/dh_makeshlibs/s/${pkg}\\([ ']\\)/${newpkg}\\1/g" \
+        -i debian/rules.new
+
+    sed -e "s/ ${pkg} / ${newpkg} /" -i "debian/${newpkg}.symbols"
+
+    # we're renaming the sonames too, fix those up..
+    sed -e "s/^libdrm/libdrm_ltsq/" -i "debian/${newpkg}.symbols"
+    sed -e "s/^libkms/libkms_ltsq/" -i "debian/${newpkg}.symbols"
+
+    # and of course the install stuff
+    sed -e "s/libdrm/libdrm_ltsq/" -i "debian/${newpkg}.install"
+    sed -e "s/libkms/libkms_ltsq/" -i "debian/${newpkg}.install"
+done
+
+mv debian/rules.new debian/rules
+
+# Now fix up the actual libdrm package..
+sed -e "/04_libdrm-2.4.37-nouveau-1.diff/d" -e "/02_build_libkms_against_in_tree_drm.diff/d" -i debian/patches/series
+# libdrm is being renamed, so make sure libkms links against it
+patch -Np1 < debian/patches/02_build_libkms_against_in_tree_drm.diff
+
+sed -e "s/-lkms/&_ltsq/" -e "s/-ldrm/&_ltsq/" -i libdrm.pc.in */*.pc.in
+
+sed -e "s/^libdrm/&_ltsq/" -i Makefile.am
+sed -e "s/^libkms/&_ltsq/g" -i libkms/Makefile.am
+sed -e "s/libkms\\.la/libkms_ltsq.la/" \
+    -e "s/libdrm\\.la/libdrm_ltsq.la/" \
+    -i Makefile.am tests/Makefile.am tests/*/Makefile.am libkms/Makefile.am
+
+for n in exynos intel nouveau omap radeon; do
+    sed -e "s/^libdrm/&_ltsq/" \
+        -e "s/libdrm_${n}\\.la/libdrm_ltsq_${n}.la/" \
+        -e "s/libdrm\\.la/libdrm_ltsq.la/" \
+        -i ${n}/Makefile.am
+done
+
+debuild -S -sa
+
+cd ..
