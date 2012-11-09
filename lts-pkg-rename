@@ -45,7 +45,7 @@ codename=quantal
 suffix=lts-${codename}
 verbose=1
 dry=""
-extraversion="~precise1~ppa6.4"
+extraversion="~precise1~ppa6.5"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -312,6 +312,11 @@ elif [ "${old_package}" = "xorg-server" ]; then
 
     # and unrename xserver-common since it's a special case
     $dry mv debian/xserver-common-${suffix}.install debian/xserver-common.install
+
+    # add -nr back as alias to -background none
+    $dry cp ${basedir}/lts-patches/xorg-server-legacy-bgnone.patch debian/patches
+
+    $dry echo xorg-server-legacy-bgnone.patch | $dry tee -a debian/patches/series
 fi
 
 $dry mv debian/rules.new debian/rules
