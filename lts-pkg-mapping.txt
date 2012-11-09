@@ -10,8 +10,7 @@ libgl1-mesa-dri-experimental	libgl1-mesa-dri-lts-quantal
 xserver-xorg-dev		xserver-xorg-dev-lts-quantal
 xserver-xorg-core		xserver-xorg-core-lts-quantal
 xserver-xorg-core-udeb		xserver-xorg-core-udeb-lts-quantal
-#xserver-common is staying unrenamed..
-xserver-common			xserver-common
+xserver-common			xserver-common-lts-quantal
 
 #evil blobs, might not need a big update
 #fglrx-dev				fglrx-dev-lts-quantal

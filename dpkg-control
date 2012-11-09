@@ -347,3 +347,6 @@ if __name__ == "__main__":
     if provides:
         print "Provides: %s" %(provides)
         provides = None
+    if conflicts:
+        print "Conflicts: %s" %(conflicts)
+        conflicts = None

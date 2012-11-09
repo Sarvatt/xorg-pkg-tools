@@ -310,8 +310,25 @@ elif [ "${old_package}" = "xorg-server" ]; then
         echo ${x} >> debian/xserver-xorg-core-${suffix}.links
     fi
 
-    # and unrename xserver-common since it's a special case
-    $dry mv debian/xserver-common-${suffix}.install debian/xserver-common.install
+    # xserver-common is weird, we cannot completely rename it, since we need the
+    # manpage from the original version, so fix things up..
+
+    # add diversion for protocol.txt
+    for n in ${basedir}/lts-patches/xserver-common.*; do
+        sed -e s/@SUFFIX@/${suffix}/g < $n > debian/$(basename $n)
+    done
+    for n in debian/xserver-common.*; do mv $n ${n/xserver-common/xserver-common-${suffix}}; done
+
+    # kill the manpage off from xserver-common
+    $dry sed -e "/man/d" -i debian/xserver-common-${suffix}.install
+    $dry sed -e "/appman_PRE/s/=.*/=/" -i man/Makefile.am
+
+    # now add in a hack to make xserver-common provide/replace/conflict xserver-common-renamed
+    sed -e "s@xserver-common,@xserver-common-renamed,@" -i debian/control.new
+    sed -e "s@xserver-common\$@xserver-common-renamed@" -i debian/control.new
+
+    # and add depend back on xserver-common for manpage
+    sed -e "s@x11-common@xserver-common, &@" -i debian/control.new
 
     # add -nr back as alias to -background none
     $dry cp ${basedir}/lts-patches/xorg-server-legacy-bgnone.patch debian/patches

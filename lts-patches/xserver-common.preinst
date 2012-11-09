@@ -1,0 +1,18 @@
+#!/bin/sh -e
+set -e
+
+if [ "$1" = install ] || [ "$1" = upgrade ] ; then
+    if dpkg-divert --listpackage /usr/lib/xorg/protocol.txt | grep -q  xserver-common-@SUFFIX@; then
+      dpkg-divert --remove --package xserver-common-@SUFFIX@ --rename \
+          --divert /usr/lib/xorg/protocol-precise.txt \
+          /usr/lib/xorg/protocol.txt
+    fi
+
+    dpkg-divert --add --package xserver-common-@SUFFIX@ --rename \
+        --divert /usr/lib/xorg/protocol-precise.txt \
+        /usr/lib/xorg/protocol.txt
+fi
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,12 @@
+#!/bin/sh -e
+set -e
+
+if [ "$1" = remove ] ; then
+    dpkg-divert --remove --package xserver-common-@SUFFIX@ --rename \
+        --divert /usr/lib/xorg/protocol-precise.txt \
+        /usr/lib/xorg/protocol.txt
+fi
+
+#DEBHELPER#
+
+exit 0
