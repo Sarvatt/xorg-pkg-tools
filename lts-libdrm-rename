@@ -29,7 +29,7 @@ ${basedir}/dpkg-control \
 
 # .. except in libdrm-dev renamed, which is special
 conflicts="Conflicts: libdrm-dev, libdrm-dev-renamed"
-provides="Provides: libdrm-dev-${suffix}, libdrm-dev-renamed, xorg-renamed-package, xorg-renamed-package-${suffix}"
+provides="Provides: libdrm-dev, libdrm-dev-renamed, xorg-renamed-package, xorg-renamed-package-${suffix}"
 
 # add conflicts to libdrm-dev
 sed -e "/Package: libdrm-dev-${suffix}\$/s@\$@\n${conflicts}\n${provides}@" -i debian/control.new
