@@ -74,6 +74,6 @@ for pkgdir in */ drivers/*; do
 done
 cd ..
 
-"${basedir}/lts-xorg-rename"
+"${basedir}/lts-xorg-rename" "${basedir}/lts-pkg-mapping.txt"
 
 echo "Done!"
