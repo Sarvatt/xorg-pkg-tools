@@ -45,7 +45,7 @@ codename=quantal
 suffix=lts-${codename}
 verbose=1
 dry=""
-extraversion="~precise1~ppa7.1"
+extraversion="~precise1~ppa8"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -179,8 +179,8 @@ else
 fi
 
 # some packages have their own mess to clean up, do so here..
-if [ -f "${basedir}/lts-${oldpackage}-rename" ]; then
-    exec "${basedir}/lts-${oldpackage}-rename" "${rename_mapping_file}"
+if [ -f "${basedir}/lts-${old_package}-rename" ]; then
+    exec "${basedir}/lts-${old_package}-rename" "${rename_mapping_file}"
 fi
 
 msg "Processing the control file..."
