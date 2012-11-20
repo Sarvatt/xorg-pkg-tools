@@ -1,20 +1,7 @@
 #!/bin/bash
 
-if [ "$0" = "$(basename "$0")" ]; then
-    basedir="$(dirname $(readlink -e $(which "$0")))"
-else
-    basedir="$(dirname $(readlink -e "$0"))"
-fi
-
 set -e
 
-# copy values from lts-pkg-rename
-eval $(grep ^lts_codename= "${basedir}/lts-pkg-rename")
-eval $(grep ^codename= "${basedir}/lts-pkg-rename")
-eval $(grep ^suffix= "${basedir}/lts-pkg-rename")
-eval $(grep ^extraversion= "${basedir}/lts-pkg-rename")
-old_package=xorg
-new_package=${old_package}-${suffix}
 old_binaries=xserver-xorg
 
 # xorg package is special and worth of its own script
@@ -27,16 +14,16 @@ sed -e "s/ |[^,]*-${suffix}//g" -i debian/control
 ${basedir}/dpkg-control \
     --source-suffix ${suffix} \
     --binary-suffix ${suffix} \
-    --mapping-file "$1" \
+    --mapping-file "${rename_mapping_file}" \
     --kill-binaries x11-common,xbase-clients,xutils,xorg,xorg-dev \
     --add-replaces --add-provides --add-breaks \
      > debian/control.new
 
 # Full list, just to make old stack gone
-conflicts="Conflicts: libxatracker1 (>= 0~), libgbm1 (>= 0~), libegl1-mesa (>= 0~), libegl1-mesa-drivers (>= 0~), libopenvg1-mesa (>= 0~), libgles1-mesa (>= 0~), libgles2-mesa (>= 0~), libglapi-mesa (>= 0~), libgl1-mesa-glx (>= 0~), libgl1-mesa-dri (>= 0~), libgl1-mesa-dri-experimental (>= 0~), xserver-xorg-core (>= 0~), xserver-xorg-dev (>= 0~), xserver-xorg-video-all (>= 0~), xserver-xorg-input-all (>= 0~)"
+conflicts="Conflicts: libxatracker1 (>= 0~), libgbm1 (>= 0~), libegl1-mesa (>= 0~), libegl1-mesa-drivers (>= 0~), libopenvg1-mesa (>= 0~), libgles1-mesa (>= 0~), libgles2-mesa (>= 0~), libglapi-mesa (>= 0~), libgl1-mesa-glx (>= 0~), libgl1-mesa-dri (>= 0~), libgl1-mesa-dri-experimental (>= 0~), xserver-xorg-core (>= 0~), xserver-xorg-dev (>= 0~), xserver-xorg-video-all (>= 0~), xserver-xorg-input-all (>= 0~), ${extraconflicts}"
 
 # add conflicts to xserver-xorg
-sed -e "/Replaces: xserver-xorg$/s@\$@\n${conflicts}@" -i debian/control.new
+sed -e "/Replaces: xserver-xorg\$/s@\$@\n${conflicts}@" -i debian/control.new
 
 # add recommends to xserver-xorg
 sed -e "s/libgl1-mesa-dri-${suffix}/&, libgl1-mesa-glx-${suffix} | libgl1, linux-generic-${suffix}/" -i debian/control.new

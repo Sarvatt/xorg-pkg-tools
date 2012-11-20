@@ -46,6 +46,10 @@ def parse_options():
         help="Add or append a Conflicts section to the control file for the old source package name",
         action="store_true", default=False)
     parser.add_option(
+        "-E", "--extra-conflicts", dest="extra_conflicts",
+        help="Also append the given argument to the conflicts list",
+        action="store", default=None)
+    parser.add_option(
         "-t", "--test", dest="test",
         help="Run the test suite instead of normal operation",
         action="store_true", default=False)
@@ -274,6 +278,11 @@ if __name__ == "__main__":
                         provides += ", xorg-renamed-package-%s" %(options.binary_suffix)
                 if options.add_conflicts and value:
                     conflicts = value
+                if options.extra_conflicts:
+                    if conflicts:
+                        conflicts += ", %s" %(options.extra_conflicts)
+                    else:
+                        conflicts = options.extra_conflicts
                 if options.binary_suffix:
                     print "Package: %s" %(mappings[value])
                     if mappings[value] == value:

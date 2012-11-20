@@ -1,25 +1,9 @@
 #!/bin/bash
 
-if [ "$0" = "$(basename "$0")" ]; then
-    basedir="$(dirname $(readlink -e $(which "$0")))"
-else
-    basedir="$(dirname $(readlink -e "$0"))"
-fi
-
 set -e
 
-# copy values from lts-pkg-rename
-eval $(grep ^lts_codename= "${basedir}/lts-pkg-rename")
-eval $(grep ^codename= "${basedir}/lts-pkg-rename")
-eval $(grep ^suffix= "${basedir}/lts-pkg-rename")
-eval $(grep ^extraversion= "${basedir}/lts-pkg-rename")
-
-mapping="$1"
-
-old_package=libdrm
-new_package=${old_package}-${suffix}
 old_binaries="libkms1 2 -intel1 -nouveau2 -omap1 -radeon1"
-ltsq=$(grep "^libdrm-intel1" "${mapping}" | cut -d- -f3)
+ltsq=$(grep "^libdrm-intel1" "${rename_mapping_file}" | cut -d- -f3)
 if [ -z "${ltsq}" ]; then
     echo "Could not get name for ltsq"
     exit 1
@@ -31,13 +15,13 @@ fi
 ${basedir}/dpkg-control \
     --source-suffix ${suffix} \
     --binary-suffix ${suffix} \
-    --mapping-file "${mapping}" \
+    --mapping-file "${rename_mapping_file}" \
     --kill-binaries "libdrm2-udeb,libdrm-nouveau1a,libdrm-nouveau1a-dbg" \
     > debian/control.new
 
 # .. except in libdrm-dev renamed, which is special
-conflicts="Conflicts: libdrm-dev, libdrm-dev-renamed"
-provides="Provides: libdrm-dev, libdrm-dev-renamed, xorg-renamed-package, xorg-renamed-package-${suffix}"
+conflicts="Conflicts: libdrm-dev, libdrm-dev-renamed, ${extraconflicts}"
+provides="Provides: libdrm-dev, libdrm-dev-renamed, ${extraprovides}"
 
 # add conflicts to libdrm-dev
 sed -e "/Package: libdrm-dev-${suffix}\$/s@\$@\n${conflicts}\n${provides}@" -i debian/control.new
