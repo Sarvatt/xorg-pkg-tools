@@ -279,6 +279,7 @@ for pkg in ${old_binaries}; do
         -e "/dh_strip/s/-N${pkg} /-N${newpkg} /" \
         -e "/dh_strip/s/${pkg}-dbg/${newpkg}-dbg/" \
         -e "/dh_makeshlibs/s/${pkg}\\([ ']\\)/${newpkg}\\1/g" \
+        -e "/dh_install/s/-p${pkg} /-p${newpkg} /" \
         -e "s@${newpkg}/usr/share/doc/${pkg}@&-${suffix}@" \
         -e "s@${newpkg}/usr/share/bug/${pkg}@&-${suffix}@" \
         -e "/DEB_DBG_PACKAGE_ALL/s/ ${pkg}-dbg/ ${pkg}-${suffix}-dbg/" \
@@ -300,8 +301,6 @@ if [ "${old_package}" = "mesa" ]; then
     for x in $files; do
         $dry mv -v "$x" "${x/i686/${suffix}-i686}"
     done
-    sed -e "/dh_installchangelogs/s/-p[^[:space:]]*/&-${suffix}/" -i debian/rules.new
-    sed -e "/dh_install/s/-p[^[:space:]]*/&-${suffix}/" -i debian/rules.new
     sed -e "s/--enable-osmesa/--disable-osmesa/" -i debian/rules.new
     $dry sed -e "/NOT_INSTALLED/s@:=@:= dri/usr/include/GL/osmesa.h@" -i debian/not-installed
 
@@ -375,6 +374,8 @@ elif [ "${old_package}" = "xserver-xorg-video-intel" ]; then
 
     # Can no longer rely on real name, so fixup
     $dry sed -e 's/-ldrm_intel/@DRMINTEL_LIBS@/' -i src/xvmc/Makefile.am
+elif [ "${old_package}" = "xserver-xorg-video-fbdev" ]; then
+    sed -e "/dh_install/s/\$(PACKAGE)-udeb/xserver-xorg-video-fbdev-udeb-${suffix}/" -i debian/rules.new
 fi
 
 $dry mv debian/rules.new debian/rules
