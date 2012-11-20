@@ -10,6 +10,12 @@
 #          (see http://www.opensource.org/licenses/mit-license.php)
 ########################################################################
 
+if [ -n "$1" ]; then
+    stack="$1"
+else
+    stack="quantal"
+fi
+
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
 else
@@ -70,10 +76,7 @@ for pkgdir in */ drivers/*; do
     if [ ! -d "${pkgdir}/debian" ]; then continue; fi
     echo
     echo $pkgdir
-    (cd "${pkgdir}" && "${basedir}/lts-pkg-rename" "${basedir}/lts-pkg-mapping.txt")
+    (cd "${pkgdir}" && "${basedir}/lts-pkg-rename" "${basedir}/lts-${stack}-mapping.txt")
 done
-cd ..
-
-"${basedir}/lts-xorg-rename" "${basedir}/lts-pkg-mapping.txt"
 
 echo "Done!"

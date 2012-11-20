@@ -39,14 +39,6 @@
 
 set -e
 
-lts_codename=precise
-#codename=$(current-ubuntu-development-codename)
-codename=quantal
-suffix=lts-${codename}
-verbose=1
-dry=""
-extraversion="~precise1~ppa8"
-
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
 else
@@ -106,6 +98,12 @@ elif [ ! -e "${rename_mapping_file}" ]; then
     ERR "No such file ${rename_mapping_file}"
 fi
 
+lts_codename=precise
+suffix=$(grep "^xorg" "$1" | cut -d- -f2-)
+verbose=1
+dry=""
+extraversion="~precise1~ppa8.2"
+
 # Determine package name from the changelog
 changelog=debian/changelog
 if [ ! -e ${changelog} ]; then
@@ -138,19 +136,22 @@ if [[ "${old_package}" =~ ${suffix}$ ]]; then
     exit 0
 fi
 
-msg "Renaming the orig.tar.gz..."
-for ext in gz bz2 lzma xz; do
-    old_orig="${old_package}_${base_version}.orig.tar.${ext}"
-    new_orig="${new_package}_${base_version}.orig.tar.${ext}"
-    if [ ! -e "../${old_orig}" ]; then continue; fi
-    if [ -e "../${new_orig}" ]; then
-        msg "../${new_orig} already exists so not renaming"
-    else
-        mv -v "../${old_orig}" "../${new_orig}"
-    fi
-    msg
-    break
-done
+if [ ${old_package} != "xorg" ]; then
+    msg "Renaming the orig.tar.gz..."
+
+    for ext in gz bz2 lzma xz; do
+        old_orig="${old_package}_${base_version}.orig.tar.${ext}"
+        new_orig="${new_package}_${base_version}.orig.tar.${ext}"
+        if [ ! -e "../${old_orig}" ]; then continue; fi
+        if [ -e "../${new_orig}" ]; then
+            msg "../${new_orig} already exists so not renaming"
+        else
+            mv -v "../${old_orig}" "../${new_orig}"
+        fi
+        msg
+        break
+    done
+fi
 
 # Make a backup of changelog
 if [ -f debian/changelog.old ]; then

@@ -47,6 +47,7 @@ mv -v debian/control.new debian/control
 cp debian/rules debian/rules.new
 
 # big mess, since we're special
+sed -e  "s/libwayland/&_${ltsq}/" -i debian/libwayland-dev.install
 mv debian/libwayland-dev.install debian/libwayland-dev-${suffix}.install
 
 sed -e /SOURCE/s/=.*/=${new_package}/ -i debian/rules.new
@@ -94,6 +95,6 @@ for n in util client server cursor; do
         -i */Makefile.am
 done
 
-debuild --auto-commit -S -sa
+debuild --source-option=--auto-commit -S -sa
 
 cd ..

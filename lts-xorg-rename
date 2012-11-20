@@ -13,30 +13,12 @@ eval $(grep ^lts_codename= "${basedir}/lts-pkg-rename")
 eval $(grep ^codename= "${basedir}/lts-pkg-rename")
 eval $(grep ^suffix= "${basedir}/lts-pkg-rename")
 eval $(grep ^extraversion= "${basedir}/lts-pkg-rename")
-new_package=xorg-${suffix}
 old_package=xorg
+new_package=${old_package}-${suffix}
 old_binaries=xserver-xorg
 
 # xorg package is special and worth of its own script
 # Only building: xserver-xorg, xserver-xorg-video-all and xserver-xorg-input-all
-
-if [ ! -f xorg_*.tar.gz ]; then
-	# This shouldn't be done on precise since we need the newer xorg
-	apt-get -qq source xorg
-	if [ -d xorg-7.6* ]; then
-		echo "E: Precise version of xorg used?"
-		exit 1
-	fi
-	cd xorg-7*/
-else
-	rm -rf -- xorg-7* xpkg
-	mkdir xpkg
-	cd xpkg
-	tar xf ../xorg_*.tar.gz --strip-components=1
-fi
-
-old_package_version=$(head -n 1 debian/changelog | cut -d' ' -f2)
-old_package_version=${old_package_version//[\(\)]/}  # Strip parens
 
 # debian/control
 # Remove any extra deps that were sneaked in from main xorg package
@@ -45,7 +27,7 @@ sed -e "s/ |[^,]*-${suffix}//g" -i debian/control
 ${basedir}/dpkg-control \
     --source-suffix ${suffix} \
     --binary-suffix ${suffix} \
-    --mapping-file "${basedir}/lts-pkg-mapping.txt" \
+    --mapping-file "$1" \
     --kill-binaries x11-common,xbase-clients,xutils,xorg,xorg-dev \
     --add-replaces --add-provides --add-breaks \
      > debian/control.new
@@ -119,15 +101,6 @@ done
 
 mv debian/rules.new debian/rules
 
-# debian/changelog
-# Our version will be older than the original
-dch --newversion "${old_package_version}${extraversion}" \
-    --force-bad-version \
-    --package xorg-${suffix} \
-    --distribution ${lts_codename} \
-    --force-distribution \
-    "Rename package for the LTS point update, and add replaces/breaks/provides"
-
 rm -r xsf-docs
 sed -e "s/xserver-xorg[^[:space:],]*/&-${suffix}/g" -i debian/scripts/vars.*
 
@@ -135,5 +108,3 @@ sed -e "s/xserver-xorg[^[:space:],]*/&-${suffix}/g" -i debian/scripts/vars.*
 sed -e "/xserver-xorg-video-qxl/d" -i debian/scripts/vars.*
 
 debuild -S
-
-cd ..

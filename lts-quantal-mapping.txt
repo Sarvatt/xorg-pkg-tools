@@ -27,6 +27,9 @@ xserver-xorg-core		xserver-xorg-core-lts-quantal
 xserver-xorg-core-udeb		xserver-xorg-core-udeb-lts-quantal
 xserver-common			xserver-common-lts-quantal
 
+# xorg package, with xorg, *-video-all and *-input-all
+xorg				xorg-lts-quantal
+
 #evil blobs, might not need a big update
 #fglrx-dev				fglrx-dev-lts-quantal
 #nvidia-current-dev			nvidia-current-dev-lts-quantal

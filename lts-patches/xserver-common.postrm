@@ -1,7 +1,7 @@
 #!/bin/sh -e
 set -e
 
-if [ "$1" = remove ] ; then
+if [ remove = "$1" -o abort-install = "$1" -o disappear = "$1" ]; then
     dpkg-divert --remove --package xserver-common-@SUFFIX@ --rename \
         --divert /usr/lib/xorg/protocol-precise.txt \
         /usr/lib/xorg/protocol.txt
