@@ -102,7 +102,7 @@ lts_codename=precise
 suffix=$(grep "^xorg" "$1" | cut -d- -f2-)
 verbose=1
 dry=""
-extraversion="~precise1~ppa8.2"
+extraversion="~precise1~ppa8.3"
 
 # Determine package name from the changelog
 changelog=debian/changelog
@@ -340,6 +340,11 @@ elif [ "${old_package}" = "xorg-server" ]; then
 
     # and add depend back on xserver-common for manpage
     sed -e "s@x11-common@xserver-common, &@" -i debian/control.new
+
+    # Special case, allow mesa-common-dev to satisfy depends for xserver-xorg-dev too..
+    # This is to make sure that the normal mesa-dev packages work alongside with the
+    # new stack, since some packages only work with the old libgl dev packages
+    sed -e "s/mesa-common-dev-${suffix},/mesa-common-dev-${suffix} | mesa-common-dev (>= 0~),/" -i debian/control.new
 
     # add -nr back as alias to -background none
     $dry cp ${basedir}/lts-patches/xorg-server-legacy-bgnone.patch debian/patches

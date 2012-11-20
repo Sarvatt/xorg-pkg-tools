@@ -11,9 +11,9 @@
 ########################################################################
 
 if [ -n "$1" ]; then
-    stack="$1"
+    release="$1"
 else
-    stack="quantal"
+    release="quantal"
 fi
 
 if [ "$0" = "$(basename "$0")" ]; then
@@ -24,17 +24,19 @@ fi
 
 set -e
 
+mapping="${basedir}/lts-${release}-mapping.txt"
+
 declare -A stack
 
 if [ -d Stack ]; then
     echo "Not checking out files, assuming already done"
 else
     echo "Will be renaming the following packages..."
-    for line in $(awk '{print $1}' "${basedir}/lts-pkg-mapping.txt"); do
+    for line in $(awk '{print $1}' "${mapping}"); do
 	if [ -z "${line}" ] || [ ${line:0:1} = '#' ]; then
 	    continue
 	fi
-	source_package=$(apt-cache showsrc ${line} 2>/dev/null | grep ^Package: | head -n 1 | cut -d' ' -f2)
+	source_package=$(apt-cache showsrc ${line} | grep ^Package: | head -n 1 | cut -d' ' -f2)
 	if [ $? = 0 ] && [ ! -z "$source_package" ]; then
 	    if [ -z ${stack[$source_package]} ]; then
 		echo ${source_package}
@@ -50,17 +52,16 @@ else
 
     mkdir -p Stack
     cd Stack
+
     for pkg in ${stack[@]} ; do
         echo -n $pkg
         apt-get -qq source $pkg
         echo .
     done
-    cd ..
 
-    rm -f xorg_7*ubuntu* xorg-lts-*_7*.*
-    apt-get -qq source xorg
     echo
     echo "Packages downloaded.  Proceeding with rename..."
+    cd ..
 fi
 
 if [ -d Stack-lts ]; then
@@ -76,7 +77,7 @@ for pkgdir in */ drivers/*; do
     if [ ! -d "${pkgdir}/debian" ]; then continue; fi
     echo
     echo $pkgdir
-    (cd "${pkgdir}" && "${basedir}/lts-pkg-rename" "${basedir}/lts-${stack}-mapping.txt")
+    (cd "${pkgdir}" && "${basedir}/lts-pkg-rename" "${mapping}")
 done
 
 echo "Done!"

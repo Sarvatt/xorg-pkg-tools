@@ -1,0 +1,83 @@
+# libdrm is super special, sonames have to be altered
+# big mess, but allows everything except libdrm-dev to be
+# co-installable with old libdrm
+libdrm-dev			libdrm-dev-lts-raring
+libdrm2				libdrm-ltsr2
+libdrm-intel1			libdrm-ltsr-intel1
+libdrm-omap1			libdrm-ltsr-omap1
+libdrm-nouveau2			libdrm-ltsr-nouveau2
+libdrm-radeon1			libdrm-ltsr-radeon1
+libkms1				libkms-ltsr1
+
+# wayland
+libwayland0			libwayland-ltsr0
+libwayland-dev			libwayland-dev-lts-raring
+
+# mesa
+libgl1-mesa-dev			libgl1-mesa-dev-lts-raring
+mesa-common-dev			mesa-common-dev-lts-raring
+libxatracker-dev		libxatracker-dev-lts-raring
+libgl1-mesa-dri			libgl1-mesa-dri-lts-raring
+libgl1-mesa-glx			libgl1-mesa-glx-lts-raring
+libgl1-mesa-dri-experimental	libgl1-mesa-dri-lts-raring
+
+# xserver-xorg package, only necessary ones
+xserver-xorg-dev		xserver-xorg-dev-lts-raring
+xserver-xorg-core		xserver-xorg-core-lts-raring
+xserver-xorg-core-udeb		xserver-xorg-core-udeb-lts-raring
+xserver-common			xserver-common-lts-raring
+
+# xorg package, with xorg, *-video-all and *-input-all
+xorg				xorg-lts-raring
+
+#evil blobs, might not need a big update
+#fglrx-dev				fglrx-dev-lts-raring
+#nvidia-current-dev			nvidia-current-dev-lts-raring
+#nvidia-173-dev				nvidia-173-dev-lts-raring
+#nvidia-96-dev				nvidia-96-dev-lts-raring
+#nvidia-current-updates-dev		nvidia-current-updates-dev-lts-raring
+
+# DDX and other drivers
+xf86-input-mtrack			xf86-input-mtrack-lts-raring
+xserver-xorg-input-mtrack		xserver-xorg-input-mtrack-lts-raring
+xf86-input-wacom			xf86-input-wacom-lts-raring
+xserver-xorg-input-wacom		xserver-xorg-input-wacom-lts-raring
+xf86-video-msm				xf86-video-msm-lts-raring
+xserver-xorg-video-msm			xserver-xorg-video-msm-lts-raring
+xf86-video-omap				xf86-video-omap-lts-raring
+xserver-xorg-video-omap			xserver-xorg-video-omap-lts-raring
+
+xserver-xorg-input-evdev		xserver-xorg-input-evdev-lts-raring
+xserver-xorg-input-evdev-dev		xserver-xorg-input-evdev-dev-lts-raring
+xserver-xorg-input-joystick-dev		xserver-xorg-input-joystick-dev-lts-raring
+xserver-xorg-input-keyboard		xserver-xorg-input-keyboard-lts-raring
+xserver-xorg-input-mouse		xserver-xorg-input-mouse-lts-raring
+xserver-xorg-input-synaptics-dev	xserver-xorg-input-synaptics-dev-lts-raring
+xserver-xorg-input-vmmouse		xserver-xorg-input-vmmouse-lts-raring
+xserver-xorg-input-void			xserver-xorg-input-void-lts-raring
+
+xserver-xorg-video-ati			xserver-xorg-video-ati-lts-raring
+xserver-xorg-video-cirrus		xserver-xorg-video-cirrus-lts-raring
+xserver-xorg-video-dummy		xserver-xorg-video-dummy-lts-raring
+xserver-xorg-video-fbdev		xserver-xorg-video-fbdev-lts-raring
+xserver-xorg-video-geode		xserver-xorg-video-geode-lts-raring
+xserver-xorg-video-intel		xserver-xorg-video-intel-lts-raring
+xserver-xorg-video-mach64		xserver-xorg-video-mach64-lts-raring
+xserver-xorg-video-mach64-dbg		xserver-xorg-video-mach64-lts-raring-dbg
+xserver-xorg-video-mga			xserver-xorg-video-mga-lts-raring
+xserver-xorg-video-modesetting		xserver-xorg-video-modesetting-lts-raring
+xserver-xorg-video-neomagic		xserver-xorg-video-neomagic-lts-raring
+xserver-xorg-video-nouveau		xserver-xorg-video-nouveau-lts-raring
+xserver-xorg-video-openchrome		xserver-xorg-video-openchrome-lts-raring
+#xserver-xorg-video-qxl -- Removed, requires a new libspice-dev to build
+xserver-xorg-video-r128			xserver-xorg-video-r128-lts-raring
+xserver-xorg-video-r128-dbg		xserver-xorg-video-r128-lts-raring-dbg
+xserver-xorg-video-s3			xserver-xorg-video-s3-lts-raring
+xserver-xorg-video-savage		xserver-xorg-video-savage-lts-raring
+xserver-xorg-video-siliconmotion	xserver-xorg-video-siliconmotion-lts-raring
+xserver-xorg-video-sis			xserver-xorg-video-sis-lts-raring
+xserver-xorg-video-sisusb		xserver-xorg-video-sisusb-lts-raring
+xserver-xorg-video-tdfx			xserver-xorg-video-tdfx-lts-raring
+xserver-xorg-video-trident		xserver-xorg-video-trident-lts-raring
+xserver-xorg-video-vesa			xserver-xorg-video-vesa-lts-raring
+xserver-xorg-video-vmware		xserver-xorg-video-vmware-lts-raring

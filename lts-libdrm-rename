@@ -16,8 +16,8 @@ eval $(grep ^extraversion= "${basedir}/lts-pkg-rename")
 
 mapping="$1"
 
-new_package=libdrm-${suffix}
 old_package=libdrm
+new_package=${old_package}-${suffix}
 old_binaries="libkms1 2 -intel1 -nouveau2 -omap1 -radeon1"
 ltsq=$(grep "^libdrm-intel1" "${mapping}" | cut -d- -f3)
 if [ -z "${ltsq}" ]; then
@@ -42,22 +42,36 @@ provides="Provides: libdrm-dev, libdrm-dev-renamed, xorg-renamed-package, xorg-r
 # add conflicts to libdrm-dev
 sed -e "/Package: libdrm-dev-${suffix}\$/s@\$@\n${conflicts}\n${provides}@" -i debian/control.new
 
-# what libdrm-nouveau1a?
-sed -e "/ libdrm-nouveau1a/d" -i debian/control.new
-rm debian/libdrm-nouveau1a.*
-
-mv -v debian/control.new debian/control
-
 # debian/rules fixes
 
 cp debian/rules debian/rules.new
 
-# remove libdrm2-udeb and nouveau1a from rules too
-sed -e "s/--add-udeb=libdrm2-udeb//" -i debian/rules.new
-sed -e "/libdrm-nouveau1a/d" -i debian/rules.new
+if grep -q libdrm_nouveau1a debian/rules.new; then
+    #libdrm 2.4.39 had nouveau1a still built, remove it
 
-# Zap temporary nouveau rules, which were needed for nouveau1a
-sed -e "/libdrm_nouveau/d" -i debian/rules.new
+    # what libdrm-nouveau1a?
+    sed -e "/ libdrm-nouveau1a/d" -i debian/control.new
+    rm debian/libdrm-nouveau1a.*
+
+    sed -e "/libdrm-nouveau1a/d" -i debian/rules.new
+
+    # Zap temporary nouveau rules, which were needed for nouveau1a
+    sed -e "/libdrm_nouveau/d" -i debian/rules.new
+
+    # Now fix up the actual libdrm package..
+    sed -e "/04_libdrm-2.4.37-nouveau-1.diff/d" \
+        -e "/02_build_libkms_against_in_tree_drm.diff/d" \
+        -i debian/patches/series
+
+    # libdrm is being renamed, so make sure libkms links against it
+    # 2.4.40 and higher already have this patch
+    patch -Np1 < debian/patches/02_build_libkms_against_in_tree_drm.diff
+fi
+
+mv -v debian/control.new debian/control
+
+# remove libdrm2-udeb from rules too
+sed -e "s/--add-udeb=libdrm2-udeb//" -i debian/rules.new
 
 # big mess, since we're special
 mv debian/libdrm-dev.install debian/libdrm-dev-${suffix}.install
@@ -119,11 +133,6 @@ done
 
 mv debian/rules.new debian/rules
 
-# Now fix up the actual libdrm package..
-sed -e "/04_libdrm-2.4.37-nouveau-1.diff/d" -e "/02_build_libkms_against_in_tree_drm.diff/d" -i debian/patches/series
-# libdrm is being renamed, so make sure libkms links against it
-patch -Np1 < debian/patches/02_build_libkms_against_in_tree_drm.diff
-
 sed -e "s/-lkms/&_${ltsq}/" -e "s/-ldrm/&_${ltsq}/" -i libdrm.pc.in */*.pc.in
 
 sed -e "s/^libdrm/&_${ltsq}/" -i Makefile.am
@@ -140,5 +149,3 @@ for n in exynos intel nouveau omap radeon; do
 done
 
 debuild -S -sa
-
-cd ..
