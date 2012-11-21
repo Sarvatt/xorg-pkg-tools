@@ -28,6 +28,9 @@ sed -e "/Replaces: xserver-xorg\$/s@\$@\n${conflicts}@" -i debian/control.new
 # add recommends to xserver-xorg
 sed -e "s/libgl1-mesa-dri-${suffix}/&, libgl1-mesa-glx-${suffix} | libgl1, linux-generic-${suffix}/" -i debian/control.new
 
+# add xserver-xorg-renamed to provides
+sed -e "s/xserver\$/&, xserver-xorg-renamed/" -i debian/control.new
+
 mv -v debian/control.new debian/control
 
 # debian/rules
