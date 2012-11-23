@@ -35,6 +35,14 @@ index 436f85d..1cb091b 100644
  Suggests: libglide3
  Conflicts: xlibmesa-dri (<< 1:7.0.0)
  Replaces: xlibmesa-dri (<< 1:7.0.0), libgl1-mesa-dri-experimental (<< 7.11.1)
+@@ -640,6 +640,7 @@ Depends:
+  libdrm-dev (>= 2.4.24) [!hurd-any],
+  libx11-dev,
+  libx11-xcb-dev,
++ libxcb-dri2-0-dev (>= 1.8),
+  libxcb-glx0-dev,
+  libxdamage-dev,
+  libxext-dev,
 diff --git a/debian/libgles2-mesa-dev.install.in b/debian/libgles2-mesa-dev.install.in
 index 981c491..e7d4422 100644
 --- a/debian/libgles2-mesa-dev.install.in
