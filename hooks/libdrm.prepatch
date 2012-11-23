@@ -1,3 +1,6 @@
 drop 02_build_libkms_against_in_tree_drm.diff upstream
 
+CHANGES+=("hook: Add libdrm-nouveau1a for precise compat.")
+patch -p1 -R < $HOOKS/libdrm-nouveau1a.patch
+
 patch -p1 < $HOOKS/libdrm-debian.patch

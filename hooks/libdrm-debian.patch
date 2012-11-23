@@ -39,4 +39,4 @@ index 95e94d6..d0ae223 100755
 +	dh_makeshlibs -plibkms1 -V'libkms1' -- -c1
  endif
  
- %:patch -p1 < $HOOKS/libdrm-debian.patch
+ %:
