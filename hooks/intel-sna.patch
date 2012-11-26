@@ -1,12 +1,12 @@
 diff --git a/debian/rules b/debian/rules
-index 493cd9c..451de4d 100755
+index 451de4d..7f8e4ca 100755
 --- a/debian/rules
 +++ b/debian/rules
 @@ -6,7 +6,7 @@ BUILDER        := $(shell dpkg-parsechangelog | awk -F': ' '/^Maintainer: / {pri
  
  # Enable SNA, pass builderstring:
  override_dh_auto_configure:
--	dh_auto_configure -- --enable-sna --with-builderstring="$(SOURCE_NAME) $(SOURCE_VERSION) ($(BUILDER))"
+-	dh_auto_configure -- --enable-sna --enable-uxa --with-default-accel=uxa --with-builderstring="$(SOURCE_NAME) $(SOURCE_VERSION) ($(BUILDER))"
 +	dh_auto_configure -- --enable-sna --enable-uxa --with-default-accel=sna --with-builderstring="$(SOURCE_NAME) $(SOURCE_VERSION) ($(BUILDER))"
  
  # Install in debian/tmp to retain control through dh_install:
