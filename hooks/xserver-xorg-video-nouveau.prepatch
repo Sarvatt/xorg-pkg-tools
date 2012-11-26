@@ -5,6 +5,8 @@
 
 # It patches configure directly instead of configure.in
 drop 01_include_snapshot_date fails
+drop 01-set-NV_DRIVER_DATE-from-ChangeLog.diff unneeded
+drop 02-kms-edid-block-fix.patch upstream
 drop 02_nouveau_bgnr upstream
 drop 03_work-around-exa-hangs.patch testing
 drop 03_use_older_libdrm_headers.diff not_needed
