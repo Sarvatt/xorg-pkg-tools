@@ -16,17 +16,17 @@ ${basedir}/dpkg-control \
     --binary-suffix ${suffix} \
     --mapping-file "${rename_mapping_file}" \
     --kill-binaries x11-common,xbase-clients,xutils,xorg,xorg-dev \
-    --add-replaces --add-provides --add-breaks \
+    --add-replaces --add-provides --add-conflicts \
      > debian/control.new
 
 # Full list, just to make old stack gone
-conflicts="Conflicts: libxatracker1 (>= 0~), libgbm1 (>= 0~), libegl1-mesa (>= 0~), libegl1-mesa-drivers (>= 0~), libopenvg1-mesa (>= 0~), libgles1-mesa (>= 0~), libgles2-mesa (>= 0~), libglapi-mesa (>= 0~), libgl1-mesa-glx (>= 0~), libgl1-mesa-dri (>= 0~), libgl1-mesa-dri-experimental (>= 0~), xserver-xorg-core (>= 0~), xserver-xorg-dev (>= 0~), xserver-xorg-video-all (>= 0~), xserver-xorg-input-all (>= 0~), ${extraconflicts}"
+conflicts="libxatracker1 (>= 0~), libgbm1 (>= 0~), libegl1-mesa (>= 0~), libegl1-mesa-drivers (>= 0~), libopenvg1-mesa (>= 0~), libgles1-mesa (>= 0~), libgles2-mesa (>= 0~), libglapi-mesa (>= 0~), libgl1-mesa-glx (>= 0~), libgl1-mesa-dri (>= 0~), libgl1-mesa-dri-experimental (>= 0~), xserver-xorg-core (>= 0~), xserver-xorg-dev (>= 0~), xserver-xorg-video-all (>= 0~), xserver-xorg-input-all (>= 0~), ${extraconflicts}"
 
 # add conflicts to xserver-xorg
-sed -e "/Replaces: xserver-xorg\$/s@\$@\n${conflicts}@" -i debian/control.new
+sed -e "s/Conflicts: xserver-xorg\$/&, ${conflicts}/" -i debian/control.new
 
 # add recommends to xserver-xorg
-sed -e "s/libgl1-mesa-dri-${suffix}/&, libgl1-mesa-glx-${suffix} | libgl1, linux-generic-${suffix}/" -i debian/control.new
+sed -e "s/libgl1-mesa-dri-${suffix}/&, libgl1-mesa-glx-${suffix}, linux-generic-${suffix}, xserver-xorg-input-all-${suffix}, xserver-xorg-video-all-${suffix}/" -i debian/control.new
 
 # add xserver-xorg-renamed to provides
 sed -e "s/xserver\$/&, xserver-xorg-renamed/" -i debian/control.new
