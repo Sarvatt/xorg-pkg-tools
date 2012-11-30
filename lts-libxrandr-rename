@@ -1,0 +1,79 @@
+#!/bin/bash
+
+ltsq=$(grep "^libdrm-intel1" "${rename_mapping_file}" | cut -d- -f3)
+if [ -z "${ltsq}" ]; then
+    echo "Could not get name for ltsq"
+    exit 1
+fi
+
+set -e
+
+# debian/control
+
+# the only package not to have conflicts/replaces/provides
+${basedir}/dpkg-control \
+    --source-suffix ${suffix} \
+    --binary-suffix ${suffix} \
+    --mapping-file "${rename_mapping_file}" \
+    > debian/control.new
+
+# .. except in libxrandr-dev renamed, which is special
+conflicts="Conflicts: libxrandr-dev, ${extraconflicts}"
+provides="Provides: libxrandr-dev, ${extraprovides}"
+
+# add conflicts to libxrandr-dev
+sed -e "/Package: libxrandr-dev-${suffix}\$/s@\$@\n${conflicts}\n${provides}@" -i debian/control.new
+
+mv -v debian/control.new debian/control
+
+# debian/rules fixes
+
+cp debian/rules debian/rules.new
+
+# big mess, since we're special
+sed -e "s/libXrandr/&_${ltsq}/" -i debian/libxrandr-dev.install
+mv debian/libxrandr-dev.install debian/libxrandr-dev-${suffix}.install
+
+for ipkg in 2; do
+    newpkg="libxrandr-${ltsq}${ipkg}"
+    pkg="libxrandr${ipkg}"
+
+    sed -e "/PACKAGE/s/= ${pkg}/= ${newpkg}/" -i debian/rules.new
+
+    echo "- Renaming ${pkg}.* files to ${newpkg}.*"
+
+    set +e
+    files=$(ls debian/${pkg}.*)
+    err=$?
+    set -e
+    if [ $err -ne 0 ]; then
+        echo "Failed to list in ${old_package} for ${old_package} -> ${new_package}"
+        continue
+    fi
+    for old_file in $files; do
+        new_file=${old_file/${pkg}/${newpkg}}
+        mv -v ${old_file} ${new_file}
+    # TODO: Maybe using 'rename' would be better?
+    done
+
+    # fixup symbols
+    sed -e "s/ ${pkg} / ${newpkg} /" -i "debian/${newpkg}.symbols"
+
+    # we're renaming the sonames too, fix those up..
+    sed -e "s/^libXrandr/&_${ltsq}/" -i "debian/${newpkg}.symbols"
+
+    # and of course the install stuff
+    sed -e "s/libXrandr/&_${ltsq}/" -i "debian/${newpkg}.install"
+done
+
+# and fix up the libXrandr.la exclusion in debian/rules
+sed -e "s/libXrandr/libXrandr_${ltsq}/" \
+    -e "s/-V.libxrandr/&-${ltsq}/" \
+    -i debian/rules.new
+
+mv debian/rules.new debian/rules
+
+sed -e "s/-lXrandr/&_${ltsq}/" -i xrandr.pc.in
+sed -e "s/libXrandr/&_${ltsq}/" -i src/Makefile.am
+
+debuild -S -sa

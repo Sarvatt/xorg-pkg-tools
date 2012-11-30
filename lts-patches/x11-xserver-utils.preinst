@@ -1,0 +1,11 @@
+#!/bin/sh -e
+set -e
+
+if [ "$1" != upgrade ]; then
+    dpkg-divert --add --package x11-xserver-utils-@SUFFIX@ --rename \
+        --divert /usr/bin/xrandr.orig /usr/bin/xrandr
+fi
+
+#DEBHELPER#
+
+exit 0

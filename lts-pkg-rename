@@ -222,6 +222,15 @@ elif [ "${old_package}" = "xorg-server" ]; then
         --extra-conflicts "${extraconflicts}" \
         --kill-binaries "xdmx,xdmx-tools,xnest,xvfb,xserver-xephyr,xserver-xfbdev,xserver-xorg-core-udeb" \
         > ${control}.new
+elif [ "${old_package}" = "x11-xserver-utils" ]; then
+    ${basedir}/dpkg-control \
+        --source-suffix ${suffix} \
+        --binary-suffix ${suffix} \
+        --mapping-file ${rename_mapping_file} \
+        --add-provides \
+        --extra-conflicts "${extraconflicts}, x11-xserver-utils-renamed" \
+        --kill-binaries "" \
+        > ${control}.new
 else
     ${basedir}/dpkg-control \
         --source-suffix ${suffix} \
@@ -294,6 +303,8 @@ for pkg in ${old_binaries}; do
         $dry sed -e "s/ ${pkg} / ${newpkg} /" -i "debian/${newpkg}.symbols"
     fi
 done
+
+msg "Applying post-rename changes"
 
 # Mesa is fun! :D
 if [ "${old_package}" = "mesa" ]; then
@@ -378,6 +389,24 @@ elif [ "${old_package}" = "xserver-xorg-video-intel" ]; then
     $dry sed -e 's/-ldrm_intel/@DRMINTEL_LIBS@/' -i src/xvmc/Makefile.am
 elif [ "${old_package}" = "xserver-xorg-video-fbdev" ]; then
     sed -e "/dh_install/s/\$(PACKAGE)-udeb/xserver-xorg-video-fbdev-udeb-${suffix}/" -i debian/rules.new
+elif [ "${old_package}" = "x11-xserver-utils" ]; then
+    # Only build xrandr
+    sed -e "/PACKAGE/s/=.*/&-${suffix}/" \
+        -e "/^DEF_SUBDIRS/s/=.*/=xrandr/" \
+        -i debian/rules.new
+
+    # fixup provides, and add depends back on unrenamed package
+    # must conflict on x11-xserver-utils-renamed, since we cannot
+    # have 2 of those at the same time due to diversions
+    sed -e "/^Provides:/s/ x11-xserver-utils/&-renamed /" \
+        -e "/^Depends:/s/\$/, x11-xserver-utils (>= 0~)/" \
+        -i debian/control.new
+
+    # add diversion scripts
+    for n in ${basedir}/lts-patches/x11-xserver-utils.*; do
+        sed -e "s/@SUFFIX@/${suffix}/g" < $n > debian/$(basename $n)
+    done
+    for n in debian/x11-xserver-utils.*; do mv $n ${n/x11-xserver-utils/x11-xserver-utils-${suffix}}; done
 fi
 
 $dry mv debian/rules.new debian/rules

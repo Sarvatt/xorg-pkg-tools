@@ -6,6 +6,8 @@ if [ -z "${ltsq}" ]; then
     exit 1
 fi
 
+set -e
+
 # debian/control
 
 # the only package not to have conflicts/replaces/provides
@@ -38,7 +40,7 @@ for ipkg in 0; do
     newpkg="libwayland-${ltsq}${ipkg}"
     pkg="libwayland${ipkg}"
 
-    sed -e /PACKAGE/s/=${pkg}/=${newpkg}/ -i debian/rules.new
+    sed -e "/PACKAGE/s/=${pkg}/=${newpkg}/" -i debian/rules.new
 
     echo "- Renaming ${pkg}.* files to ${newpkg}.*"
 

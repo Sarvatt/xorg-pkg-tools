@@ -81,3 +81,9 @@ xserver-xorg-video-tdfx			xserver-xorg-video-tdfx-lts-quantal
 xserver-xorg-video-trident		xserver-xorg-video-trident-lts-quantal
 xserver-xorg-video-vesa			xserver-xorg-video-vesa-lts-quantal
 xserver-xorg-video-vmware		xserver-xorg-video-vmware-lts-quantal
+
+# Bonus series, I would still rather have this sru'd back to precise rather
+# than renaming, but meh, not like it will happen.
+libxrandr2				libxrandr-ltsq2
+libxrandr-dev				libxrandr-dev-lts-quantal
+x11-xserver-utils			x11-xserver-utils-lts-quantal
