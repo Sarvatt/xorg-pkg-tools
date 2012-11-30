@@ -228,7 +228,7 @@ elif [ "${old_package}" = "x11-xserver-utils" ]; then
         --binary-suffix ${suffix} \
         --mapping-file ${rename_mapping_file} \
         --add-provides \
-        --extra-conflicts "${extraconflicts}, x11-xserver-utils-renamed" \
+        --extra-conflicts "x11-xserver-utils-renamed, ${extraconflicts}" \
         --kill-binaries "" \
         > ${control}.new
 else
