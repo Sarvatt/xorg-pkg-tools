@@ -39,7 +39,7 @@
 
 set -e
 
-extraversion="~precise1~ppa9.4"
+extraversion="~precise1"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -100,7 +100,7 @@ elif [ ! -e "${rename_mapping_file}" ]; then
     ERR "No such file ${rename_mapping_file}"
 fi
 
-lts_codename=precise
+lts_codename=precise-proposed
 suffix=$(grep "^xorg" "$1" | cut -d- -f2-)
 verbose=1
 dry=""
