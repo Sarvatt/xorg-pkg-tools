@@ -39,7 +39,7 @@
 
 set -e
 
-extraversion="~precise1~ppa9"
+extraversion="~precise1~ppa9.1"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -220,7 +220,7 @@ elif [ "${old_package}" = "xorg-server" ]; then
         --mapping-file ${rename_mapping_file} \
         --add-replaces --add-provides --add-conflicts \
         --extra-conflicts "${extraconflicts}" \
-        --kill-binaries "xdmx,xdmx-tools,xnest,xvfb,xserver-xephyr,xserver-xfbdev" \
+        --kill-binaries "xdmx,xdmx-tools,xnest,xvfb,xserver-xephyr,xserver-xfbdev,xserver-xorg-core-udeb" \
         > ${control}.new
 else
     ${basedir}/dpkg-control \
@@ -280,6 +280,7 @@ for pkg in ${old_binaries}; do
         -e "/dh_strip/s/${pkg}-dbg/${newpkg}-dbg/" \
         -e "/dh_makeshlibs/s/${pkg}\\([ ']\\)/${newpkg}\\1/g" \
         -e "/dh_install/s/-p${pkg} /-p${newpkg} /" \
+        -e "/dh_install/s/-p${pkg}\$/-p${newpkg}/" \
         -e "s@${newpkg}/usr/share/doc/${pkg}@&-${suffix}@" \
         -e "s@${newpkg}/usr/share/bug/${pkg}@&-${suffix}@" \
         -e "/DEB_DBG_PACKAGE_ALL/s/ ${pkg}-dbg/ ${pkg}-${suffix}-dbg/" \
@@ -309,9 +310,10 @@ if [ "${old_package}" = "mesa" ]; then
         $dry sed -e "s/-ldrm${lib}/\$(shell \$(PKG_CONFIG) libdrm${lib} --libs)/" -i $(grep -l -r -- -ldrm${lib} src/)
     done
 elif [ "${old_package}" = "xorg-server" ]; then
-    # Force the udeb building
+    # Disable the udeb building
     # and fix the abi depends
-    sed -e "/ifneq.*-udeb/s/.*/ifeq (1, 1)/" \
+    sed -e "/ifneq.*-udeb/s/.*/ifeq (1, 0)/" \
+        -e "/DH_INSTALL_OPTIONS =/s/-udeb/&-${suffix}/" \
         -e "/-abi-/s/ xserver-xorg-core/&-${suffix}/" \
         -e "s/--enable-dmx/--disable-dmx/" \
         -e "s/--enable-kdrive/--disable-kdrive/" \

@@ -32,7 +32,7 @@ cp debian/rules debian/rules.new
 sed -e  "s/libwayland/&_${ltsq}/" -i debian/libwayland-dev.install
 mv debian/libwayland-dev.install debian/libwayland-dev-${suffix}.install
 
-sed -e /SOURCE/s/=.*/=${new_package}/ -i debian/rules.new
+sed -e /^SOURCE/s/=.*/=${new_package}/ -i debian/rules.new
 
 for ipkg in 0; do
     newpkg="libwayland-${ltsq}${ipkg}"
