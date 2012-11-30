@@ -403,7 +403,7 @@ elif [ "${old_package}" = "x11-xserver-utils" ]; then
         -i debian/control.new
 
     # Disable building manpage + xkeystone
-    sed -e "/bin_SCRIPTS/s/=.*/=/" -e "/SUBDIRS/s/=.*/=/" -i xrandr/Makefile.*
+    sed -e "/^bin_SCRIPTS/s/=.*/=/" -e "/^SUBDIRS/s/=.*/=/" -i xrandr/Makefile.*
 
     # Supress things we don't install
     sed -e "/app-defaults/d" -e "/man/d" \
