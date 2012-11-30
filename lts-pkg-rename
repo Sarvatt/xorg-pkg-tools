@@ -39,7 +39,7 @@
 
 set -e
 
-extraversion="~precise1~ppa9.1"
+extraversion="~precise1~ppa9.3"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -401,6 +401,13 @@ elif [ "${old_package}" = "x11-xserver-utils" ]; then
     sed -e "/^Provides:/s/ x11-xserver-utils/&-renamed /" \
         -e "/^Depends:/s/\$/, x11-xserver-utils (>= 0~)/" \
         -i debian/control.new
+
+    # Disable building manpage + xkeystone
+    sed -e "/bin_SCRIPTS/s/=.*/=/" -e "/SUBDIRS/s/=.*/=/" -i xrandr/Makefile.am
+
+    # Supress things we don't install
+    sed -e "/app-defaults/d" -e "/man/d" \
+        -i debian/x11-xserver-utils-${suffix}.install
 
     # add diversion scripts
     for n in ${basedir}/lts-patches/x11-xserver-utils.*; do
