@@ -39,7 +39,7 @@
 
 set -e
 
-extraversion="~precise1~ppa9.3"
+extraversion="~precise1~ppa9.4"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -403,7 +403,7 @@ elif [ "${old_package}" = "x11-xserver-utils" ]; then
         -i debian/control.new
 
     # Disable building manpage + xkeystone
-    sed -e "/bin_SCRIPTS/s/=.*/=/" -e "/SUBDIRS/s/=.*/=/" -i xrandr/Makefile.am
+    sed -e "/bin_SCRIPTS/s/=.*/=/" -e "/SUBDIRS/s/=.*/=/" -i xrandr/Makefile.*
 
     # Supress things we don't install
     sed -e "/app-defaults/d" -e "/man/d" \
