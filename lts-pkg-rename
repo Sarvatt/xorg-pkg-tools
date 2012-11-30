@@ -393,7 +393,9 @@ elif [ "${old_package}" = "x11-xserver-utils" ]; then
     # Only build xrandr
     sed -e "/PACKAGE/s/=.*/&-${suffix}/" \
         -e "/^DEF_SUBDIRS/s/=.*/=xrandr/" \
+        -e "/dh_installmenu/d" \
         -i debian/rules.new
+    rm debian/*.menu
 
     # fixup provides, and add depends back on unrenamed package
     # must conflict on x11-xserver-utils-renamed, since we cannot
