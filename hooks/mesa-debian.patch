@@ -15,7 +15,7 @@ index 436f85d..1cb091b 100644
   flex,
   bison,
 - llvm-3.1-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
-+ llvm-3.1-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
++ llvm-3.2-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
   libwayland-dev (>= 0.99.0) [linux-any],
  Vcs-Git: git://git.debian.org/git/pkg-xorg/lib/mesa
  Vcs-Browser: http://git.debian.org/?p=pkg-xorg/lib/mesa.git
@@ -168,11 +168,11 @@ index 4e85ff6..ea9bb92 100644
       if test "x$llvm_prefix" != x; then
  -        AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no], ["$llvm_prefix/bin"])
 -+        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no], ["$llvm_prefix/bin"])
-++        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no], ["$llvm_prefix/bin"])
+++        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.2], [no], ["$llvm_prefix/bin"])
       else
  -        AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no])
 -+        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no])
-++        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no])
+++        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.2], [no])
       fi
   
       if test "x$LLVM_CONFIG" != xno; then
@@ -225,3 +225,27 @@ index e059404..ad0c558 100755
  else
  	# Temporarily work around FTBFS on sparc, ignore new symbols:
  	dh_makeshlibs -s -- -c1
+
+
+diff --git a/configure.ac b/configure.ac
+index 1294740..e67d27e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1799,7 +1799,7 @@ gallium_require_drm_loader() {
+ 
+ radeon_llvm_check() {
+     LLVM_REQUIRED_VERSION_MAJOR="3"
+-    LLVM_REQUIRED_VERSION_MINOR="2"
++    LLVM_REQUIRED_VERSION_MINOR="2"
+     LLVM_AVAILABLE_VERSION_MAJOR=`echo $LLVM_VERSION | cut -d. -f1`
+     LLVM_AVAILABLE_VERSION_MINOR=`echo $LLVM_VERSION | cut -d. -f2`
+     if test "$LLVM_AVAILABLE_VERSION_MAJOR" -lt "$LLVM_REQUIRED_VERSION_MAJOR" -o [ "$LLVM_AVAILABLE_VERSION_MAJOR" -eq "$LLVM_REQUIRED_VERSION_MAJOR" -a "$LLVM_AVAILABLE_VERSION_MINOR" -lt "$LLVM_REQUIRED_VERSION_MINOR" ] ; then
+@@ -1815,7 +1815,7 @@ radeon_llvm_check() {
+                       and build with --enable-experimental-targets=AMDGPU])
+     fi
+     AC_MSG_WARN([Please ensure you use the latest llvm tree from git://people.freedesktop.org/~tstellar/llvm master before submitting a bug])
+-    if test "x$LLVM_VERSION" = "x3.2"; then
++    if test "x$LLVM_VERSION" = "x3.2"; then
+         LLVM_LIBS="$LLVM_LIBS `$LLVM_CONFIG --libs amdgpu`"
+     fi
+ }
