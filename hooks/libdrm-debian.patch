@@ -6,8 +6,8 @@ index 95e94d6..d0ae223 100755
  	dh_strip -s --remaining-packages
  
  override_dh_makeshlibs:
--	dh_makeshlibs -plibdrm2 -V'libdrm2 (>= 2.4.31)' --add-udeb=libdrm2-udeb -- -c4
-+	dh_makeshlibs -plibdrm2 -V'libdrm2 (>= 2.4.31)' --add-udeb=libdrm2-udeb -- -c1
+-	dh_makeshlibs -plibdrm2 -V'libdrm2 (>= 2.4.38)' --add-udeb=libdrm2-udeb -- -c4
++	dh_makeshlibs -plibdrm2 -V'libdrm2 (>= 2.4.38)' --add-udeb=libdrm2-udeb -- -c1
  ifeq ($(INTEL), yes)
 -	dh_makeshlibs -plibdrm-intel1 -V'libdrm-intel1 (>= 2.4.38)' -- -c4
 +	dh_makeshlibs -plibdrm-intel1 -V'libdrm-intel1 (>= 2.4.38)' -- -c1
