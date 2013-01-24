@@ -1,13 +1,13 @@
 # libdrm is super special, sonames have to be altered
 # big mess, but allows everything except libdrm-dev to be
 # co-installable with old libdrm
-libdrm-dev			libdrm-dev-lts-quantal
-libdrm2				libdrm-ltsq2
-libdrm-intel1			libdrm-ltsq-intel1
-libdrm-omap1			libdrm-ltsq-omap1
-libdrm-nouveau2			libdrm-ltsq-nouveau2
-libdrm-radeon1			libdrm-ltsq-radeon1
-libkms1				libkms-ltsq1
+#libdrm-dev			libdrm-dev-lts-quantal
+#libdrm2				libdrm-ltsq2
+#libdrm-intel1			libdrm-ltsq-intel1
+#libdrm-omap1			libdrm-ltsq-omap1
+#libdrm-nouveau2			libdrm-ltsq-nouveau2
+#libdrm-radeon1			libdrm-ltsq-radeon1
+#libkms1				libkms-ltsq1
 
 # wayland
 libwayland0			libwayland-ltsq0

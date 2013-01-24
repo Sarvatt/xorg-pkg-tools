@@ -40,6 +40,7 @@
 set -e
 
 extraversion="~precise1"
+lts_codename="precise"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -100,7 +101,6 @@ elif [ ! -e "${rename_mapping_file}" ]; then
     ERR "No such file ${rename_mapping_file}"
 fi
 
-lts_codename=precise-proposed
 suffix=$(grep "^xorg" "$1" | cut -d- -f2-)
 verbose=1
 dry=""
@@ -171,7 +171,7 @@ dch --newversion "${old_package_version}${extraversion}" \
     --package ${new_package} \
     --distribution ${lts_codename} \
     --force-distribution \
-    "Rename package for the LTS point update, and add replaces/breaks/provides"
+    "Rebuild for libdrm-dev update (LP: #1086345)"
 
 if [ -n "$dry" ]; then
     mv -v debian/changelog debian/changelog.new
