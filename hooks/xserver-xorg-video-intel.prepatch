@@ -1,3 +1,14 @@
+getp() {
+ (cd debian/patches; rm -f $1
+  wget http://kernel.ubuntu.com/~sarvatt/patches/$1)
+ CHANGES+=("hook: Refresh $1")
+}
+
+getp 0002-Update-manpage-for-new-accelmethod-option.patch
+drop upstream-snapshot-778dba90c.diff upstream
+drop sna-compensate-clipextents.diff upstream
+
+
 drop 101_copy-fb.patch testing
 drop 102_gen6_invalidate_texture_cache.patch upstream
 drop 102_remove_surface_binding_cache.patch upstream
@@ -21,7 +32,3 @@ drop dont-run-intel-mode-fini-before-preinit.diff upstream
 drop fix-glamor-check.diff upstream
 
 drop 0001-Fix-build-failure-when-passing-with-builderstring.patch upstream
-
-patch -p1 < $HOOKS/intel-sna.patch
-CHANGES+=("Note: SNA can now be picked via AccelMethod in xorg.conf.")
-
