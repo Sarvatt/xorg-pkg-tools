@@ -4,11 +4,14 @@ getp() {
  CHANGES+=("hook: Refresh $1")
 }
 
+drop 15-fix-oot-build.diff upstream
+drop gbm-remember-to-init-format.patch upstream
+
 #mesa master (9.1)
 drop 06_kfreebsd-ftbfs.diff fails
 
-patch -p1 < $HOOKS/mesa-debian.patch
-CHANGES+=("hook: Add libtxc-dxtn0 to libgl1-mesa-dri recommends.")
+#patch -p1 < $HOOKS/mesa-debian.patch
+#CHANGES+=("hook: Add libtxc-dxtn0 to libgl1-mesa-dri recommends.")
 #patch -p1 < $HOOKS/mesa-egl-symbols.patch
 #patch -p1 < $HOOKS/mesa-libgbm-symbols.patch
 #CHANGES+=("hook: Refresh symbols.")
