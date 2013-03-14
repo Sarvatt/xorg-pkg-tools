@@ -1,5 +1,5 @@
 diff --git a/debian/control b/debian/control
-index 436f85d..1cb091b 100644
+index 059bc58..70140d5 100644
 --- a/debian/control
 +++ b/debian/control
 @@ -6,6 +6,7 @@ XSBC-Original-Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
@@ -10,16 +10,16 @@ index 436f85d..1cb091b 100644
   debhelper (>= 8.1.3),
   quilt (>= 0.40),
   pkg-config,
-@@ -32,7 +33,7 @@ Build-Depends:
+@@ -31,7 +32,7 @@ Build-Depends:
   libudev-dev [linux-any],
   flex,
   bison,
-- llvm-3.1-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
-+ llvm-3.2-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
-  libwayland-dev (>= 0.99.0) [linux-any],
+- llvm-3.2-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
++ llvm-3.3-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386],
+  libwayland-dev (>= 1.0.2) [linux-any],
  Vcs-Git: git://git.debian.org/git/pkg-xorg/lib/mesa
  Vcs-Browser: http://git.debian.org/?p=pkg-xorg/lib/mesa.git
-@@ -190,6 +191,7 @@ Depends:
+@@ -189,6 +190,7 @@ Depends:
   libxxf86vm-dev,
   libxdamage-dev,
   libxfixes-dev,
@@ -27,22 +27,6 @@ index 436f85d..1cb091b 100644
   libxcb-glx0-dev,
   libx11-xcb-dev,
   ${misc:Depends},
-@@ -532,6 +534,7 @@ Pre-Depends: dpkg (>= 1.15.6~),
- Depends:
-  ${shlibs:Depends},
-  ${misc:Depends}
-+Recommends: libtxc-dxtn0
- Suggests: libglide3
- Conflicts: xlibmesa-dri (<< 1:7.0.0)
- Replaces: xlibmesa-dri (<< 1:7.0.0), libgl1-mesa-dri-experimental (<< 7.11.1)
-@@ -640,6 +640,7 @@ Depends:
-  libdrm-dev (>= 2.4.24) [!hurd-any],
-  libx11-dev,
-  libx11-xcb-dev,
-+ libxcb-dri2-0-dev (>= 1.8),
-  libxcb-glx0-dev,
-  libxdamage-dev,
-  libxext-dev,
 diff --git a/debian/libgles2-mesa-dev.install.in b/debian/libgles2-mesa-dev.install.in
 index 981c491..e7d4422 100644
 --- a/debian/libgles2-mesa-dev.install.in
@@ -52,157 +36,20 @@ index 981c491..e7d4422 100644
  dri/usr/include/GLES2 usr/include
 +dri/usr/include/GLES3 usr/include
  dri/usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig/glesv2.pc usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig
-diff --git a/debian/patches/100_no_abi_tag.patch b/debian/patches/100_no_abi_tag.patch
-index 36e97a8..584a2c4 100644
---- a/debian/patches/100_no_abi_tag.patch
-+++ b/debian/patches/100_no_abi_tag.patch
-@@ -2,43 +2,43 @@
- +++ b/src/mapi/glapi/gen/gl_x86-64_asm.py
- @@ -181,19 +181,6 @@
-  
-- 	def printRealFooter(self):
-- 		print ''
---		print '#if defined(GLX_USE_TLS) && defined(__linux__)'
---		print '	.section ".note.ABI-tag", "a"'
---		print '	.p2align 2'
---		print '	.long	1f - 0f   /* name length */'
---		print '	.long	3f - 2f   /* data length */'
---		print '	.long	1         /* note length */'
---		print '0:	.asciz "GNU"      /* vendor name */'
---		print '1:	.p2align 2'
---		print '2:	.long	0         /* note data: the ABI tag */'
---		print '	.long	2,4,20    /* Minimum kernel version w/TLS */'
---		print '3:	.p2align 2        /* pad out section */'
---		print '#endif /* GLX_USE_TLS */'
---		print ''
-- 		print '#if defined (__ELF__) && defined (__linux__)'
-- 		print '	.section .note.GNU-stack,"",%progbits'
-- 		print '#endif'
-+     def printRealFooter(self):
-+         print ''
-+-        print '#if defined(GLX_USE_TLS) && defined(__linux__)'
-+-        print '	.section ".note.ABI-tag", "a"'
-+-        print '	.p2align 2'
-+-        print '	.long	1f - 0f   /* name length */'
-+-        print '	.long	3f - 2f   /* data length */'
-+-        print '	.long	1         /* note length */'
-+-        print '0:	.asciz "GNU"      /* vendor name */'
-+-        print '1:	.p2align 2'
-+-        print '2:	.long	0         /* note data: the ABI tag */'
-+-        print '	.long	2,4,20    /* Minimum kernel version w/TLS */'
-+-        print '3:	.p2align 2        /* pad out section */'
-+-        print '#endif /* GLX_USE_TLS */'
-+-        print ''
-+         print '#if defined (__ELF__) && defined (__linux__)'
-+         print '	.section .note.GNU-stack,"",%progbits'
-+         print '#endif'
- --- a/src/mapi/glapi/gen/gl_x86_asm.py
- +++ b/src/mapi/glapi/gen/gl_x86_asm.py
- @@ -189,19 +189,6 @@
-- 		print '\t\tALIGNTEXT16'
-- 		print 'GLNAME(gl_dispatch_functions_end):'
-- 		print ''
---		print '#if defined(GLX_USE_TLS) && defined(__linux__)'
---		print '	.section ".note.ABI-tag", "a"'
---		print '	.p2align 2'
---		print '	.long	1f - 0f   /* name length */'
---		print '	.long	3f - 2f   /* data length */'
---		print '	.long	1         /* note length */'
---		print '0:	.asciz "GNU"      /* vendor name */'
---		print '1:	.p2align 2'
---		print '2:	.long	0         /* note data: the ABI tag */'
---		print '	.long	2,4,20    /* Minimum kernel version w/TLS */'
---		print '3:	.p2align 2        /* pad out section */'
---		print '#endif /* GLX_USE_TLS */'
---		print ''
-- 		print '#if defined (__ELF__) && defined (__linux__)'
-- 		print '	.section .note.GNU-stack,"",%progbits'
-- 		print '#endif'
-+         print '\t\tALIGNTEXT16'
-+         print 'GLNAME(gl_dispatch_functions_end):'
-+         print ''
-+-        print '#if defined(GLX_USE_TLS) && defined(__linux__)'
-+-        print '	.section ".note.ABI-tag", "a"'
-+-        print '	.p2align 2'
-+-        print '	.long	1f - 0f   /* name length */'
-+-        print '	.long	3f - 2f   /* data length */'
-+-        print '	.long	1         /* note length */'
-+-        print '0:	.asciz "GNU"      /* vendor name */'
-+-        print '1:	.p2align 2'
-+-        print '2:	.long	0         /* note data: the ABI tag */'
-+-        print '	.long	2,4,20    /* Minimum kernel version w/TLS */'
-+-        print '3:	.p2align 2        /* pad out section */'
-+-        print '#endif /* GLX_USE_TLS */'
-+-        print ''
-+         print '#if defined (__ELF__) && defined (__linux__)'
-+         print '	.section .note.GNU-stack,"",%progbits'
-+         print '#endif'
-diff --git a/debian/patches/101_ubuntu_hidden_glname.patch b/debian/patches/101_ubuntu_hidden_glname.patch
-index be16da9..8e70ee8 100644
---- a/debian/patches/101_ubuntu_hidden_glname.patch
-+++ b/debian/patches/101_ubuntu_hidden_glname.patch
-@@ -1,10 +1,10 @@
- --- a/src/mapi/glapi/gen/gl_x86_asm.py
- +++ b/src/mapi/glapi/gen/gl_x86_asm.py
- @@ -176,7 +176,6 @@
-- 		print ''
-- 		print '\t\tALIGNTEXT16'
-- 		print '\t\tGLOBL GLNAME(gl_dispatch_functions_start)'
---		print '\t\tHIDDEN(GLNAME(gl_dispatch_functions_start))'
-- 		print 'GLNAME(gl_dispatch_functions_start):'
-- 		print ''
-- 		return
-+         print ''
-+         print '\t\tALIGNTEXT16'
-+         print '\t\tGLOBL GLNAME(gl_dispatch_functions_start)'
-+-        print '\t\tHIDDEN(GLNAME(gl_dispatch_functions_start))'
-+         print 'GLNAME(gl_dispatch_functions_start):'
-+         print ''
-+         return
-diff --git a/debian/patches/13-llvm-config-pick-a-version.diff b/debian/patches/13-llvm-config-pick-a-version.diff
-index 4e85ff6..ea9bb92 100644
---- a/debian/patches/13-llvm-config-pick-a-version.diff
-+++ b/debian/patches/13-llvm-config-pick-a-version.diff
-@@ -9,10 +9,10 @@ receives bug fixes quickly, so pick 3.1 for now.
-  if test "x$enable_gallium_llvm" = xyes; then
-      if test "x$llvm_prefix" != x; then
- -        AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no], ["$llvm_prefix/bin"])
--+        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no], ["$llvm_prefix/bin"])
-++        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.2], [no], ["$llvm_prefix/bin"])
-      else
- -        AC_PATH_PROG([LLVM_CONFIG], [llvm-config], [no])
--+        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.1], [no])
-++        AC_PATH_PROG([LLVM_CONFIG], [llvm-config-3.2], [no])
-      fi
-  
-      if test "x$LLVM_CONFIG" != xno; then
-diff --git a/debian/not-installed b/debian/not-installed
-index 1f769d9..255c891 100644
---- a/debian/not-installed
-+++ b/debian/not-installed
-@@ -3,7 +3,6 @@
- # Common list:
- NOT_INSTALLED := \
- 	dri/etc/drirc \
--	dri/usr/include/GL/vms_x_fix.h \
- 	dri/usr/include/GL/wglext.h \
- 	dri/usr/include/GL/wmesa.h
- 
 diff --git a/debian/rules b/debian/rules
-index e059404..ad0c558 100755
+index 3f1f626..a2679e4 100755
 --- a/debian/rules
 +++ b/debian/rules
-@@ -78,7 +78,8 @@ else
- 	DRI_DRIVERS += i915 i965
- 	# Radeonsi needs LLVM, so only build it on the subset of archs
- 	# where we have LLVM enabled.
--	GALLIUM_DRIVERS += radeonsi
-+	#GALLIUM_DRIVERS += radeonsi
-+	EXTRA_SED=-e"/radeonsi_dri.so/ s/^/\#/"
-     else
- 	EXTRA_SED=-e"/radeonsi_dri.so/ s/^/\#/"
-     endif
-@@ -239,7 +239,7 @@ binary-arch: install
+@@ -155,7 +156,7 @@ $(STAMP)-build-%: configure
+ 	             --infodir=\$${prefix}/share/info --sysconfdir=/etc \
+ 	             --libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
+ 	             --localstatedir=/var $(confflags) $(confflags-$*) \
+-	             ac_cv_path_LLVM_CONFIG=llvm-config-3.2
++	             ac_cv_path_LLVM_CONFIG=llvm-config-3.3
+ 	cd $(DEB_BUILD_DIR)/$* && $(MAKE)
+ 
+ 	# Remove extra po files.  These confuse pkgstriptranslations
+@@ -230,7 +231,7 @@ binary-arch: install
  	# purge .la files
  	find debian/tmp/ -name '*.la' -exec rm '{}' ';'
  
@@ -211,7 +58,7 @@ index e059404..ad0c558 100755
  
  	# Create an ld.so.conf which says where to find libGL from Mesa
  	echo "/usr/lib/$(DEB_HOST_MULTIARCH)/mesa" \
-@@ -276,11 +276,11 @@ ifeq (,$(filter sparc sparc64,$(DEB_HOST_ARCH)))
+@@ -267,11 +268,11 @@ ifeq (,$(filter sparc sparc64,$(DEB_HOST_ARCH)))
  	# proprietary alternatives can't make more difficult…
  	set -e ; for PACKAGE in \
  		libegl1-mesa libgles1-mesa libgles2-mesa libopenvg1-mesa ; do \
@@ -225,27 +72,3 @@ index e059404..ad0c558 100755
  else
  	# Temporarily work around FTBFS on sparc, ignore new symbols:
  	dh_makeshlibs -s -- -c1
-
-
-diff --git a/configure.ac b/configure.ac
-index 1294740..e67d27e 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -1799,7 +1799,7 @@ gallium_require_drm_loader() {
- 
- radeon_llvm_check() {
-     LLVM_REQUIRED_VERSION_MAJOR="3"
--    LLVM_REQUIRED_VERSION_MINOR="2"
-+    LLVM_REQUIRED_VERSION_MINOR="2"
-     LLVM_AVAILABLE_VERSION_MAJOR=`echo $LLVM_VERSION | cut -d. -f1`
-     LLVM_AVAILABLE_VERSION_MINOR=`echo $LLVM_VERSION | cut -d. -f2`
-     if test "$LLVM_AVAILABLE_VERSION_MAJOR" -lt "$LLVM_REQUIRED_VERSION_MAJOR" -o [ "$LLVM_AVAILABLE_VERSION_MAJOR" -eq "$LLVM_REQUIRED_VERSION_MAJOR" -a "$LLVM_AVAILABLE_VERSION_MINOR" -lt "$LLVM_REQUIRED_VERSION_MINOR" ] ; then
-@@ -1815,7 +1815,7 @@ radeon_llvm_check() {
-                       and build with --enable-experimental-targets=AMDGPU])
-     fi
-     AC_MSG_WARN([Please ensure you use the latest llvm tree from git://people.freedesktop.org/~tstellar/llvm master before submitting a bug])
--    if test "x$LLVM_VERSION" = "x3.2"; then
-+    if test "x$LLVM_VERSION" = "x3.2"; then
-         LLVM_LIBS="$LLVM_LIBS `$LLVM_CONFIG --libs amdgpu`"
-     fi
- }
