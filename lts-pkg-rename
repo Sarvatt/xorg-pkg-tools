@@ -40,7 +40,7 @@
 set -e
 
 extraversion="~precise1"
-lts_codename="precise"
+lts_codename="precise-proposed"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -316,10 +316,12 @@ if [ "${old_package}" = "mesa" ]; then
     sed -e "s/--enable-osmesa/--disable-osmesa/" -i debian/rules.new
     $dry sed -e "/NOT_INSTALLED/s@:=@:= dri/usr/include/GL/osmesa.h@" -i debian/not-installed
 
-    # Use sonames for all instances of -ldrm*
-    for lib in _radeon _nouveau _intel ""; do
-        $dry sed -e "s/-ldrm${lib}/\$(shell \$(PKG_CONFIG) libdrm${lib} --libs)/" -i $(grep -l -r -- -ldrm${lib} src/)
-    done
+    if [ -f configs/current.in ] && grep -q "^LIBDRM_LIB = " configs/current.in; then
+        # Use sonames for all instances of -ldrm*
+        for lib in _radeon _nouveau _intel ""; do
+            $dry sed -e "s/-ldrm${lib}/\$(shell \$(PKG_CONFIG) libdrm${lib} --libs)/" -i $(grep -l -r -- -ldrm${lib} src/)
+        done
+    fi
 elif [ "${old_package}" = "xorg-server" ]; then
     # Disable the udeb building
     # and fix the abi depends
