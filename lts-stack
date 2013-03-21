@@ -83,7 +83,7 @@ for pkgdir in */ drivers/*; do
     oldstack="`pwd`/../Prev"
     pushd "$pkgdir"
     "${basedir}/lts-pkg-rename" "${mapping}" "${oldstack}"
-    popd
+    popd >/dev/null
 done
 
 echo "Done!"

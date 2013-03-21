@@ -41,7 +41,7 @@ set -e
 
 extraversion="~precise"
 lts_codename="precise-proposed"
-changelog_entry="Rebuild for libdrm-dev update (LP: #1086345)"
+changelog_entry="Copy mesa update from quantal. (LP: #1134466)"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
