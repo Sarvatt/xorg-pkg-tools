@@ -71,13 +71,19 @@ mkdir -p Stack-lts/drivers
 
 cd Stack-lts
 cp -r ../Stack/*/ ../Stack/*.orig.tar.* .
-mv xf86* xserver-xorg-* drivers/
+for n in xf86* xserver-xorg-*; do
+    if [ -d "${n}" ]; then
+        mv "${n}" drivers/
+    fi
+done
 
 for pkgdir in */ drivers/*; do
     if [ ! -d "${pkgdir}/debian" ]; then continue; fi
-    echo
-    echo $pkgdir
-    (cd "${pkgdir}" && "${basedir}/lts-pkg-rename" "${mapping}")
+    # Location of last rename attempt, this allows for automated integration of changelogs
+    oldstack="`pwd`/../Prev"
+    pushd "$pkgdir"
+    "${basedir}/lts-pkg-rename" "${mapping}" "${oldstack}"
+    popd
 done
 
 echo "Done!"

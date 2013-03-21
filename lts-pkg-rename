@@ -39,8 +39,9 @@
 
 set -e
 
-extraversion="~precise1"
+extraversion="~precise"
 lts_codename="precise-proposed"
+changelog_entry="Rebuild for libdrm-dev update (LP: #1086345)"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -165,13 +166,57 @@ msg "Updating the maintainer..."
 update-maintainer -q
 
 msg "Adding a changelog entry..."
+
+added_entry=no
+prev_orig="`echo $2/Stack/${old_package}-[0-9]*/`"
+prev_renamed="`echo $2/Stack-lts/${old_package}-[0-9]*/`"
+if [ ! -d "${prev_renamed}" ]; then
+    # One last attempt, maybe we did apt-get source?
+    prev_renamed="`echo $2/Stack-lts/${old_package}-${suffix}-[0-9]*/`"
+fi
+
+if [ -f "${prev_orig}/debian/changelog" -a -f "${prev_renamed}/debian/changelog" ]; then
+    prev_old_package_version=$(head -n 1 "${prev_orig}/debian/changelog" | cut -d' ' -f2)
+
+    cp "${prev_renamed}/debian/changelog" ${changelog}
+
+    if [ "${prev_old_package_version//[\(\)]/}" = "${old_package_version}" ]; then
+        prev_new_package_version=$(head -n 1 "${prev_renamed}/debian/changelog" | cut -d' ' -f2)
+        prev_new_package_version="${prev_new_package_version//[\(\)]/}"
+
+        revision=${prev_new_package_version//*$extraversion}
+        let revision++
+
+        # This is a rebuild only, just increment version
+        dch --newversion "${old_package_version}${extraversion}${revision}" \
+            --package ${new_package} \
+            --distribution ${lts_codename} \
+            --force-distribution \
+            "${changelog_entry}"
+    else
+        # Merge in the new changelog entry first, we're forcing a bad version
+        dpkg-mergechangelogs \
+            "${prev_orig}/debian/changelog" \
+            "${changelog}" \
+            "${changelog}.old" \
+            "${changelog}"
+
+        dch --newversion "${old_package_version}${extraversion}1" \
+            --force-bad-version \
+            --package ${new_package} \
+            --distribution ${lts_codename} \
+            --force-distribution \
+            "${changelog_entry}"
+    fi
+else
 # ~precise1 is a downgrade so force version
-dch --newversion "${old_package_version}${extraversion}" \
-    --force-bad-version \
-    --package ${new_package} \
-    --distribution ${lts_codename} \
-    --force-distribution \
-    "Rebuild for libdrm-dev update (LP: #1086345)"
+    dch --newversion "${old_package_version}${extraversion}1" \
+        --force-bad-version \
+        --package ${new_package} \
+        --distribution ${lts_codename} \
+        --force-distribution \
+        "${changelog_entry}"
+fi
 
 if [ -n "$dry" ]; then
     mv -v debian/changelog debian/changelog.new
