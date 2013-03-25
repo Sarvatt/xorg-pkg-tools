@@ -132,4 +132,4 @@ for n in exynos intel nouveau omap radeon; do
         -i ${n}/Makefile.am
 done
 
-debuild -S -sa
+debuild -S -sa ${debuild_args}

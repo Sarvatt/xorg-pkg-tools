@@ -175,15 +175,17 @@ if [ ! -d "${prev_renamed}" ]; then
     prev_renamed="`echo $2/Stack-lts/${old_package}-${suffix}-[0-9]*/`"
 fi
 
+debuild_args=""
+
 if [ -f "${prev_orig}/debian/changelog" -a -f "${prev_renamed}/debian/changelog" ]; then
     prev_old_package_version=$(head -n 1 "${prev_orig}/debian/changelog" | cut -d' ' -f2)
+    prev_new_package_version=$(head -n 1 "${prev_renamed}/debian/changelog" | cut -d' ' -f2)
+    prev_new_package_version="${prev_new_package_version//[\(\)]/}"
 
+    debuild_args="-v${prev_new_package_version}"
     cp "${prev_renamed}/debian/changelog" ${changelog}
 
     if [ "${prev_old_package_version//[\(\)]/}" = "${old_package_version}" ]; then
-        prev_new_package_version=$(head -n 1 "${prev_renamed}/debian/changelog" | cut -d' ' -f2)
-        prev_new_package_version="${prev_new_package_version//[\(\)]/}"
-
         revision=${prev_new_package_version//*$extraversion}
         let revision++
 
@@ -241,7 +243,7 @@ extraprovides="xorg-renamed-package, xorg-renamed-package-${suffix},"
 
 # some packages have their own mess to clean up, do so here..
 if [ -f "${basedir}/lts-${old_package}-rename" ]; then
-    export old_package new_package rename_mapping_file basedir
+    export old_package new_package rename_mapping_file basedir debuild_args
     export codename lts_codename suffix extraversion extraconflicts extraprovides
 
     exec "${basedir}/lts-${old_package}-rename"
@@ -469,6 +471,6 @@ $dry mv debian/rules.new debian/rules
 $dry mv ${control}.new ${control}
 
 msg "Generating changes file..."
-$dry debuild -S -sa
+$dry debuild -S -sa ${debuild_args}
 
 msg "${old_package} now renamed to ${new_package}"

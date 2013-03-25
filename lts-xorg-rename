@@ -97,4 +97,4 @@ sed -e "s/xserver-xorg[^[:space:],]*/&-${suffix}/g" -i debian/scripts/vars.*
 # qxl requires a spice upgrade, and there is no reason to upgrade it, so just nuke it
 sed -e "/xserver-xorg-video-qxl/d" -i debian/scripts/vars.*
 
-debuild -S
+debuild -S ${debuild_args}

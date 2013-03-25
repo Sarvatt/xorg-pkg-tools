@@ -76,4 +76,4 @@ mv debian/rules.new debian/rules
 sed -e "s/-lXrandr/&_${ltsq}/" -i xrandr.pc.in
 sed -e "s/libXrandr/&_${ltsq}/" -i src/Makefile.am
 
-debuild -S -sa
+debuild -S -sa ${debuild_args}
