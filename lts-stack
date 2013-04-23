@@ -72,7 +72,7 @@ mkdir -p Stack-lts/drivers
 cd Stack-lts
 cp -r ../Stack/*/ ../Stack/*.orig.tar.* .
 for n in xf86* xserver-xorg-*; do
-    if [ -d "${n}" ]; then
+    if [ -e "${n}" ]; then
         mv "${n}" drivers/
     fi
 done

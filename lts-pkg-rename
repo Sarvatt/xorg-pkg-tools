@@ -39,9 +39,9 @@
 
 set -e
 
-extraversion="~precise"
-lts_codename="precise-proposed"
-changelog_entry="Copy mesa update from quantal. (LP: #1134466)"
+extraversion="~precise1+ppa22."
+lts_codename="precise"
+changelog_entry="Second lts-raring test upload, without arm support."
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -233,6 +233,11 @@ case "${suffix}" in
     ;;
     lts-raring)
         extraconflicts="xorg-renamed-package-lts-quantal,"
+
+        # Suppress building arm packages, only i386 and amd64 are supported
+        $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
+                 -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
+                 -i ${control}
     ;;
     *)
         ERR "unknown release ${suffix}"
@@ -355,12 +360,22 @@ msg "Applying post-rename changes"
 
 # Mesa is fun! :D
 if [ "${old_package}" = "mesa" ]; then
-    sed -e "s/\\\$\\\$PACKAGE/&-${suffix}/" -i debian/rules.new
     files="$(ls debian/*-i686.*)"
     for x in $files; do
         $dry mv -v "$x" "${x/i686/${suffix}-i686}"
     done
-    sed -e "s/--enable-osmesa/--disable-osmesa/" -i debian/rules.new
+
+    # Fixup mesa rules, and add a build hack for armel, which is no longer
+    # supported on raring or newer. It only has to build the stack, the
+    # resulting mesa package is unlikely to work anyway, since the required
+    # kernel is only available for amd64 and i386.
+    sed -e "s/--enable-osmesa/--disable-osmesa/" \
+        -e "s/\\\$\\\$PACKAGE/&-${suffix}/" \
+        -e "s/powerpc/armel &/" \
+        -i debian/rules.new
+
+    sed -e "s/powerpc/armel &/" -i debian/control.new
+
     $dry sed -e "/NOT_INSTALLED/s@:=@:= dri/usr/include/GL/osmesa.h@" -i debian/not-installed
 
     if [ -f configs/current.in ] && grep -q "^LIBDRM_LIB = " configs/current.in; then
@@ -417,11 +432,13 @@ elif [ "${old_package}" = "xorg-server" ]; then
     $dry sed -e "/appman_PRE/s/=.*/=/" -i man/Makefile.am
 
     # now add in a hack to make xserver-common provide/replace/conflict xserver-common-renamed
-    sed -e "s@xserver-common,@xserver-common-renamed,@" -i debian/control.new
-    sed -e "s@xserver-common\$@xserver-common-renamed@" -i debian/control.new
-
     # and add depend back on xserver-common for manpage
-    sed -e "s@x11-common@xserver-common, &@" -i debian/control.new
+    # libunwind7-dev is only available on i386 and amd64
+    sed -e "s@xserver-common,@xserver-common-renamed,@" \
+        -e "s@xserver-common\$@xserver-common-renamed@" \
+        -e "s@x11-common@xserver-common, &@" \
+        -e "s@libunwind8-dev@libunwind7-dev [i386 amd64]@" \
+        -i debian/control.new
 
     # Special case, allow mesa-common-dev to satisfy depends for xserver-xorg-dev too..
     # This is to make sure that the normal mesa-dev packages work alongside with the

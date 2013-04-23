@@ -59,13 +59,13 @@ for ipkg in 0; do
     done
 
     # fixup symbols
-    sed -e "s/ ${pkg} / ${newpkg} /" -i "debian/${newpkg}.symbols.in"
+    sed -e "s/ ${pkg} / ${newpkg} /" -i debian/${newpkg}.symbols*
 
     # we're renaming the sonames too, fix those up..
-    sed -e "s/^libwayland/&_${ltsq}/" -i "debian/${newpkg}.symbols.in"
+    sed -e "s/^libwayland/&_${ltsq}/" -i debian/${newpkg}.symbols*
 
     # and of course the install stuff
-    sed -e "s/libwayland/&_${ltsq}/" -i "debian/${newpkg}.install"
+    sed -e "s/libwayland/&_${ltsq}/" -i debian/${newpkg}.install
 done
 
 mv debian/rules.new debian/rules
