@@ -8,6 +8,12 @@ CHANGES+=("hook: Refresh symbols.")
 #' debian/control
 #CHANGES+=("hook: Add libtool to build depends.")
 
+#patch -p1 < $HOOKS/mesa-control.patch
+#CHANGES+=("hook: Add libtxc-dxtn0 to libgl1-mesa-dri recommends.")
+#CHANGES+=("hook: Switch to llvm-3.1.")
+#patch -p1 < $HOOKS/mesa-more-symbols.patch
+#CHANGES+=("hook: Refresh libgbm1 symbols.")
+
 # Robert Hooker 2011-07-08
 # Natty had debhelper 8.1.2ubuntu2 with multiarch backported
 # debian did not get multiarch until 8.1.3.
