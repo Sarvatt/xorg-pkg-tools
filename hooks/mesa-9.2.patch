@@ -1,23 +1,3 @@
-diff --git a/debian/changelog b/debian/changelog
-index 10fa859..7083782 100644
---- a/debian/changelog
-+++ b/debian/changelog
-@@ -1,10 +1,14 @@
--mesa (9.2.0~git20130502.156bcca6-0ubuntu0sarvatt) raring; urgency=low
-+mesa (9.2.0~git20130502.156bcca6-0ubuntu0sarvatt~quantal) quantal; urgency=critical
- 
-   * Checkout from git 20130502 (master branch) up to commit
-     156bcca62c9f4e79e78929f72bc085757f36a65a
-   * Only added debian/ tree from origin/ubuntu
-   * hook: Drop revert-a64c1eb9b110.diff (fails)
-   * hook: Refresh symbols.
-+  * + Don't build radeonsi, needs llvm 3.3
-+    + Drop libllvmradeon* install
-+    + Refresh 118-dricore-gallium.patch to work with gallium osmesa
-+    + Disable xvmc and vdpau
- 
-  -- Robert Hooker <sarvatt@ubuntu.com>  Thu, 02 May 2013 14:05:00 -0400
- 
 diff --git a/debian/libgl1-mesa-dri.install.in b/debian/libgl1-mesa-dri.install.in
 index bb606d6..5cf3bba 100644
 --- a/debian/libgl1-mesa-dri.install.in
@@ -50,25 +30,6 @@ index cfcc54d..46ded7e 100644
  --- a/src/gallium/targets/dri-r300/Makefile.am
  +++ b/src/gallium/targets/dri-r300/Makefile.am
  @@ -49,7 +49,7 @@
-diff --git a/debian/patches/series b/debian/patches/series
-index a026495..52b8cd7 100644
---- a/debian/patches/series
-+++ b/debian/patches/series
-@@ -1,11 +1,11 @@
- 04_osmesa_version.diff
- #05_kfreebsd-egl-x11.diff
--06_kfreebsd-ftbfs.diff
--08-kfreebsd-gallium.diff
-+#06_kfreebsd-ftbfs.diff
-+#08-kfreebsd-gallium.diff
- #11-hurd-ftbfs-again.diff
- 
- # Ubuntu patches.
--101_ubuntu_hidden_glname.patch
-+#101_ubuntu_hidden_glname.patch
- 117-static-gallium.patch
- 118-dricore-gallium.patch
- 120-hide-x86sse.patch
 diff --git a/debian/rules b/debian/rules
 index 7c1d8fc..2a95d08 100755
 --- a/debian/rules
