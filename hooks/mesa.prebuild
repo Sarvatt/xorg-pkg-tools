@@ -1,4 +1,5 @@
 patch -p1 < $HOOKS/mesa-gles-symbols.patch
+patch -p1 < $HOOKS/mesa-9.2-egl-symbols.patch
 CHANGES+=("hook: Refresh symbols.")
 
 ## Legacy unused hooks for reference
