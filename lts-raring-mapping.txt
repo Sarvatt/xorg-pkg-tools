@@ -42,7 +42,7 @@ xf86-input-mtrack			xf86-input-mtrack-lts-raring
 xserver-xorg-input-mtrack		xserver-xorg-input-mtrack-lts-raring
 xf86-input-wacom			xf86-input-wacom-lts-raring
 xserver-xorg-input-wacom		xserver-xorg-input-wacom-lts-raring
-xf86-video-msm				xf86-video-msm-lts-raring
+#xf86-video-msm				xf86-video-msm-lts-raring
 #xserver-xorg-video-msm			xserver-xorg-video-msm-lts-raring
 #xf86-video-omap			xf86-video-omap-lts-raring
 #xserver-xorg-video-omap		xserver-xorg-video-omap-lts-raring

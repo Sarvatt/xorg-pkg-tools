@@ -39,9 +39,9 @@
 
 set -e
 
-extraversion="~precise1+ppa22."
-lts_codename="precise"
-changelog_entry="Second lts-raring test upload, without arm support."
+extraversion="~precise"
+lts_codename="precise-proposed"
+changelog_entry="Initial lts-raring xserver stack upload, i386 and amd64 only. (LP: #1177679)"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -237,6 +237,11 @@ case "${suffix}" in
         # Suppress building arm packages, only i386 and amd64 are supported
         $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
                  -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
+                 -i ${control}
+    ;;
+    omap-revert)
+        $dry sed -e "/^Architecture: any\$/s/:.*/: armhf/" \
+                 -e "/^Architecture: linux-any/s/:.*/: armhf/" \
                  -i ${control}
     ;;
     *)

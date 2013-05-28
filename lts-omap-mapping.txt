@@ -1,0 +1,8 @@
+# xserver-xorg package, only necessary ones
+xserver-xorg-dev		xserver-xorg-omap-revert-dev
+xserver-xorg-core		xserver-xorg-core-omap-revert
+xserver-xorg-core-udeb		xserver-xorg-core-omap-revert-udeb
+xserver-common			xserver-common-omap-revert
+
+xf86-video-omap			xf86-video-omap-revert
+xserver-xorg-video-omap		xserver-xorg-video-omap-revert
