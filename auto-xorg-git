@@ -23,6 +23,7 @@ DROP_DEBIAN_PATCHES="no"
 PACKAGE_VERSION=
 EPOCH=AUTO
 QUIET=0
+URGENCY="low"
 declare -a CHANGES
 
 # Include the bash library functions
@@ -259,7 +260,7 @@ update_changelogs() {
 
     # -b forces version even if missing epoch, --force-distribution allows
     # non-interactive updating when the release is not known
-    dch --force-distribution -b --distribution $DISTRIBUTION --newversion ${EPOCH:+$EPOCH:}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
+    dch --force-distribution --urgency $URGENCY -b --distribution $DISTRIBUTION --newversion ${EPOCH:+$EPOCH:}${GITVER}-$ADDVERSION "Checkout from git $TODAY ($BRANCH branch) up to $LASTCOMMIT" || die "dch: $?"
     
     # Change Maintainer if on Ubuntu
     if [ "$(lsb_release -i -s)" = "Ubuntu" ] &&
@@ -317,6 +318,7 @@ usage() {
     echo " -s <version>       Force Build-depends to xserver-xorg-dev <version>"
     echo " -t <separator>     Separator between version and date [~]"
     echo " -u <upstream-repo> Specify non-standard git repository"
+    echo " -U <urgency>       Specify the urgency for the changelog (default: low)"
     echo " -S <strategy>      Override merge strategy"
     echo " -v <pkg-version>   Override package version (don't autodetect)"
     echo " -w <working-dir>   Tmp location for checkouts (defaults to cwd)"
@@ -326,7 +328,7 @@ usage() {
 # main starts here
 
 # Command line options
-while getopts "a:b:d:De:fgG:H:l:mnop:qr:s:t:u:S:v:w:h\?" opt; do
+while getopts "a:b:d:De:fgG:H:l:mnop:qr:s:t:u:U:S:v:w:h\?" opt; do
     case "$opt" in
         a ) ADDVERSION="$OPTARG"                   ;;
         b ) BRANCH="$OPTARG";
@@ -349,6 +351,7 @@ while getopts "a:b:d:De:fgG:H:l:mnop:qr:s:t:u:S:v:w:h\?" opt; do
         s ) XSERVER_VERSION="$OPTARG"              ;;
         t ) DATE_PREFIX="$OPTARG"                  ;;
         u ) UPSTREAMGIT="$OPTARG"                  ;;
+        U ) URGENCY="$OPTARG"                      ;;
         v ) PACKAGE_VERSION="$OPTARG"              ;;
         w ) WORKING_DIR="$OPTARG"                  ;;
         h ) usage 0;                               ;;
