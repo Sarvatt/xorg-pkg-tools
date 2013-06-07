@@ -401,6 +401,7 @@ elif [ "${old_package}" = "xorg-server" ]; then
         -e "s/--enable-xvfb/--disable-xvfb/" \
         -e "s/--enable-xephyr/--disable-xephyr/" \
         -e "s/--enable-xfbdev/--disable-xfbdev/" \
+        -e "s/--enable-xselinux/--disable-xselinux/" \
         -i debian/rules.new
 
     # Kill of xvfb-run too
