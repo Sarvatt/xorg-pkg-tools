@@ -1,13 +1,3 @@
-diff --git a/debian/changelog b/debian/changelog
-index 3752f66..65d7789 100644
---- a/debian/changelog
-+++ b/debian/changelog
-@@ -1,4 +1,4 @@
--mesa (9.2.0~git20130516.435aea6f-0ubuntu0sarvatt) raring; urgency=low
-+mesa (9.2.0~git20130516.435aea6f-0ubuntu0sarvatt~precise) precise; urgency=low
- 
-   * Checkout from git 20130516 (master branch) up to commit
-     435aea6f3284da42ef9da1d928f59971ecf6a3d2
 diff --git a/debian/libegl1-mesa.symbols b/debian/libegl1-mesa.symbols
 index 233124a..89848ac 100644
 --- a/debian/libegl1-mesa.symbols
