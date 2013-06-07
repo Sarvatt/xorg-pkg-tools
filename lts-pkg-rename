@@ -443,6 +443,7 @@ elif [ "${old_package}" = "xorg-server" ]; then
         -e "s@xserver-common\$@xserver-common-renamed@" \
         -e "s@x11-common@xserver-common, &@" \
         -e "s@libunwind8-dev@libunwind7-dev [i386 amd64]@" \
+        -e "/libaudit-dev/d" \
         -i debian/control.new
 
     # Special case, allow mesa-common-dev to satisfy depends for xserver-xorg-dev too..
