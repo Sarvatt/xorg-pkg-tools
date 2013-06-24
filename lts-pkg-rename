@@ -41,7 +41,11 @@ set -e
 
 extraversion="~precise"
 lts_codename="precise-proposed"
-changelog_entry="Initial lts-raring xserver stack upload, i386 and amd64 only. (LP: #1177679)"
+if [ -n "$4" ]; then
+    changelog_entry="$4"
+else
+    changelog_entry="Initial lts-raring xserver stack upload, i386 and amd64 only. (LP: #1177679)"
+fi
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
