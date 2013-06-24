@@ -41,8 +41,8 @@ set -e
 
 extraversion="~precise"
 lts_codename="precise-proposed"
-if [ -n "$4" ]; then
-    changelog_entry="$4"
+if [ -n "$3" ]; then
+    changelog_entry="$3"
 else
     changelog_entry="Initial lts-raring xserver stack upload, i386 and amd64 only. (LP: #1177679)"
 fi
