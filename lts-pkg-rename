@@ -95,14 +95,19 @@ while getopts "h\?qvn" opt $*; do
 done
 shift `expr $OPTIND - 1`
 
-rename_mapping_file=$1
+if [ -f "${basedir}/lts-$1-mapping.txt" ]; then
+    rename_mapping_file="${basedir}/lts-$1-mapping.txt"
+else
+    rename_mapping_file=$1
+fi
+
 if [ -z "${rename_mapping_file}" ]; then
     usage 1
 elif [ ! -e "${rename_mapping_file}" ]; then
     ERR "No such file ${rename_mapping_file}"
 fi
 
-suffix=$(grep "^xorg" "$1" | cut -d- -f2-)
+suffix=$(grep "^xorg" "${rename_mapping_file}" | cut -d- -f2-)
 verbose=1
 dry=""
 
