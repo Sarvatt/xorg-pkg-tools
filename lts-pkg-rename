@@ -39,12 +39,12 @@
 
 set -e
 
-extraversion="~precise"
-lts_codename="precise-proposed"
+extraversion="~~0ppa"
+lts_codename="precise"
 if [ -n "$3" ]; then
     changelog_entry="$3"
 else
-    changelog_entry="Initial lts-raring xserver stack upload, i386 and amd64 only. (LP: #1177679)"
+    changelog_entry="Initial lts-saucy test upload, i386 and amd64 only."
 fi
 
 if [ "$0" = "$(basename "$0")" ]; then
@@ -248,6 +248,14 @@ case "${suffix}" in
                  -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
                  -i ${control}
     ;;
+    lts-saucy)
+        extraconflicts="xorg-renamed-package-lts-quantal, xorg-renamed-package-lts-raring,"
+
+        # Suppress building arm packages, only i386 and amd64 are supported
+        $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
+                 -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
+                 -i ${control}
+    ;;
     omap-revert)
         $dry sed -e "/^Architecture: any\$/s/:.*/: armhf/" \
                  -e "/^Architecture: linux-any/s/:.*/: armhf/" \
@@ -372,6 +380,15 @@ done
 
 msg "Applying post-rename changes"
 
+# xorg-server and xserver-xorg-video-*
+if [ -f "debian/patches/xmir.patch" ]; then
+    $dry sed -e /xmir/d -i debian/patches/series
+    if [ -s debian/patches/series ]; then
+        echo '# placeholder' > debian/patches/series
+    fi
+    $dry rm -f debian/patches/xmir.patch
+fi
+
 # Mesa is fun! :D
 if [ "${old_package}" = "mesa" ]; then
     files="$(ls debian/*-i686.*)"
@@ -388,7 +405,16 @@ if [ "${old_package}" = "mesa" ]; then
         -e "s/powerpc/armel &/" \
         -i debian/rules.new
 
-    sed -e "s/powerpc/armel &/" -i debian/control.new
+    if grep -q libmir debian/control; then
+        sed -e "/libmirclient-dev/d" \
+            -i debian/control.new
+        $dry sed -e /mir/d -i debian/patches/series
+        $dry rm -f debian/patches/*mir*
+        sed -e /mir/d -i debian/rules.new
+    else
+        sed -e "s/powerpc/armel &/" \
+            -i debian/control.new
+    fi
 
     $dry sed -e "/NOT_INSTALLED/s@:=@:= dri/usr/include/GL/osmesa.h@" -i debian/not-installed
 
@@ -411,6 +437,7 @@ elif [ "${old_package}" = "xorg-server" ]; then
         -e "s/--enable-xephyr/--disable-xephyr/" \
         -e "s/--enable-xfbdev/--disable-xfbdev/" \
         -e "s/--enable-xselinux/--disable-xselinux/" \
+        -e "s/--enable-xmir/--disable-xmir/" \
         -i debian/rules.new
 
     # Kill of xvfb-run too
@@ -449,11 +476,13 @@ elif [ "${old_package}" = "xorg-server" ]; then
     # now add in a hack to make xserver-common provide/replace/conflict xserver-common-renamed
     # and add depend back on xserver-common for manpage
     # libunwind7-dev is only available on i386 and amd64
+    # xmir is not available on precise, kill building it
     sed -e "s@xserver-common,@xserver-common-renamed,@" \
         -e "s@xserver-common\$@xserver-common-renamed@" \
         -e "s@x11-common@xserver-common, &@" \
         -e "s@libunwind8-dev@libunwind7-dev [i386 amd64]@" \
-        -e "/libaudit-dev/d" \
+        -e "/libaudit-dev/d" -e "/libmir/d" -e "/XMir/d" \
+        -e "/^Architecture/s/: amd64 armhf i386\$/: invalid/" \
         -i debian/control.new
 
     # Special case, allow mesa-common-dev to satisfy depends for xserver-xorg-dev too..
@@ -468,7 +497,9 @@ elif [ "${old_package}" = "xorg-server" ]; then
 elif [ "${old_package}" = "xserver-xorg-video-intel" ]; then
 
     # Can no longer rely on real name, so fixup
-    $dry sed -e 's/-ldrm_intel/@DRMINTEL_LIBS@/' -i src/xvmc/Makefile.am
+    if [ -f src/xvmc/Makefile.am ]; then
+        $dry sed -e 's/-ldrm_intel/@DRMINTEL_LIBS@/' -i src/xvmc/Makefile.am
+    fi
 elif [ "${old_package}" = "xserver-xorg-video-fbdev" ]; then
     sed -e "/dh_install/s/\$(PACKAGE)-udeb/xserver-xorg-video-fbdev-udeb-${suffix}/" -i debian/rules.new
 elif [ "${old_package}" = "x11-xserver-utils" ]; then
