@@ -39,7 +39,7 @@
 
 set -e
 
-extraversion="~~0ppa"
+extraversion="~~2ppa"
 lts_codename="precise"
 if [ -n "$3" ]; then
     changelog_entry="$3"
@@ -254,6 +254,7 @@ case "${suffix}" in
         # Suppress building arm packages, only i386 and amd64 are supported
         $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
                  -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
+                 -e "/^Architecture: /s/armel armhf i386 powerpc/i386/" \
                  -i ${control}
     ;;
     omap-revert)
