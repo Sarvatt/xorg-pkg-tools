@@ -39,7 +39,7 @@
 
 set -e
 
-extraversion="~~2ppa"
+extraversion="~~3ppa"
 lts_codename="precise"
 if [ -n "$3" ]; then
     changelog_entry="$3"
@@ -388,6 +388,9 @@ if [ -f "debian/patches/xmir.patch" ]; then
         echo '# placeholder' > debian/patches/series
     fi
     $dry rm -f debian/patches/xmir.patch
+
+   # Append a ~, to allow ppa ~~ versions
+    sed -e '/server-xorg-dev/s/ubuntu./&~/' -i debian/control.new
 fi
 
 # Mesa is fun! :D
@@ -441,6 +444,8 @@ elif [ "${old_package}" = "xorg-server" ]; then
         -e "s/--enable-xmir/--disable-xmir/" \
         -i debian/rules.new
 
+    sed -e '/ubuntu/s/$/~/' -i debian/serverminver
+
     # Kill of xvfb-run too
     sed -e "/xvfb-run/d" -e "/^.PATH=/d" -e "/Xvfb/d" -i debian/rules.new
 
@@ -478,12 +483,17 @@ elif [ "${old_package}" = "xorg-server" ]; then
     # and add depend back on xserver-common for manpage
     # libunwind7-dev is only available on i386 and amd64
     # xmir is not available on precise, kill building it
+    # libxfixes does not break xorg-server per se, so just require
+    # a new enough version for -dev. unity needs a fix for pointer barriers,
+    # but the version in precise is older, so lower version requirement.
     sed -e "s@xserver-common,@xserver-common-renamed,@" \
         -e "s@xserver-common\$@xserver-common-renamed@" \
         -e "s@x11-common@xserver-common, &@" \
         -e "s@libunwind8-dev@libunwind7-dev [i386 amd64]@" \
         -e "/libaudit-dev/d" -e "/libmir/d" -e "/XMir/d" \
         -e "/^Architecture/s/: amd64 armhf i386\$/: invalid/" \
+        -e "/libxfixes3/d" -e "/libxfixes-dev/s/1:5.0.1/1:5.0-4ubuntu4.2~/" \
+        -e '/unity/s@7\.0\.2@5.20.0-0ubuntu3~@' \
         -i debian/control.new
 
     # Special case, allow mesa-common-dev to satisfy depends for xserver-xorg-dev too..
