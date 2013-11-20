@@ -22,6 +22,8 @@ libxatracker-dev		libxatracker-dev-lts-saucy
 libgl1-mesa-dri			libgl1-mesa-dri-lts-saucy
 libgl1-mesa-glx			libgl1-mesa-glx-lts-saucy
 libgl1-mesa-dri-experimental	libgl1-mesa-dri-lts-saucy
+libgbm-dev			libgbm-dev-lts-saucy
+libegl1-mesa-dev		libegl1-mesa-dev-lts-saucy
 
 # xserver-xorg package, only necessary ones
 xserver-xorg-dev		xserver-xorg-dev-lts-saucy
@@ -38,6 +40,11 @@ xorg				xorg-lts-saucy
 #nvidia-173-dev				nvidia-173-dev-lts-saucy
 #nvidia-96-dev				nvidia-96-dev-lts-saucy
 #nvidia-current-updates-dev		nvidia-current-updates-dev-lts-saucy
+
+#glamor
+libglamor0				libglamor-ltss0
+libglamor-dev				libglamor-dev-lts-saucy
+xserver-xorg-glamor			xserver-xorg-glamor-lts-saucy
 
 # DDX and other drivers
 xf86-input-mtrack			xf86-input-mtrack-lts-saucy

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+ltsq=$(grep "^[#]*libdrm-intel1" "${rename_mapping_file}" | cut -d- -f3)
+if [ -z "${ltsq}" ]; then
+    echo "Could not get name for ltsq"
+    exit 1
+fi
+
+set -e
+
+# debian/control
+
+# Strictly speaking libglamor itself doesn't conflict, but libglamor
+# depends on the xorg abi too, so it sort of does.
+${basedir}/dpkg-control \
+    --source-suffix ${suffix} \
+    --binary-suffix ${suffix} \
+    --mapping-file "${rename_mapping_file}" \
+    --add-replaces --add-provides --add-conflicts \
+    --extra-conflicts "${extraconflicts}" \
+    > debian/control.new
+
+mv -v debian/control.new debian/control
+
+# debian/rules fixes
+
+cp debian/rules debian/rules.new
+
+# big mess, since we're special
+sed -e  "s/libglamor/&_${ltsq}/" -i debian/libglamor-dev.install
+mv debian/libglamor-dev.install debian/libglamor-dev-${suffix}.install
+mv debian/xserver-xorg-glamoregl.install debian/xserver-xorg-glamoregl-${suffix}.install
+
+for ipkg in 0; do
+    newpkg="libglamor-${ltsq}${ipkg}"
+    pkg="libglamor${ipkg}"
+
+    echo "- Renaming ${pkg}.* files to ${newpkg}.*"
+
+    set +e
+    files=$(ls debian/${pkg}.*)
+    err=$?
+    set -e
+    if [ $err -ne 0 ]; then
+        echo "Failed to list in ${old_package} for ${old_package} -> ${new_package}"
+        continue
+    fi
+    for old_file in $files; do
+        new_file=${old_file/${pkg}/${newpkg}}
+        mv -v ${old_file} ${new_file}
+    # TODO: Maybe using 'rename' would be better?
+    done
+
+    # and of course the install stuff
+    sed -e "s/libglamor/&_${ltsq}/" -i debian/${newpkg}.install
+done
+
+mv -v debian/rules.new debian/rules
+
+sed -e "s/-lglamor/&_${ltsq}/" -i *.pc.in
+sed -e "s/^libglamor_la/libglamor_${ltsq}_la/" -i */Makefile.am
+sed -e "s/libglamor\\.la/libglamor_${ltsq}.la/" -i */Makefile.am
+
+debuild --source-option=--auto-commit -S -sa
+
+cd ..

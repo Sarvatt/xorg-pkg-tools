@@ -39,13 +39,9 @@
 
 set -e
 
-extraversion="~~3ppa"
+extraversion="~~4ppa"
 lts_codename="precise"
-if [ -n "$3" ]; then
-    changelog_entry="$3"
-else
-    changelog_entry="Initial lts-saucy test upload, i386 and amd64 only."
-fi
+default_changelog_entry="Initial lts-saucy test upload, i386 and amd64 only."
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -185,6 +181,12 @@ if [ ! -d "${prev_renamed}" ]; then
 fi
 
 debuild_args=""
+
+if [ -n "$3" ]; then
+    changelog_entry="$3"
+else
+    changelog_entry="${default_changelog_entry}"
+fi
 
 if [ -f "${prev_orig}/debian/changelog" -a -f "${prev_renamed}/debian/changelog" ]; then
     prev_old_package_version=$(head -n 1 "${prev_orig}/debian/changelog" | cut -d' ' -f2)
