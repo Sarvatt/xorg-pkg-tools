@@ -44,7 +44,7 @@ xorg				xorg-lts-saucy
 #glamor
 libglamor0				libglamor-ltss0
 libglamor-dev				libglamor-dev-lts-saucy
-xserver-xorg-glamor			xserver-xorg-glamor-lts-saucy
+xserver-xorg-glamoregl			xserver-xorg-glamoregl-lts-saucy
 
 # DDX and other drivers
 xf86-input-mtrack			xf86-input-mtrack-lts-saucy

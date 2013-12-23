@@ -39,9 +39,9 @@
 
 set -e
 
-extraversion="~~4ppa"
-lts_codename="precise"
-default_changelog_entry="Initial lts-saucy test upload, i386 and amd64 only."
+extraversion="~precise"
+lts_codename="precise-proposed"
+default_changelog_entry="Initial lts-saucy upload, i386/amd64 only. (LP: #1253041)"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
