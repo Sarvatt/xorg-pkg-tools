@@ -4,20 +4,23 @@ getp() {
  CHANGES+=("hook: Refresh $1")
 }
 
-#mesa master (9.1)
-drop 15-fix-oot-build.diff upstream
-drop gbm-remember-to-init-format.patch upstream
-drop revert-a64c1eb9b110.diff fails
-drop 06_kfreebsd-ftbfs.diff unneeded
-drop 08-kfreebsd-gallium.diff unneeded
-drop 101_ubuntu_hidden_glname.patch unneeded
-
-patch -p1 < $HOOKS/mesa-9.2.patch
-CHANGES+=("hook: Don't build radeonsi, requires llvm-3.3.")
-CHANGES+=("hook: Don't build xvmc or vdpau.")
-CHANGES+=("hook: Refresh 118-dricore-gallium.patch to work with gallium osmesa")
+#mesa 10.1.0
+drop egl-platform-mir.patch fails
 
 ## Legacy unused hooks for reference
+
+#mesa master (9.1)
+#drop 15-fix-oot-build.diff upstream
+#drop gbm-remember-to-init-format.patch upstream
+#drop revert-a64c1eb9b110.diff fails
+#drop 06_kfreebsd-ftbfs.diff unneeded
+#drop 08-kfreebsd-gallium.diff unneeded
+#drop 101_ubuntu_hidden_glname.patch unneeded
+
+#patch -p1 < $HOOKS/mesa-9.2.patch
+#CHANGES+=("hook: Don't build radeonsi, requires llvm-3.3.")
+#CHANGES+=("hook: Don't build xvmc or vdpau.")
+#CHANGES+=("hook: Refresh 118-dricore-gallium.patch to work with gallium osmesa")
 
 #rm -rf debian
 #git clone git://sarvatt.com/mesa.git temp

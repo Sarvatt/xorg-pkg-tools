@@ -1,6 +1,10 @@
-patch -p1 < $HOOKS/mesa-gles-symbols.patch
-patch -p1 < $HOOKS/mesa-9.2-egl-symbols.patch
-CHANGES+=("hook: Refresh symbols.")
+patch -p1 < $HOOKS/mesa-debian.patch
+CHANGES+=("hook: Add build-dep on x11proto-dri3-dev, x11proto-present-dev, libxcb-dri3-dev, libxcb-present-dev, libxcb-randr0-dev, libxcb-sync-dev, libxshmfence-dev.")
+CHANGES+=("hook: Drop MIR support.")
+
+#patch -p1 < $HOOKS/mesa-gles-symbols.patch
+#patch -p1 < $HOOKS/mesa-9.2-egl-symbols.patch
+#CHANGES+=("hook: Refresh symbols.")
 
 ## Legacy unused hooks for reference
 
