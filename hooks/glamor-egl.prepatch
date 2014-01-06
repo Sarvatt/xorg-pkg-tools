@@ -1,0 +1,3 @@
+drop fix-fdo65964.diff upstream
+drop fix-setwindowpixmap.diff upstream
+

@@ -125,7 +125,8 @@ debpkg_to_fdopkg() {
         | sed -e "s/^libxprintutil$/libXprintUtil/" \
         | sed -e "s/^lib\([a-z]\)/lib\U\1/" \
         | sed -e "s/^lib\(.*\)wm$/lib\1WM/" \
-        | sed -e "s/^xtrans/libxtrans/"
+        | sed -e "s/^xtrans/libxtrans/" \
+        | sed -e "s/^glamor-egl$/glamor/"
 }
 
 # Return the debian form of a freedesktop.org Xorg package name
@@ -137,6 +138,7 @@ fdopkg_to_debpkg() {
         | sed -e "s/^x11proto$/x11proto-core/" \
         | sed -e "s/^\(.*\)proto$/x11proto-\1/" \
         | sed -e "s/^encodings$/xfonts-encodings/" \
+	| sed -e "s/^glamor/glamor-egl/" \
         | tr A-Z a-z
 }
 
@@ -159,7 +161,7 @@ fdogitdir_for_fdopkg() {
         echo "nouveau"
     elif [ ${fdopkg} = "xf86-video-avivo" ]; then
         echo "avivo"
-    elif [ ${fdopkg#xf86-} != ${fdopkg} ]; then
+    elif [ ${fdopkg#xf86-} != ${fdopkg} -o ${fdopkg} = "glamor" ]; then
         echo "xorg/driver"
     elif [ ${fdopkg#lib} != ${fdopkg} ]; then
         echo "xorg/lib"
@@ -186,7 +188,7 @@ debgitdir_for_debpkg() {
         echo "pkg-xorg/wayland"
     elif [ ${debpkg} = "xorg-server" ]; then
         echo "pkg-xorg/xserver"
-    elif [ ${debpkg#xserver-xorg-} != ${debpkg} ]; then
+    elif [ ${debpkg#xserver-xorg-} != ${debpkg} -o ${debpkg} = "glamor-egl" ]; then
         echo "pkg-xorg/driver"
     elif [ ${debpkg#lib} != ${debpkg} -o ${debpkg} = "mesa" -o \
         ${debpkg} = "pixman" -o ${debpkg} = "xft" -o \
