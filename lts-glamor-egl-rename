@@ -55,6 +55,13 @@ for ipkg in 0; do
     sed -e "s/libglamor/&_${ltsq}/" -i debian/${newpkg}.install
 done
 
+# add a override for debian/rules
+echo -e "\\noverride_dh_shlibdeps:
+	dh_shlibdeps -a -O--builddirectory=build/
+	sed -i 's/libgl1-mesa-glx /libgl1-mesa-glx-${suffix} /' debian/libglamor-${ltsq}0.substvars" \
+	>> debian/rules.new
+
+
 mv -v debian/rules.new debian/rules
 
 sed -e "s/-lglamor/&_${ltsq}/" -i *.pc.in
