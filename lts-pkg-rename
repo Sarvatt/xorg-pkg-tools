@@ -386,7 +386,7 @@ msg "Applying post-rename changes"
 # xorg-server and xserver-xorg-video-*
 if [ -f "debian/patches/xmir.patch" ]; then
     $dry sed -e /xmir/d -i debian/patches/series
-    if [ -s debian/patches/series ]; then
+    if [ ! -s debian/patches/series ]; then
         echo '# placeholder' > debian/patches/series
     fi
     $dry rm -f debian/patches/xmir.patch
@@ -506,7 +506,7 @@ elif [ "${old_package}" = "xorg-server" ]; then
     # add -nr back as alias to -background none
     $dry cp ${basedir}/lts-patches/xorg-server-legacy-bgnone.patch debian/patches
 
-    $dry echo xorg-server-legacy-bgnone.patch | $dry tee -a debian/patches/series
+    echo xorg-server-legacy-bgnone.patch | $dry tee -a debian/patches/series
 elif [ "${old_package}" = "xserver-xorg-video-intel" ]; then
 
     # Can no longer rely on real name, so fixup
