@@ -32,6 +32,17 @@ index 91e3def..dd2eeb7 100644
   ${misc:Depends},
  Description: free implementation of the EGL API -- development files
   This package contains the development environment required for compiling
+@@ -625,6 +625,10 @@
+  libxxf86vm-dev,
+  x11proto-dri2-dev (>= 2.6),
+  x11proto-gl-dev (>= 1.4.14),
++ libxcb-dri3-dev,
++ libxcb-present-dev,
++ libxcb-sync-dev,
++ libxshmfence-dev,
+  ${misc:Depends},
+ Conflicts: libgl-dev, libgl1-mesa-dri-dev
+ Replaces: libgl-dev, libgl1-mesa-dri-dev
 diff --git a/debian/rules b/debian/rules
 index 6b9bfc4..64eee0d 100755
 --- a/debian/rules
