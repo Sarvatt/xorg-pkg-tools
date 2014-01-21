@@ -6,7 +6,8 @@ getp() {
 
 #mesa 10.1.0
 drop egl-platform-mir.patch fails
-
+patch -p1 < $HOOKS/mesa-refresh-02.patch
+CHANGE+=("hooks: Refresh 02_gbm_no_undefined.diff")
 ## Legacy unused hooks for reference
 
 #mesa master (9.1)
