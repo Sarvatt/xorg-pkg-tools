@@ -1,5 +1,5 @@
 diff --git a/debian/control b/debian/control
-index 91e3def..dd2eeb7 100644
+index 91e3def..4347ed4 100644
 --- a/debian/control
 +++ b/debian/control
 @@ -22,6 +22,13 @@ Build-Depends:
@@ -16,7 +16,7 @@ index 91e3def..dd2eeb7 100644
   linux-libc-dev (>= 2.6.31) [linux-any],
   libx11-xcb-dev,
   libxcb-dri2-0-dev,
-@@ -34,7 +34,6 @@ Build-Depends:
+@@ -34,7 +41,6 @@ Build-Depends:
   llvm-3.4-dev (>= 1:3.3-4) [amd64 i386 kfreebsd-amd64 kfreebsd-i386 armhf],
   libelf-dev [amd64 i386 kfreebsd-amd64 kfreebsd-i386 armhf],
   libwayland-dev (>= 1.0.2) [linux-any],
@@ -24,7 +24,7 @@ index 91e3def..dd2eeb7 100644
  Vcs-Git: git://git.debian.org/git/pkg-xorg/lib/mesa
  Vcs-Browser: http://git.debian.org/?p=pkg-xorg/lib/mesa.git
  Homepage: http://mesa3d.sourceforge.net/
-@@ -185,7 +184,6 @@ Depends:
+@@ -185,7 +191,6 @@ Depends:
   libxcb-glx0-dev,
   libxcb-dri2-0-dev,
   libx11-xcb-dev,
@@ -32,7 +32,7 @@ index 91e3def..dd2eeb7 100644
   ${misc:Depends},
  Description: free implementation of the EGL API -- development files
   This package contains the development environment required for compiling
-@@ -625,6 +625,10 @@
+@@ -620,6 +625,10 @@ Depends:
   libxxf86vm-dev,
   x11proto-dri2-dev (>= 2.6),
   x11proto-gl-dev (>= 1.4.14),
@@ -43,11 +43,54 @@ index 91e3def..dd2eeb7 100644
   ${misc:Depends},
  Conflicts: libgl-dev, libgl1-mesa-dri-dev
  Replaces: libgl-dev, libgl1-mesa-dri-dev
+diff --git a/debian/libgbm1.symbols b/debian/libgbm1.symbols
+index 31ea9a4..46bc2e2 100644
+--- a/debian/libgbm1.symbols
++++ b/debian/libgbm1.symbols
+@@ -1,19 +1,13 @@
+ libgbm.so.1 libgbm1 #MINVER#
+  _gbm_create_device@Base 8.1~0
+- _gbm_fd_get_device_name@Base 7.11~1
+- _gbm_log@Base 7.11~1
+  _gbm_mesa_get_device@Base 7.11~1
+- _gbm_udev_device_new_from_fd@Base 7.11~1
+  devices@Base 8.1~0
+- dri_fd_get_driver_name@Base 8.1~0
+  gbm_bo_create@Base 7.11~1
+-#MISSING: 8.1~0 gbm_bo_create_from_egl_image@Base 7.11~1
+  gbm_bo_destroy@Base 7.11~1
+  gbm_bo_get_device@Base 8.1~0
+  gbm_bo_get_format@Base 8.1~0
+  gbm_bo_get_handle@Base 7.11~1
+  gbm_bo_get_height@Base 7.11~1
+-#MISSING: 8.1~0 gbm_bo_get_pitch@Base 7.11~1
+  gbm_bo_get_stride@Base 8.1~0
+  gbm_bo_get_user_data@Base 8.1~0
+  gbm_bo_get_width@Base 7.11~1
 diff --git a/debian/rules b/debian/rules
-index 6b9bfc4..64eee0d 100755
+index 6b9bfc4..9a7a0df 100755
 --- a/debian/rules
 +++ b/debian/rules
-@@ -72,9 +72,6 @@ else
+@@ -10,6 +10,7 @@ ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+ 	MAKEFLAGS += -j$(NUMJOBS)
+ endif
+ 
++DEB_DISTRIBUTION   ?= $(shell dpkg-parsechangelog | sed -n -e 's/^Distribution: //p')
+ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+ DEB_HOST_ARCH      ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+ DEB_HOST_ARCH_OS   ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+@@ -23,6 +24,10 @@ else
+ 	confflags += --build=$(DEB_BUILD_GNU_TYPE) --host=$(DEB_HOST_GNU_TYPE)
+ endif
+ 
++ifeq ($(DEB_DISTRIBUTION), saucy)
++	confflags += --disable-dri3
++endif
++
+ ifeq (,$(filter $(DEB_HOST_ARCH), armel armhf))
+ buildflags = \
+ 	$(shell DEB_CFLAGS_MAINT_APPEND=-Wall DEB_CXXFLAGS_MAINT_APPEND=-Wall dpkg-buildflags --export=configure)
+@@ -72,9 +77,6 @@ else
  	EGL_DISPLAYS += wayland
  
  # Mir isn't built on AArch64 and PPC
@@ -57,7 +100,7 @@ index 6b9bfc4..64eee0d 100755
      ifeq (,$(filter $(DEB_HOST_ARCH), s390 s390x))
  	DRI_DRIVERS += r200 radeon nouveau
      endif
-@@ -241,7 +241,7 @@ binary-arch: install
+@@ -241,7 +243,7 @@ binary-arch: install
  	install -m755 -d debian/libgl1-mesa-dri/usr/lib/${DEB_HOST_MULTIARCH}/dri/
  	mv debian/tmp/dri/usr/lib/${DEB_HOST_MULTIARCH}/dri/*_dri.so \
  	   debian/libgl1-mesa-dri/usr/lib/${DEB_HOST_MULTIARCH}/dri/
@@ -66,7 +109,7 @@ index 6b9bfc4..64eee0d 100755
  
  	# Create an ld.so.conf which says where to find libGL from Mesa
  	echo "/usr/lib/$(DEB_HOST_MULTIARCH)/mesa" \
-@@ -281,14 +281,14 @@ ifneq (,$(filter $(DEB_HOST_ARCH),arm64 ppc64 ppc64el))
+@@ -281,14 +283,14 @@ ifneq (,$(filter $(DEB_HOST_ARCH),arm64 ppc64 ppc64el))
  			dh_makeshlibs -p$$PACKAGE -- -c4 \
  			-edebian/$$PACKAGE/usr/lib/$(DEB_HOST_MULTIARCH)/mesa-egl/\* \
  		; done
