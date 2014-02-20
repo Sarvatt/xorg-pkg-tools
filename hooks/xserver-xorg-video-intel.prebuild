@@ -1,5 +1,8 @@
 # This will be sourced as a bash script
 
+patch -p1 < $HOOKS/xserver-xorg-video-intel-disable-backlight.patch
+CHANGES+=("hook: Disable backlight helper.")
+
 # Tormod Volden 2009-03-08
 # 
 

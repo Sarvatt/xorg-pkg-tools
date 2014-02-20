@@ -1,0 +1,12 @@
+diff --git a/debian/rules b/debian/rules
+index 037f617..4f64e37 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -24,6 +24,7 @@ override_dh_auto_configure:
+ 	    --with-default-accel=sna \
+ 	    --with-builderstring="$(SOURCE_NAME) $(SOURCE_VERSION) ($(BUILDER))" \
+ 	    --disable-silent-rules \
++	    --disable-backlight-helper \
+ 	    $(valgrind)
+ 
+ # Install in debian/tmp to retain control through dh_install:
