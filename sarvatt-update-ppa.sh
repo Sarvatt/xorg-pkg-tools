@@ -50,19 +50,19 @@
 # Location to upload to, as defined in ~/.dput.cf
 PPA=xorg
 # Primary distribution to create packages for. Will not have the dist in the version.
-DIST=quantal
+DIST=trusty
 # Secondary distribution to create packages for, will add ~lucid to the version for the default.
-DIST2=precise
+DIST2=saucy
 # Extra version tag to add. example: libdrm 2.4.20+git20100604.ffffffff-0ubuntu0sarvatt
 NAMETAG=0ubuntu0sarvatt
 
 # Set to 1 enable building of package sets. Descriptions of each are below.
-CUSTOM_ONE=0
+CUSTOM_ONE=1
 CUSTOM_TWO=0
 PROTOS=0
 LIBS=0
 VIDEO_DEBIAN=0
-VIDEO_UBUNTU=0
+VIDEO_UBUNTU=1
 INPUT_DEBIAN=0
 INPUT_UBUNTU=0
 
@@ -73,9 +73,9 @@ DEFAULT_DEBIAN_BRANCH=unstable
 XORGPKGTOOLS="$PWD"
 
 # Path to hooks directory, adjustable because different packagers use different hooks.
-HOOKDIR=hooks-sarvatt
+HOOKDIR=hooks
 
-DEFAULT_OPTS="-r $DIST -H $XORGPKGTOOLS/$HOOKDIR -g -a $NAMETAG"
+DEFAULT_OPTS="-r $DIST -H $XORGPKGTOOLS/$HOOKDIR -U high -g -a $NAMETAG"
 
 SEND=
 ############################################################################################################
@@ -83,7 +83,7 @@ SEND=
 ############################################################################################################
 # CUSTOM_ONE: Custom target, usually for things you want to do seperately. Only supports one package.
 CUSTOM_ONE_LIST="mesa"
-CUSTOM_ONE_OPTS="$DEFAULT_OPTS -d origin/ubuntu -v 8.1 -t ~"
+CUSTOM_ONE_OPTS="$DEFAULT_OPTS -d origin/ubuntu -v 10.2.0 -t ~"
 
 # CUSTOM_TWO: Another custom target, default is set up for building xserver with custom branch options.
 CUSTOM_TWO_LIST="xorg-server"
