@@ -29,7 +29,11 @@ cp debian/rules debian/rules.new
 # big mess, since we're special
 sed -e  "s/libglamor/&_${ltsq}/" -i debian/libglamor-dev.install
 mv debian/libglamor-dev.install debian/libglamor-dev-${suffix}.install
-mv debian/xserver-xorg-glamoregl.install debian/xserver-xorg-glamoregl-${suffix}.install
+if [ -f debian/xserver-xorg-glamoregl.install ]; then
+	mv debian/xserver-xorg-glamoregl.install debian/xserver-xorg-glamoregl-${suffix}.install
+else
+	mv debian/xserver-xorg-video-glamoregl.install debian/xserver-xorg-video-glamoregl-${suffix}.install
+fi
 
 for ipkg in 0; do
     newpkg="libglamor-${ltsq}${ipkg}"

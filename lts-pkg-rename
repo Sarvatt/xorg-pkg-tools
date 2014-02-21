@@ -39,9 +39,9 @@
 
 set -e
 
-extraversion="~precise"
-lts_codename="precise-proposed"
-default_changelog_entry="Initial lts-saucy upload, i386/amd64 only. (LP: #1253041)"
+extraversion="~~ppa"
+lts_codename="precise"
+default_changelog_entry="Initial lts-trusty upload, i386/amd64 only."
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -259,6 +259,15 @@ case "${suffix}" in
                  -e "/^Architecture: /s/armel armhf i386 powerpc/i386/" \
                  -i ${control}
     ;;
+    lts-trusty)
+        extraconflicts="xorg-renamed-package-lts-quantal, xorg-renamed-package-lts-raring, xorg-renamed-package-lts-saucy,"
+
+        # Suppress building arm packages, only i386 and amd64 are supported
+        $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
+                 -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
+                 -e "/^Architecture: /s/armel armhf i386 powerpc/i386/" \
+                 -i ${control}
+    ;;
     omap-revert)
         $dry sed -e "/^Architecture: any\$/s/:.*/: armhf/" \
                  -e "/^Architecture: linux-any/s/:.*/: armhf/" \
@@ -397,6 +406,19 @@ fi
 
 # Mesa is fun! :D
 if [ "${old_package}" = "mesa" ]; then
+    if [ "${new_package}" = "mesa-lts-trusty" ]; then
+        # Disable dri3 support, too much crap to backport.
+        sed -e "/present/d" \
+            -e "/dri3/d" \
+            -e "/libxcb-sync-dev/d" \
+            -e "/libxshmfence/d" \
+            -e "/libxcb-randr0-dev/d" \
+            -i debian/control.new
+
+        sed -e '/--enable-dri /s/ / --disable-dri3/' \
+            -i debian/rules.new
+    fi
+
     files="$(ls debian/*-i686.*)"
     for x in $files; do
         $dry mv -v "$x" "${x/i686/${suffix}-i686}"
@@ -445,6 +467,22 @@ elif [ "${old_package}" = "xorg-server" ]; then
         -e "s/--enable-xselinux/--disable-xselinux/" \
         -e "s/--enable-xmir/--disable-xmir/" \
         -i debian/rules.new
+
+    if [ "${new_package}" = "xorg-server-lts-trusty" ]; then
+        sed -e "/libxshmfence/d" \
+            -e "/x11proto-present/d" \
+            -e "/x11proto-dri3/d" \
+            -e "/libx11-dev/s/.*/ libx11-dev,/" \
+            -e "/xtrans-dev/s/.*/ xtrans-dev,/" \
+            -i debian/control.new
+
+        sed -e "s/--enable-dri3/--disable-dri3/" \
+            -e "s/--enable-present/--disable-present/" \
+            -e "s/--enable-mitshm/& --disable-xtrans-send-fds/" \
+            -i debian/rules.new
+
+        sed -e '/XTRANS=/s/=.*/="xtrans >= 1.2.6"/' -i configure.ac
+    fi
 
     sed -e '/ubuntu/s/$/~/' -i debian/serverminver
 
