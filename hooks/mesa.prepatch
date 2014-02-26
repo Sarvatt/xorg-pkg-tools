@@ -6,6 +6,9 @@ getp() {
 
 #mesa 10.1.0
 drop egl-platform-mir.patch fails
+drop fix-defaults-glxfbconfig.patch upstream
+drop fix-sort-glxfbconfig.patch upstream
+
 ## Legacy unused hooks for reference
 
 #mesa master (9.1)
