@@ -4,7 +4,8 @@ getp() {
  CHANGES+=("hook: Refresh $1")
 }
 
-#mesa 10.1.0
+#mesa 10.2.0
+drop 01_hurd.diff fails
 drop egl-platform-mir.patch fails
 drop fix-defaults-glxfbconfig.patch upstream
 drop fix-sort-glxfbconfig.patch upstream
