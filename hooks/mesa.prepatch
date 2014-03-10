@@ -6,6 +6,7 @@ getp() {
 
 #mesa 10.2.0
 drop 01_hurd.diff fails
+drop 03_gbm_make_devices_static.diff upstream
 drop egl-platform-mir.patch fails
 drop fix-defaults-glxfbconfig.patch upstream
 drop fix-sort-glxfbconfig.patch upstream
