@@ -1,5 +1,3 @@
-patch -p1 < $HOOKS/mesa-debian.patch
-CHANGES+=("hook: Drop MIR support.")
 patch -p1 < $HOOKS/mesa-symbols.patch
 CHANGES+=("hook: update symbols.")
 
