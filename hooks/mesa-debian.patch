@@ -1,5 +1,5 @@
 diff --git a/debian/control b/debian/control
-index 50d88f5..57d0e25 100644
+index a1f52c4..0f6c554 100644
 --- a/debian/control
 +++ b/debian/control
 @@ -42,7 +42,6 @@ Build-Depends:
@@ -10,16 +10,66 @@ index 50d88f5..57d0e25 100644
  Vcs-Git: git://git.debian.org/git/pkg-xorg/lib/mesa
  Vcs-Browser: http://git.debian.org/?p=pkg-xorg/lib/mesa.git
  Homepage: http://mesa3d.sourceforge.net/
-@@ -197,7 +196,6 @@ Depends:
+@@ -199,7 +198,6 @@ Depends:
   libxcb-sync-dev,
   libxshmfence-dev,
   libx11-xcb-dev,
 - libmirclient-dev [!arm64 !powerpc !ppc64 !ppc64el],
-  libwayland-dev (>= 1.2.0),
+  libwayland-dev (>= 1.2.0) [linux-any],
   ${misc:Depends},
  Description: free implementation of the EGL API -- development files
+@@ -474,7 +474,7 @@ Section: libs
+ Architecture: any
+ Depends:
+  ${shlibs:Depends},
+- ${misc:Depends}
++ ${misc:Depends},
+  libglapi-mesa (= ${binary:Version}),
+  libudev1 | libudev0,
+ Recommends: libgl1-mesa-dri (>= 7.2)
+diff --git a/debian/patches/04_osmesa_version.diff b/debian/patches/04_osmesa_version.diff
+index 4141672..8b1305b 100644
+--- a/debian/patches/04_osmesa_version.diff
++++ b/debian/patches/04_osmesa_version.diff
+@@ -1,22 +1,22 @@
+ --- a/src/gallium/targets/osmesa/Makefile.am
+ +++ b/src/gallium/targets/osmesa/Makefile.am
+ @@ -38,7 +38,7 @@
++ lib@OSMESA_LIB@_la_LDFLAGS = \
++ 	-module \
++ 	-no-undefined \
++-	-version-number @OSMESA_VERSION@ \
+++	-version-number 6:5:3 \
++ 	$(GC_SECTIONS) \
++ 	$(LD_NO_UNDEFINED)
+  
+- lib@OSMESA_LIB@_la_SOURCES = target.c
+- 
+--lib@OSMESA_LIB@_la_LDFLAGS = -module -version-number @OSMESA_VERSION@ -no-undefined
+-+lib@OSMESA_LIB@_la_LDFLAGS = -module -version-number 6:5:3 -no-undefined
+- 
+- if HAVE_SHARED_GLAPI
+- SHARED_GLAPI_LIB = $(top_builddir)/src/mapi/shared-glapi/libglapi.la
+ --- a/src/mesa/drivers/osmesa/Makefile.am
+ +++ b/src/mesa/drivers/osmesa/Makefile.am
+ @@ -35,7 +35,7 @@
+- nodist_EXTRA_lib@OSMESA_LIB@_la_SOURCES = dummy.cpp
+- lib@OSMESA_LIB@_la_SOURCES = osmesa.c
+- 
+--lib@OSMESA_LIB@_la_LDFLAGS = -module -version-number @OSMESA_VERSION@ -no-undefined
+-+lib@OSMESA_LIB@_la_LDFLAGS = -module -version-number 6:5:3 -no-undefined
++ lib@OSMESA_LIB@_la_LDFLAGS = \
++ 	-module \
++ 	-no-undefined \
++-	-version-number @OSMESA_VERSION@ \
+++	-version-number 6:5:3 \
++ 	$(GC_SECTIONS) \
++ 	$(LD_NO_UNDEFINED)
+  
+- if HAVE_SHARED_GLAPI
+- SHARED_GLAPI_LIB = $(top_builddir)/src/mapi/shared-glapi/libglapi.la
 diff --git a/debian/rules b/debian/rules
-index e668222..25cc06d 100755
+index 43329b0..931fa44 100755
 --- a/debian/rules
 +++ b/debian/rules
 @@ -61,7 +61,7 @@ ifeq ($(DEB_HOST_ARCH_OS), hurd)
@@ -31,17 +81,19 @@ index e668222..25cc06d 100755
  # Gallium drivers require libdrm-{nouveau,radeon}, only available on Linux
  	GALLIUM_DRIVERS += nouveau svga
  #
-@@ -72,9 +72,6 @@ else
+@@ -71,11 +71,6 @@ else
+ # Non-Linux ports also lack *_CLOEXEC and epoll, so wayland isn't ready yet:
  	EGL_DISPLAYS += wayland
  
- # Mir isn't built on AArch64 and PPC
+-# Mir isn't built on AArch64 and PPC
 -    ifeq (,$(filter $(DEB_HOST_ARCH),arm64 powerpc ppc64 ppc64el))
 -	EGL_DISPLAYS += mir
 -    endif
+-
      ifeq (,$(filter $(DEB_HOST_ARCH), s390 s390x))
  	DRI_DRIVERS += nouveau
      endif
-@@ -239,7 +236,7 @@ binary-arch: install
+@@ -237,7 +232,7 @@ binary-arch: install
  	install -m755 -d debian/libgl1-mesa-dri/usr/lib/${DEB_HOST_MULTIARCH}/dri/
  	mv debian/tmp/dri/usr/lib/${DEB_HOST_MULTIARCH}/dri/*_dri.so \
  	   debian/libgl1-mesa-dri/usr/lib/${DEB_HOST_MULTIARCH}/dri/
@@ -50,10 +102,10 @@ index e668222..25cc06d 100755
  
  	# Create an ld.so.conf which says where to find libGL from Mesa
  	echo "/usr/lib/$(DEB_HOST_MULTIARCH)/mesa" \
-@@ -275,10 +272,10 @@ binary-arch: install
+@@ -273,10 +268,10 @@ binary-arch: install
  	# proprietary alternatives can't make more difficult…
  	set -e ; for PACKAGE in \
- 		libegl1-mesa libgles1-mesa libgles2-mesa libopenvg1-mesa ; do \
+ 		libegl1-mesa libgles1-mesa libgles2-mesa libopenvg1-mesa; do \
 -			dh_makeshlibs -p$$PACKAGE -- -c4 \
 +			dh_makeshlibs -p$$PACKAGE -- -c1 \
  			-edebian/$$PACKAGE/usr/lib/$(DEB_HOST_MULTIARCH)/mesa-egl/\* \
@@ -63,44 +115,3 @@ index e668222..25cc06d 100755
  
  	dh_installdeb -s
  	dh_shlibdeps -s -l/usr/lib/$(DEB_HOST_MULTIARCH)/mesa:\
-diff --git a/debian/patches/04_osmesa_version.diff b/debian/patches/04_osmesa_version.diff
-index 45df2cc..0755082 100644
---- a/debian/patches/04_osmesa_version.diff
-+++ b/debian/patches/04_osmesa_version.diff
-@@ -9,19 +9,6 @@
-  
-  GLAPI_LIB = $(top_builddir)/src/mapi/glapi/libglapi.la
-  if HAVE_SHARED_GLAPI
--@@ -73,9 +73,9 @@
-- all-local: lib@OSMESA_LIB@.la
-- 	$(MKDIR_P) $(top_builddir)/$(LIB_DIR);
-- 	$(MKDIR_P) $(top_builddir)/$(LIB_DIR)/gallium;
---	ln -f .libs/lib@OSMESA_LIB@.so $(top_builddir)/$(LIB_DIR)/gallium/lib@OSMESA_LIB@.so;
---	ln -f .libs/lib@OSMESA_LIB@.so.@OSMESA_VERSION@ $(top_builddir)/$(LIB_DIR)/gallium/lib@OSMESA_LIB@.so.@OSMESA_VERSION@;
---	ln -f .libs/lib@OSMESA_LIB@.so.@OSMESA_VERSION@.0.0 $(top_builddir)/$(LIB_DIR)/gallium/
--+	ln -f .libs/lib@OSMESA_LIB@.so $(top_builddir)/$(LIB_DIR)/gallium/
--+	ln -f .libs/lib@OSMESA_LIB@.so.6 $(top_builddir)/$(LIB_DIR)/gallium/
--+	ln -f .libs/lib@OSMESA_LIB@.so.6.5.3 $(top_builddir)/$(LIB_DIR)/gallium/
-- endif
-- 
-- pkgconfigdir = $(libdir)/pkgconfig
- --- a/src/mesa/drivers/osmesa/Makefile.am
- +++ b/src/mesa/drivers/osmesa/Makefile.am
- @@ -37,7 +37,7 @@
-@@ -33,16 +20,3 @@
-  
-  GLAPI_LIB = $(top_builddir)/src/mapi/glapi/libglapi.la
-  if HAVE_SHARED_GLAPI
--@@ -54,9 +54,9 @@
-- # a while by putting a link to the driver into /lib of the build tree.
-- all-local: lib@OSMESA_LIB@.la
-- 	$(MKDIR_P) $(top_builddir)/$(LIB_DIR);
---	ln -f .libs/lib@OSMESA_LIB@.so $(top_builddir)/$(LIB_DIR)/lib@OSMESA_LIB@.so;
---	ln -f .libs/lib@OSMESA_LIB@.so.@OSMESA_VERSION@ $(top_builddir)/$(LIB_DIR)/lib@OSMESA_LIB@.so.@OSMESA_VERSION@;
---	ln -f .libs/lib@OSMESA_LIB@.so.@OSMESA_VERSION@.0.0 $(top_builddir)/$(LIB_DIR)/
--+	ln -f .libs/lib@OSMESA_LIB@.so $(top_builddir)/$(LIB_DIR)/
--+	ln -f .libs/lib@OSMESA_LIB@.so.6 $(top_builddir)/$(LIB_DIR)/
--+	ln -f .libs/lib@OSMESA_LIB@.so.6.5.3 $(top_builddir)/$(LIB_DIR)/
-- endif
-- 
-- pkgconfigdir = $(libdir)/pkgconfig

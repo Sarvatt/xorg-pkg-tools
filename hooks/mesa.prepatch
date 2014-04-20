@@ -8,14 +8,8 @@ patch -p1 < $HOOKS/mesa-debian.patch
 CHANGES+=("hook: Drop MIR support.")
 
 #mesa 10.2.0
-drop 01_hurd.diff fails
-drop 03_gbm_make_devices_static.diff upstream
+drop 02_gbm_no_undefined.diff upstream
 drop egl-platform-mir.patch fails
-drop fix-defaults-glxfbconfig.patch upstream
-drop fix-sort-glxfbconfig.patch upstream
-drop 05_fix-defaults-glxfbconfig.patch upstream
-drop 06_fix-sort-glxfbconfig.patch upstream
-drop fix-bsymbolic-madness.patch upstream
 
 
 ## Legacy unused hooks for reference
