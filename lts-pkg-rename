@@ -415,7 +415,7 @@ if [ "${old_package}" = "mesa" ]; then
             -e "/libxcb-randr0-dev/d" \
             -i debian/control.new
 
-        sed -e '/--enable-dri /s/ / --disable-dri3/' \
+        sed -e 's/--enable-dri3/--disable-dri3/' \
             -i debian/rules.new
     fi
 
