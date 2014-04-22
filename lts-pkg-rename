@@ -39,7 +39,7 @@
 
 set -e
 
-extraversion="~~ppa"
+extraversion="~~ppa2."
 lts_codename="precise"
 default_changelog_entry="Initial lts-trusty upload, i386/amd64 only."
 

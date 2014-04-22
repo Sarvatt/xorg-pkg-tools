@@ -1,0 +1,18 @@
+#!/bin/sh -e
+set -e
+
+pkg=$(dpkg-divert --listpackage /usr/bin/xrandr)
+if [ -n "${pkg}" -a "${pkg}" != "x11-xserver-utils-@SUFFIX@" ]; then
+    dpkg-divert --remove --package ${pkg} --rename \
+        --divert /usr/bin/xrandr.orig /usr/bin/xrandr
+    pkg=""
+fi
+
+if [ -z "${pkg}" ]; then
+    dpkg-divert --add --package "x11-xserver-utils-@SUFFIX@" --rename \
+        --divert /usr/bin/xrandr.orig /usr/bin/xrandr
+fi
+
+#DEBHELPER#
+
+exit 0
