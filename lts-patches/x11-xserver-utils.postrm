@@ -3,7 +3,7 @@ set -e
 
 pkg=$(dpkg-divert --listpackage /usr/bin/xrandr)
 
-if [ "${pkg}" = "x11-xserver-utils-@SUFFIX@" ]; then
+if [ remove = "$1" -o abort-install = "$1" -o disappear = "$1" ]; then
     dpkg-divert --remove --package "${pkg}" --rename \
         --divert /usr/bin/xrandr.orig /usr/bin/xrandr
 fi
