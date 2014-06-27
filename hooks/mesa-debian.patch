@@ -18,69 +18,10 @@ index a1f52c4..0f6c554 100644
   libwayland-dev (>= 1.2.0) [linux-any],
   ${misc:Depends},
  Description: free implementation of the EGL API -- development files
-@@ -474,7 +474,7 @@ Section: libs
- Architecture: any
- Depends:
-  ${shlibs:Depends},
-- ${misc:Depends}
-+ ${misc:Depends},
-  libglapi-mesa (= ${binary:Version}),
-  libudev1 | libudev0,
- Recommends: libgl1-mesa-dri (>= 7.2)
-diff --git a/debian/patches/04_osmesa_version.diff b/debian/patches/04_osmesa_version.diff
-index 4141672..8b1305b 100644
---- a/debian/patches/04_osmesa_version.diff
-+++ b/debian/patches/04_osmesa_version.diff
-@@ -1,22 +1,22 @@
- --- a/src/gallium/targets/osmesa/Makefile.am
- +++ b/src/gallium/targets/osmesa/Makefile.am
- @@ -38,7 +38,7 @@
-+ lib@OSMESA_LIB@_la_LDFLAGS = \
-+ 	-module \
-+ 	-no-undefined \
-+-	-version-number @OSMESA_VERSION@ \
-++	-version-number 6:5:3 \
-+ 	$(GC_SECTIONS) \
-+ 	$(LD_NO_UNDEFINED)
-  
-- lib@OSMESA_LIB@_la_SOURCES = target.c
-- 
---lib@OSMESA_LIB@_la_LDFLAGS = -module -version-number @OSMESA_VERSION@ -no-undefined
--+lib@OSMESA_LIB@_la_LDFLAGS = -module -version-number 6:5:3 -no-undefined
-- 
-- if HAVE_SHARED_GLAPI
-- SHARED_GLAPI_LIB = $(top_builddir)/src/mapi/shared-glapi/libglapi.la
- --- a/src/mesa/drivers/osmesa/Makefile.am
- +++ b/src/mesa/drivers/osmesa/Makefile.am
- @@ -35,7 +35,7 @@
-- nodist_EXTRA_lib@OSMESA_LIB@_la_SOURCES = dummy.cpp
-- lib@OSMESA_LIB@_la_SOURCES = osmesa.c
-- 
---lib@OSMESA_LIB@_la_LDFLAGS = -module -version-number @OSMESA_VERSION@ -no-undefined
--+lib@OSMESA_LIB@_la_LDFLAGS = -module -version-number 6:5:3 -no-undefined
-+ lib@OSMESA_LIB@_la_LDFLAGS = \
-+ 	-module \
-+ 	-no-undefined \
-+-	-version-number @OSMESA_VERSION@ \
-++	-version-number 6:5:3 \
-+ 	$(GC_SECTIONS) \
-+ 	$(LD_NO_UNDEFINED)
-  
-- if HAVE_SHARED_GLAPI
-- SHARED_GLAPI_LIB = $(top_builddir)/src/mapi/shared-glapi/libglapi.la
 diff --git a/debian/rules b/debian/rules
 index 43329b0..931fa44 100755
 --- a/debian/rules
 +++ b/debian/rules
-@@ -61,7 +61,7 @@ ifeq ($(DEB_HOST_ARCH_OS), hurd)
- 	DRI_DRIVERS += swrast
- else
-   ifeq ($(DEB_HOST_ARCH_OS), linux)
--	confflags_DRI3 = --enable-dri3
-+	confflags_DRI3 = --disable-dri3
- # Gallium drivers require libdrm-{nouveau,radeon}, only available on Linux
- 	GALLIUM_DRIVERS += nouveau svga
- #
 @@ -71,11 +71,6 @@ else
  # Non-Linux ports also lack *_CLOEXEC and epoll, so wayland isn't ready yet:
  	EGL_DISPLAYS += wayland
