@@ -10,7 +10,7 @@ CHANGES+=("hook: Drop MIR support.")
 #mesa 10.2.0
 drop 02_gbm_no_undefined.diff upstream
 drop egl-platform-mir.patch fails
-
+drop 01_targets-xa-limit-the-amount-of-exported-symbols.diff upstream
 
 ## Legacy unused hooks for reference
 

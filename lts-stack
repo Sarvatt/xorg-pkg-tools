@@ -13,7 +13,7 @@
 if [ -n "$1" ]; then
     release="$1"
 else
-    release="quantal"
+    release="trusty"
 fi
 
 if [ "$0" = "$(basename "$0")" ]; then

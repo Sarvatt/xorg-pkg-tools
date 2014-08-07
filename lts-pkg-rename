@@ -39,9 +39,9 @@
 
 set -e
 
-extraversion="~~ppa2."
-lts_codename="precise"
-default_changelog_entry="Initial lts-trusty upload, i386/amd64 only."
+extraversion="~precise"
+lts_codename="precise-proposed"
+default_changelog_entry="Initial lts-trusty upload, i386/amd64 only. (LP: #1318616)"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -481,6 +481,10 @@ elif [ "${old_package}" = "xorg-server" ]; then
             -e "s/--enable-mitshm/& --disable-xtrans-send-fds/" \
             -i debian/rules.new
 
+        # add a override for debian/rules
+        sed -e "/dh_shlibdeps/a\\\\tsed -i \'s/libgl1-mesa-glx /libgl1-mesa-glx-${suffix} /\' -i debian/xserver-xorg-core-${suffix}.substvars"
+            -i debian/rules.new
+
         sed -e '/XTRANS=/s/=.*/="xtrans >= 1.2.6"/' -i configure.ac
     fi
 
@@ -580,6 +584,9 @@ elif [ "${old_package}" = "x11-xserver-utils" ]; then
         sed -e "s/@SUFFIX@/${suffix}/g" < $n > debian/$(basename $n)
     done
     for n in debian/x11-xserver-utils.*; do mv $n ${n/x11-xserver-utils/x11-xserver-utils-${suffix}}; done
+elif [ "${new_package}" = "xserver-xorg-input-synaptics-lts-trusty" ]; then
+    # bugfixed kde-config-touchpad
+    sed -e '/kde-config-touchpad/s/-2/-1ubuntu1.3/' -i debian/control.new
 fi
 
 $dry mv debian/rules.new debian/rules
