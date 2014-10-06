@@ -39,9 +39,9 @@
 
 set -e
 
-extraversion="~precise"
-lts_codename="precise-proposed"
-default_changelog_entry="Initial lts-trusty upload, i386/amd64 only. (LP: #1318616)"
+extraversion="~~14.04~ppa"
+lts_codename="trusty"
+default_changelog_entry="Rebuild utopic packages in a ppa."
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -83,6 +83,9 @@ base_version() {
     echo ${buf%-*}       # Strip debian version
 }
 
+verbose=1
+dry=""
+
 while getopts "h\?qvn" opt $*; do
     case "$opt" in
 	h ) usage 0                                ;;
@@ -108,8 +111,6 @@ elif [ ! -e "${rename_mapping_file}" ]; then
 fi
 
 suffix=$(grep "^xorg" "${rename_mapping_file}" | cut -d- -f2-)
-verbose=1
-dry=""
 
 # Determine package name from the changelog
 changelog=debian/changelog
@@ -240,9 +241,11 @@ fi
 
 case "${suffix}" in
     lts-quantal)
+        backport_arch="precise"
         extraconflicts=""
     ;;
     lts-raring)
+        backport_arch="precise"
         extraconflicts="xorg-renamed-package-lts-quantal,"
 
         # Suppress building arm packages, only i386 and amd64 are supported
@@ -251,6 +254,7 @@ case "${suffix}" in
                  -i ${control}
     ;;
     lts-saucy)
+        backport_arch="precise"
         extraconflicts="xorg-renamed-package-lts-quantal, xorg-renamed-package-lts-raring,"
 
         # Suppress building arm packages, only i386 and amd64 are supported
@@ -260,6 +264,7 @@ case "${suffix}" in
                  -i ${control}
     ;;
     lts-trusty)
+        backport_arch="precise"
         extraconflicts="xorg-renamed-package-lts-quantal, xorg-renamed-package-lts-raring, xorg-renamed-package-lts-saucy,"
 
         # Suppress building arm packages, only i386 and amd64 are supported
@@ -269,9 +274,14 @@ case "${suffix}" in
                  -i ${control}
     ;;
     omap-revert)
+        backport_arch="precise"
         $dry sed -e "/^Architecture: any\$/s/:.*/: armhf/" \
                  -e "/^Architecture: linux-any/s/:.*/: armhf/" \
                  -i ${control}
+    ;;
+    lts-utopic)
+        backport_arch="trusty"
+        extraconflicts=""
     ;;
     *)
         ERR "unknown release ${suffix}"
@@ -300,13 +310,20 @@ if [ "${old_package}" = "mesa" ]; then
         --kill-binaries "libosmesa6,libosmesa6-dev,libgl1-mesa-dri-experimental,libgl1-mesa-dri-experimental-dbg" \
         > ${control}.new
 elif [ "${old_package}" = "xorg-server" ]; then
+    if [ "${backport_arch}" = "precise" ]; then
+        extrakill=",xserver-xephyr"
+    else
+        # Build xephyr, it has dri3 support which is useful on trusty. :D
+        extrakill=""
+    fi
+
     ${basedir}/dpkg-control \
         --source-suffix ${suffix} \
         --binary-suffix ${suffix} \
         --mapping-file ${rename_mapping_file} \
         --add-replaces --add-provides --add-conflicts \
         --extra-conflicts "${extraconflicts}" \
-        --kill-binaries "xdmx,xdmx-tools,xnest,xvfb,xserver-xephyr,xserver-xfbdev,xserver-xorg-core-udeb" \
+        --kill-binaries "xdmx,xdmx-tools,xnest,xvfb,xserver-xfbdev,xserver-xorg-core-udeb${extrakill}" \
         > ${control}.new
 elif [ "${old_package}" = "x11-xserver-utils" ]; then
     ${basedir}/dpkg-control \
@@ -395,9 +412,11 @@ msg "Applying post-rename changes"
 # xorg-server and xserver-xorg-video-*
 if [ -f "debian/patches/xmir.patch" ]; then
     $dry sed -e /xmir/d -i debian/patches/series
+
     if [ ! -s debian/patches/series ]; then
         echo '# placeholder' > debian/patches/series
     fi
+
     $dry rm -f debian/patches/xmir.patch
 
    # Append a ~, to allow ppa ~~ versions
@@ -462,11 +481,14 @@ elif [ "${old_package}" = "xorg-server" ]; then
         -e "s/--enable-kdrive/--disable-kdrive/" \
         -e "s/--enable-xnest/--disable-xnest/" \
         -e "s/--enable-xvfb/--disable-xvfb/" \
-        -e "s/--enable-xephyr/--disable-xephyr/" \
         -e "s/--enable-xfbdev/--disable-xfbdev/" \
         -e "s/--enable-xselinux/--disable-xselinux/" \
         -e "s/--enable-xmir/--disable-xmir/" \
         -i debian/rules.new
+
+    if [ "${backport_arch}" = "precise" ]; then
+        sed -e "s/--enable-xephyr/--disable-xephyr/" -i debian/rules.new
+    fi
 
     if [ "${new_package}" = "xorg-server-lts-trusty" ]; then
         sed -e "/libxshmfence/d" \
