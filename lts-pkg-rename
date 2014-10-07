@@ -247,37 +247,14 @@ case "${suffix}" in
     lts-raring)
         backport_arch="precise"
         extraconflicts="xorg-renamed-package-lts-quantal,"
-
-        # Suppress building arm packages, only i386 and amd64 are supported
-        $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
-                 -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
-                 -i ${control}
     ;;
     lts-saucy)
         backport_arch="precise"
         extraconflicts="xorg-renamed-package-lts-quantal, xorg-renamed-package-lts-raring,"
-
-        # Suppress building arm packages, only i386 and amd64 are supported
-        $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
-                 -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
-                 -e "/^Architecture: /s/armel armhf i386 powerpc/i386/" \
-                 -i ${control}
     ;;
     lts-trusty)
         backport_arch="precise"
         extraconflicts="xorg-renamed-package-lts-quantal, xorg-renamed-package-lts-raring, xorg-renamed-package-lts-saucy,"
-
-        # Suppress building arm packages, only i386 and amd64 are supported
-        $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
-                 -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
-                 -e "/^Architecture: /s/armel armhf i386 powerpc/i386/" \
-                 -i ${control}
-    ;;
-    omap-revert)
-        backport_arch="precise"
-        $dry sed -e "/^Architecture: any\$/s/:.*/: armhf/" \
-                 -e "/^Architecture: linux-any/s/:.*/: armhf/" \
-                 -i ${control}
     ;;
     lts-utopic)
         backport_arch="trusty"
@@ -287,6 +264,14 @@ case "${suffix}" in
         ERR "unknown release ${suffix}"
     ;;
 esac
+
+if [ "${suffix}" != "lts-quantal" ]; then
+        # Suppress building arm packages, only i386 and amd64 are supported
+        $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
+                 -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
+                 -e "/^Architecture: /s/armel armhf i386 powerpc/i386/" \
+                 -i ${control}
+fi
 
 extraprovides="xorg-renamed-package, xorg-renamed-package-${suffix},"
 
