@@ -293,7 +293,7 @@ extraprovides="xorg-renamed-package, xorg-renamed-package-${suffix},"
 # some packages have their own mess to clean up, do so here..
 if [ -f "${basedir}/lts-${old_package}-rename" ]; then
     export old_package new_package rename_mapping_file basedir debuild_args
-    export codename lts_codename suffix extraversion extraconflicts extraprovides
+    export codename lts_codename suffix extraversion extraconflicts extraprovides backport_arch
 
     exec "${basedir}/lts-${old_package}-rename"
 fi
@@ -478,7 +478,6 @@ elif [ "${old_package}" = "xorg-server" ]; then
         -e "/DH_INSTALL_OPTIONS =/s/-udeb/&-${suffix}/" \
         -e "/-abi-/s/ xserver-xorg-core/&-${suffix}/" \
         -e "s/--enable-dmx/--disable-dmx/" \
-        -e "s/--enable-kdrive/--disable-kdrive/" \
         -e "s/--enable-xnest/--disable-xnest/" \
         -e "s/--enable-xvfb/--disable-xvfb/" \
         -e "s/--enable-xfbdev/--disable-xfbdev/" \
@@ -487,7 +486,9 @@ elif [ "${old_package}" = "xorg-server" ]; then
         -i debian/rules.new
 
     if [ "${backport_arch}" = "precise" ]; then
-        sed -e "s/--enable-xephyr/--disable-xephyr/" -i debian/rules.new
+        sed -e "s/--enable-xephyr/--disable-xephyr/" \
+            -e "s/--enable-kdrive/--disable-kdrive/" \
+            -i debian/rules.new
     fi
 
     if [ "${new_package}" = "xorg-server-lts-trusty" ]; then

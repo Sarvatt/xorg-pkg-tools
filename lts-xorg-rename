@@ -25,8 +25,13 @@ conflicts="libxatracker1 (>= 0~), libgbm1 (>= 0~), libegl1-mesa (>= 0~), libegl1
 # add conflicts to xserver-xorg
 sed -e "s/Conflicts: xserver-xorg\$/&, ${conflicts}/" -i debian/control.new
 
+extrarecommends=""
+if [ "${backport_arch}" = "precise" ]; then
+	extrarecommends=", x11-xserver-utils-${suffix}"
+fi
+
 # add recommends to xserver-xorg
-sed -e "s/libgl1-mesa-dri-${suffix}/&, libgl1-mesa-glx-${suffix}, linux-generic-${suffix}, xserver-xorg-input-all-${suffix}, xserver-xorg-video-all-${suffix}, x11-xserver-utils-${suffix}/" -i debian/control.new
+sed -e "s/libgl1-mesa-dri-${suffix}/&, libgl1-mesa-glx-${suffix}, linux-generic-${suffix}, xserver-xorg-input-all-${suffix}, xserver-xorg-video-all-${suffix}${extrarecommends}/" -i debian/control.new
 
 # add xserver-xorg-renamed to provides
 sed -e "s/xserver\$/&, xserver-xorg-renamed/" -i debian/control.new
