@@ -39,7 +39,7 @@
 
 set -e
 
-extraversion="~~14.04~ppa"
+extraversion="~~14.04~ppa5."
 lts_codename="trusty"
 default_changelog_entry="Rebuild utopic packages in a ppa."
 
@@ -299,7 +299,7 @@ elif [ "${old_package}" = "xorg-server" ]; then
         extrakill=",xserver-xephyr"
     else
         # Build xephyr, it has dri3 support which is useful on trusty. :D
-        extrakill=""
+        extrakill=",xserver-xorg-xmir,xserver-common"
     fi
 
     ${basedir}/dpkg-control \
@@ -456,6 +456,20 @@ if [ "${old_package}" = "mesa" ]; then
             $dry sed -e "s/-ldrm${lib}/\$(shell \$(PKG_CONFIG) libdrm${lib} --libs)/" -i $(grep -l -r -- -ldrm${lib} src/)
         done
     fi
+
+    # libgbm1 is starting to be used now, install the override
+    if [ "${backport_arch}" = "trusty" ]; then
+        # libgbm1 is 'speshul', we have to override it because the version in trusty is too old.
+        # I don't believe it's harmful to keep libgbm1 renamed while using unrenamed stack,
+        # because the dri loader probably works with the old libgbm too.
+
+        for n in ${basedir}/lts-patches/libgbm1.*; do
+            sed -e s/@SUFFIX@/${suffix}/g < $n > debian/$(basename $n)
+        done
+        for n in debian/libgbm1.*; do mv $n ${n/libgbm1/libgbm1-${suffix}}; done
+
+        sed -e '/^\(Provides\|Conflicts\|Replaces\):/s/ \(libgbm1-dbg\|libgbm1\)\(,\|\)//' -i debian/control.new
+    fi
 elif [ "${old_package}" = "xorg-server" ]; then
     # Disable the udeb building
     # and fix the abi depends
@@ -477,6 +491,10 @@ elif [ "${old_package}" = "xorg-server" ]; then
     fi
 
     if [ "${new_package}" = "xorg-server-lts-trusty" ]; then
+        # DRI3 is too much work, and the new xtrans is only needed for the fd passing in DRI3.
+        # So stop building it altogether, and lower the requirements as needed to build with
+        # what's in precise.
+
         sed -e "/libxshmfence/d" \
             -e "/x11proto-present/d" \
             -e "/x11proto-dri3/d" \
@@ -489,11 +507,13 @@ elif [ "${old_package}" = "xorg-server" ]; then
             -e "s/--enable-mitshm/& --disable-xtrans-send-fds/" \
             -i debian/rules.new
 
-        # add a override for debian/rules
-        sed -e "/dh_shlibdeps/a\\\\tsed -i \'s/libgl1-mesa-glx /libgl1-mesa-glx-${suffix} /\' -i debian/xserver-xorg-core-${suffix}.substvars"
-            -i debian/rules.new
-
         sed -e '/XTRANS=/s/=.*/="xtrans >= 1.2.6"/' -i configure.ac
+    fi
+
+    if [ "${new_package}" = "xserver-xorg-lts-trusty" -o "${backport_arch}" = "trusty" ]; then
+        # add a override for debian/rules
+        sed -e "/dh_shlibdeps/a\\\\tsed -i \'s/libgl1-mesa-glx /libgl1-mesa-glx-${suffix} /\' -i debian/xserver-xorg-core-${suffix}.substvars" \
+            -i debian/rules.new
     fi
 
     sed -e '/ubuntu/s/$/~/' -i debian/serverminver
@@ -518,51 +538,62 @@ elif [ "${old_package}" = "xorg-server" ]; then
         echo ${x} >> debian/xserver-xorg-core-${suffix}.links
     fi
 
-    # xserver-common is weird, we cannot completely rename it, since we need the
-    # manpage from the original version, so fix things up..
-
-    # add diversion for protocol.txt
-    for n in ${basedir}/lts-patches/xserver-common.*; do
-        sed -e s/@SUFFIX@/${suffix}/g < $n > debian/$(basename $n)
-    done
-    for n in debian/xserver-common.*; do mv $n ${n/xserver-common/xserver-common-${suffix}}; done
-
-    # kill the manpage off from xserver-common
-    $dry sed -e "/man/d" -i debian/xserver-common-${suffix}.install
-    $dry sed -e "/appman_PRE/s/=.*/=/" -i man/Makefile.am
-
-    # now add in a hack to make xserver-common provide/replace/conflict xserver-common-renamed
-    # and add depend back on xserver-common for manpage
-    # libunwind7-dev is only available on i386 and amd64
-    # xmir is not available on precise, kill building it
-    # libxfixes does not break xorg-server per se, so just require
-    # a new enough version for -dev. unity needs a fix for pointer barriers,
-    # but the version in precise is older, so lower version requirement.
-    sed -e "s@xserver-common,@xserver-common-renamed,@" \
-        -e "s@xserver-common\$@xserver-common-renamed@" \
-        -e "s@x11-common@xserver-common, &@" \
-        -e "s@libunwind8-dev@libunwind7-dev [i386 amd64]@" \
-        -e "/libaudit-dev/d" -e "/libmir/d" -e "/XMir/d" \
-        -e "/^Architecture/s/: amd64 armhf i386\$/: invalid/" \
-        -e "/libxfixes3/d" -e "/libxfixes-dev/s/1:5.0.1/1:5.0-4ubuntu4.2~/" \
-        -e '/unity/s@7\.0\.2@5.20.0-0ubuntu3~@' \
-        -i debian/control.new
-
     # Special case, allow mesa-common-dev to satisfy depends for xserver-xorg-dev too..
     # This is to make sure that the normal mesa-dev packages work alongside with the
     # new stack, since some packages only work with the old libgl dev packages
     sed -e "s/mesa-common-dev-${suffix},/mesa-common-dev-${suffix} | mesa-common-dev (>= 0~),/" -i debian/control.new
 
-    # add -nr back as alias to -background none
-    $dry cp ${basedir}/lts-patches/xorg-server-legacy-bgnone.patch debian/patches
+    if [ "${backport_arch}" = "precise" ]; then
+        # xserver-common is weird, we cannot completely rename it, since we need the
+        # manpage from the original version, so fix things up..
 
-    echo xorg-server-legacy-bgnone.patch | $dry tee -a debian/patches/series
+        # add diversion for protocol.txt
+        for n in ${basedir}/lts-patches/xserver-common.*; do
+            sed -e s/@SUFFIX@/${suffix}/g < $n > debian/$(basename $n)
+        done
+        for n in debian/xserver-common.*; do mv $n ${n/xserver-common/xserver-common-${suffix}}; done
+
+        # kill the manpage off from xserver-common
+        $dry sed -e "/man/d" -i debian/xserver-common-${suffix}.install
+        $dry sed -e "/appman_PRE/s/=.*/=/" -i man/Makefile.am
+
+        # now add in a hack to make xserver-common provide/replace/conflict xserver-common-renamed
+        # and add depend back on xserver-common for manpage
+        # libunwind7-dev is only available on i386 and amd64
+        # xmir is not available on precise, kill building it
+        # libxfixes does not break xorg-server per se, so just require
+        # a new enough version for -dev. unity needs a fix for pointer barriers,
+        # but the version in precise is older, so lower version requirement.
+        sed -e "s@xserver-common,@xserver-common-renamed,@" \
+            -e "s@xserver-common\$@xserver-common-renamed@" \
+            -e "s@x11-common@xserver-common, &@" \
+            -e "s@libunwind8-dev@libunwind7-dev [i386 amd64]@" \
+            -e "/libaudit-dev/d" -e "/libmir/d" -e "/XMir/d" \
+            -e "/^Architecture/s/: amd64 armhf i386\$/: invalid/" \
+            -e "/libxfixes3/d" -e "/libxfixes-dev/s/1:5.0.1/1:5.0-4ubuntu4.2~/" \
+            -e '/unity/s@7\.0\.2@5.20.0-0ubuntu3~@' \
+            -i debian/control.new
+
+        # add -nr back as alias to -background none
+        $dry cp ${basedir}/lts-patches/xorg-server-legacy-bgnone.patch debian/patches
+
+        echo xorg-server-legacy-bgnone.patch | $dry tee -a debian/patches/series
+    else
+        # Don't bother overriding xserver-common, nothing really cares if we have the newest version.
+        sed -e '/xserver-common/s/ (>= ${source:Version})//' \
+            -e '/libmir/d' -i debian/control.new
+
+        # Prevent xserver manpage from being installed.
+        $dry sed -e "/appman_PRE/s/=.*/=/" -i man/Makefile.am
+    fi
 elif [ "${old_package}" = "xserver-xorg-video-intel" ]; then
-
-    # Can no longer rely on real name, so fixup
+    # Can no longer rely on real name, so fixup. Only affects quantal with libdrm rename.
     if [ -f src/xvmc/Makefile.am ]; then
         $dry sed -e 's/-ldrm_intel/@DRMINTEL_LIBS@/' -i src/xvmc/Makefile.am
     fi
+
+    # Fixup backlight helper.
+    sed -e "/xf86-video-intel-backlight-helper/s/xserver-xorg-video-intel/&-${suffix}/" -i debian/xserver-xorg-video-intel-${suffix}.install
 elif [ "${old_package}" = "xserver-xorg-video-fbdev" ]; then
     sed -e "/dh_install/s/\$(PACKAGE)-udeb/xserver-xorg-video-fbdev-udeb-${suffix}/" -i debian/rules.new
 elif [ "${old_package}" = "x11-xserver-utils" ]; then
@@ -593,7 +624,7 @@ elif [ "${old_package}" = "x11-xserver-utils" ]; then
     done
     for n in debian/x11-xserver-utils.*; do mv $n ${n/x11-xserver-utils/x11-xserver-utils-${suffix}}; done
 elif [ "${new_package}" = "xserver-xorg-input-synaptics-lts-trusty" ]; then
-    # bugfixed kde-config-touchpad
+    # require the bugfixed kde-config-touchpad, LP: #1328266
     sed -e '/kde-config-touchpad/s/-2/-1ubuntu1.3/' -i debian/control.new
 fi
 
