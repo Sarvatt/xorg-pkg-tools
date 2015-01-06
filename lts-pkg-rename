@@ -39,9 +39,9 @@
 
 set -e
 
-extraversion="~~14.04~ppa5."
-lts_codename="trusty"
-default_changelog_entry="Rebuild utopic packages in a ppa."
+extraversion="~trusty"
+lts_codename="trusty-proposed"
+default_changelog_entry="Rebuild utopic package for lts-trusty for all archs. (LP: #1400626)"
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -63,7 +63,7 @@ ERR() {
 }
 
 warn() {
-    echo "Error: $*" 2>&1
+    echo "Warning: $*" 2>&1
 }
 
 msg() {
@@ -115,20 +115,17 @@ suffix=$(grep "^xorg" "${rename_mapping_file}" | cut -d- -f2-)
 # Determine package name from the changelog
 changelog=debian/changelog
 if [ ! -e ${changelog} ]; then
-    dbg $PWD
-    ERR "Could not locate debian/changelog from the current dir"
+    ERR "Could not locate debian/changelog from the current dir ${PWD}"
 fi
 
 rules=debian/rules
 if [ ! -e ${rules} ]; then
-    dbg $PWD
-    ERR "Could not locate debian/rules from the current dir"
+    ERR "Could not locate debian/rules from the current dir ${PWD}"
 fi
 
 control=debian/control
 if [ ! -e ${rules} ]; then
-    msg $PWD
-    ERR "Could not locate debian/control from the current dir"
+    ERR "Could not locate debian/control from the current dir ${PWD}"
 fi
 
 old_package=$(head -n 1 ${changelog} | cut -d' ' -f1)
@@ -139,8 +136,7 @@ base_version=$(base_version ${old_package_version})
 old_binaries=$(grep ^Package: ${control} | grep -v -- -dbg | cut -f2 -d' ')
 
 if [[ "${old_package}" =~ ${suffix}$ ]]; then
-    dbg ${old_package}
-    warn "Already renamed"
+    warn "Already renamed ${old_package}"
     exit 0
 fi
 
@@ -167,6 +163,8 @@ if [ -f debian/changelog.old ]; then
 else
     cp debian/changelog debian/changelog.old
 fi
+# Geode has a changelog.dch file that breaks things, kill it just in case..
+rm -f debian/changelog.dch
 
 msg "Updating the maintainer..."
 update-maintainer -q
@@ -265,7 +263,7 @@ case "${suffix}" in
     ;;
 esac
 
-if [ "${suffix}" != "lts-quantal" ]; then
+if [ "${suffix}" != "lts-quantal" -a "$backport_arch" = "precise" ]; then
         # Suppress building arm packages, only i386 and amd64 are supported
         $dry sed -e "/^Architecture: any\$/s/:.*/: amd64 i386/" \
                  -e "/^Architecture: linux-any/s/:.*/: amd64 i386/" \
@@ -332,8 +330,7 @@ fi
 
 msg "Checking rules..."
 if ! grep -q ${old_package} ${rules}; then
-    dbg "${rules} mentions ${old_package}"
-    warn "Manual update of ${rules} required"
+    warn "Manual update of ${rules} required for ${old_package}"
 fi
 
 msg "Renaming binary install, etc. files..."
@@ -344,20 +341,6 @@ for pkg in ${old_binaries}; do
     newpkg="${pkg}-${suffix}"
 
     msg "- Renaming ${pkg}.* files to ${newpkg}.*"
-
-    set +e
-    files=$(ls debian/${pkg}.*)
-    err=$?
-    set -e
-    if [ $err -ne 0 ]; then
-	warn "Failed to list in ${old_package} for ${old_package} -> ${new_package}"
-	continue
-    fi
-    for old_file in $files; do
-	new_file=${old_file/${pkg}/${newpkg}}
-	$dry mv -v ${old_file} ${new_file}
-    # TODO: Maybe using 'rename' would be better?
-    done
 
     # Argh my eyes, so terribly sorry about this
     # substitute $(XXV) for ati
@@ -384,6 +367,20 @@ for pkg in ${old_binaries}; do
         -e "/DEB_DH_STRIP_ARGS/s/=${pkg}-dbg/=${pkg}-${suffix}-dbg/" \
 	-e "/--link-doc/s/=${pkg}/&-${suffix}/" \
         -i debian/rules.new
+
+    set +e
+    files=$(ls debian/${pkg}.*)
+    err=$?
+    set -e
+    if [ $err -ne 0 ]; then
+	warn "Failed to list in ${old_package} for ${pkg} -> ${newpkg}"
+	continue
+    fi
+    for old_file in $files; do
+	new_file=${old_file/${pkg}/${newpkg}}
+	$dry mv -v ${old_file} ${new_file}
+    # TODO: Maybe using 'rename' would be better?
+    done
 
     if [ -f "debian/${newpkg}.symbols" ]; then
         sed -e "s/ ${pkg} / ${newpkg} /" -i "debian/${newpkg}.symbols"

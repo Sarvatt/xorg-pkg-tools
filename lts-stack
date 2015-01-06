@@ -10,21 +10,29 @@
 #          (see http://www.opensource.org/licenses/mit-license.php)
 ########################################################################
 
-if [ -n "$1" ]; then
-    release="$1"
-else
-    release="trusty"
-fi
-
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
 else
     basedir="$(dirname $(readlink -e "$0"))"
 fi
 
+if [ -n "$1" ]; then
+    release="$1"
+else
+    release="$(basename $(pwd))"
+    if [ ! -f "${basedir}/lts-${release}-mapping.txt" ]; then
+        release="unknown"
+    fi
+fi
+
 set -e
 
 mapping="${basedir}/lts-${release}-mapping.txt"
+
+if [ ! -f "${mapping}" ]; then
+    echo Error: Unknown release ${release}
+    exit 1
+fi
 
 declare -A stack
 

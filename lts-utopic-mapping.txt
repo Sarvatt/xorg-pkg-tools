@@ -15,11 +15,16 @@ xserver-xorg-core-udeb		xserver-xorg-core-udeb-lts-utopic
 # xorg package, with xorg, *-video-all and *-input-all
 xorg				xorg-lts-utopic
 
-# DDX and other drivers, x86 only
-xf86-input-mtrack			xf86-input-mtrack-lts-utopic
-xserver-xorg-input-mtrack		xserver-xorg-input-mtrack-lts-utopic
-xf86-input-wacom			xf86-input-wacom-lts-utopic
-xserver-xorg-input-wacom		xserver-xorg-input-wacom-lts-utopic
+# DDX and other drivers
+xf86-input-mtrack		xf86-input-mtrack-lts-utopic
+xserver-xorg-input-mtrack	xserver-xorg-input-mtrack-lts-utopic
+xf86-input-wacom		xf86-input-wacom-lts-utopic
+xserver-xorg-input-wacom	xserver-xorg-input-wacom-lts-utopic
+
+# arm
+xf86-video-omap			xf86-video-omap-lts-utopic
+xserver-xorg-video-omap		xserver-xorg-video-omap-lts-utopic
+#xserver-xorg-video-freedreno	xserver-xorg-video-freedreno-lts-utopic
 
 xserver-xorg-input-evdev		xserver-xorg-input-evdev-lts-utopic
 xserver-xorg-input-evdev-dev		xserver-xorg-input-evdev-dev-lts-utopic
