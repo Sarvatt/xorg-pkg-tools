@@ -4,13 +4,18 @@ getp() {
  CHANGES+=("hook: Refresh $1")
 }
 
+#mesa 10.5.0
+#patch -p1 < $HOOKS/mesa-debian.patch
+#CHANGES+=("hook: Drop MIR support.")
 patch -p1 < $HOOKS/mesa-debian.patch
-CHANGES+=("hook: Drop MIR support.")
+CHANGES+=("hook: gbm/egl_gallium got dropped.")
+CHANGES+=("hook: Disable OpenVG support.")
+CHANGES+=("hook: Relax symbols check.")
 
-#mesa 10.2.0
-drop 02_gbm_no_undefined.diff upstream
-drop egl-platform-mir.patch fails
-drop 01_targets-xa-limit-the-amount-of-exported-symbols.diff upstream
+#drop egl-platform-mir.patch fails
+drop 01_gallium-util-add-missing-u_debug-include.patch upstream
+drop 07_gallium-fix-build-failure-on-powerpcspe.diff upstream
+drop fix-altivec-intrinsics.patch upstream
 
 ## Legacy unused hooks for reference
 
