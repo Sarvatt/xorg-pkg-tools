@@ -296,7 +296,7 @@ if __name__ == "__main__":
                 else:
                     print orig_line
 
-        elif 'Description' == prop or 'Vcs-Git' == prop or 'Vcs-Browser' == prop:
+        elif 'Description' == prop or 'Vcs-Git' == prop or 'Vcs-Browser' == prop or 'Homepage' == prop:
             print orig_line
 
         elif 'Replaces' == prop and replaces:

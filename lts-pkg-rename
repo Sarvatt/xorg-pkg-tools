@@ -387,6 +387,10 @@ for pkg in ${old_binaries}; do
     elif [ -n "$dry" -a "debian/${pkg}.symbols" ]; then
         $dry sed -e "s/ ${pkg} / ${newpkg} /" -i "debian/${newpkg}.symbols"
     fi
+
+    if [ -f "debian/${newpkg}.links" ]; then
+        $dry sed -e "s@bug/${pkg}/@bug/${newpkg}/@" -i "debian/${newpkg}.links"
+    fi
 done
 
 msg "Applying post-rename changes"
@@ -440,7 +444,7 @@ if [ "${old_package}" = "mesa" ]; then
         $dry sed -e /mir/d -i debian/patches/series
         $dry rm -f debian/patches/*mir*
         sed -e /mir/d -i debian/rules.new
-    else
+    elif [ "${backport_arch}" = "precise" ]; then
         sed -e "s/powerpc/armel &/" \
             -i debian/control.new
     fi
