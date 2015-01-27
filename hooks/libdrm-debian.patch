@@ -1,16 +1,16 @@
 diff --git a/debian/rules b/debian/rules
-index 3041981..a59c6ae 100755
+index c723001..77f8b0d 100755
 --- a/debian/rules
 +++ b/debian/rules
-@@ -82,16 +82,16 @@ endif
+@@ -88,18 +88,18 @@ endif
  	dh_strip -s --remaining-packages
  
  override_dh_makeshlibs:
 -	dh_makeshlibs -plibdrm2 -V'libdrm2 (>= 2.4.46)' --add-udeb=libdrm2-udeb -- -c4
 +	dh_makeshlibs -plibdrm2 -V'libdrm2 (>= 2.4.46)' --add-udeb=libdrm2-udeb -- -c1
  ifeq ($(INTEL), yes)
--	dh_makeshlibs -plibdrm-intel1 -V'libdrm-intel1 (>= 2.4.46)' -- -c4
-+	dh_makeshlibs -plibdrm-intel1 -V'libdrm-intel1 (>= 2.4.46)' -- -c1
+-	dh_makeshlibs -plibdrm-intel1 -V'libdrm-intel1 (>= 2.4.57)' -- -c4
++	dh_makeshlibs -plibdrm-intel1 -V'libdrm-intel1 (>= 2.4.57)' -- -c1
  endif
  ifeq ($(NOUVEAU), yes)
 -	dh_makeshlibs -plibdrm-nouveau2 -V'libdrm-nouveau2 (>= 2.4.38)' -- -c4
@@ -18,9 +18,13 @@ index 3041981..a59c6ae 100755
  endif
 -	dh_makeshlibs -plibdrm-radeon1 -V'libdrm-radeon1 (>= 2.4.39)' -- -c4
 +	dh_makeshlibs -plibdrm-radeon1 -V'libdrm-radeon1 (>= 2.4.39)' -- -c1
- ifeq ($(OMAP), yes)
+ ifeq ($(ARM), yes)
 -	dh_makeshlibs -plibdrm-omap1 -V'libdrm-omap1 (>= 2.4.38)' -- -c4
+-	dh_makeshlibs -plibdrm-freedreno1 -V'libdrm-freedreno1 (>= 2.4.57)' -- -c4
+-	dh_makeshlibs -plibdrm-exynos1 -V'libdrm-exynos1' -- -c4
 +	dh_makeshlibs -plibdrm-omap1 -V'libdrm-omap1 (>= 2.4.38)' -- -c1
++	dh_makeshlibs -plibdrm-freedreno1 -V'libdrm-freedreno1 (>= 2.4.57)' -- -c1
++	dh_makeshlibs -plibdrm-exynos1 -V'libdrm-exynos1' -- -c1
  endif
  
  %:
