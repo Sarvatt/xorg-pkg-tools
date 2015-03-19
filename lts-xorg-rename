@@ -35,7 +35,10 @@ extrarecommends=""
 if [ "${backport_arch}" = "precise" ]; then
 	extrarecommends=", x11-xserver-utils-${suffix}"
 else
-	extrarecommends=", libegl1-mesa-${suffix}, libegl1-mesa-drivers-${suffix}, libgbm1-${suffix}, libgles2-mesa-${suffix}, libgles1-mesa-${suffix}, libegl1-mesa-drivers-${suffix},"
+	extrarecommends=", libegl1-mesa-${suffix}, libegl1-mesa-drivers-${suffix}, libgbm1-${suffix}, libgles2-mesa-${suffix}, libgles1-mesa-${suffix},"
+	if [ "${suffix}" = "lts-utopic" ]; then
+		extrarecommends="${extrarecommends} libegl1-mesa-drivers-${suffix},"
+	fi
 fi
 
 # add recommends to xserver-xorg

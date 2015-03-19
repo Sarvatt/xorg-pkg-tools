@@ -39,9 +39,9 @@
 
 set -e
 
-extraversion="~trusty"
-lts_codename="trusty-proposed"
-default_changelog_entry="Rebuild utopic package for lts-trusty for all archs. (LP: #1400626)"
+extraversion="~~ppa3."
+lts_codename="trusty"
+default_changelog_entry="Initial ppa upload for lts-vivid."
 
 if [ "$0" = "$(basename "$0")" ]; then
     basedir="$(dirname $(readlink -e $(which "$0")))"
@@ -258,6 +258,10 @@ case "${suffix}" in
         backport_arch="trusty"
         extraconflicts=""
     ;;
+    lts-vivid)
+        backport_arch="trusty"
+        extraconflicts="xorg-renamed-package-lts-utopic,"
+    ;;
     *)
         ERR "unknown release ${suffix}"
     ;;
@@ -284,13 +288,19 @@ fi
 msg "Processing the control file..."
 
 if [ "${old_package}" = "mesa" ]; then
+    if [ "${backport_arch}" != "precise" -a "${new_package}" != "mesa-lts-utopic" ]; then
+        extrakill=",libegl1-mesa-drivers"
+    else
+        extrakill=""
+    fi
+
     ${basedir}/dpkg-control \
         --source-suffix ${suffix} \
         --binary-suffix ${suffix} \
         --mapping-file ${rename_mapping_file} \
         --add-replaces --add-provides --add-conflicts \
         --extra-conflicts "${extraconflicts}" \
-        --kill-binaries "libosmesa6,libosmesa6-dev,libgl1-mesa-dri-experimental,libgl1-mesa-dri-experimental-dbg" \
+        --kill-binaries "libosmesa6,libosmesa6-dev,libgl1-mesa-dri-experimental,libgl1-mesa-dri-experimental-dbg${extrakill}" \
         > ${control}.new
 elif [ "${old_package}" = "xorg-server" ]; then
     if [ "${backport_arch}" = "precise" ]; then
@@ -422,6 +432,8 @@ if [ "${old_package}" = "mesa" ]; then
 
         sed -e 's/--enable-dri3/--disable-dri3/' \
             -i debian/rules.new
+    elif [ "${backport_arch}" = "trusty" -a "${new_package}" != "mesa-lts-utopic" ]; then
+        sed -e "s@libegl1-mesa, ${extraprovides}@& libegl1-mesa-drivers,@" -i debian/control.new
     fi
 
     files="$(ls debian/*-i686.*)"
@@ -440,6 +452,7 @@ if [ "${old_package}" = "mesa" ]; then
 
     if grep -q libmir debian/control; then
         sed -e "/libmirclient-dev/d" \
+            -e "/mir-client-platform-mesa-dev/d" \
             -i debian/control.new
         $dry sed -e /mir/d -i debian/patches/series
         $dry rm -f debian/patches/*mir*
